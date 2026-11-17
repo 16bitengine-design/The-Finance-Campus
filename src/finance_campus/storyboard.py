@@ -85,6 +85,19 @@ def validate_storyboard(data: Any) -> list[str]:
                         errors.append(f"{item_prefix}.text must be a non-empty string")
                 elif isinstance(element[field], bool) or not isinstance(element[field], (int, float)) or not math.isfinite(element[field]):
                     errors.append(f"{item_prefix}.{field} must be a finite number")
+            motion = element.get("motion")
+            if motion is not None:
+                motion_fields = ("from_x", "from_y", "to_x", "to_y", "start_seconds", "end_seconds")
+                if not isinstance(motion, dict):
+                    errors.append(f"{item_prefix}.motion must be an object")
+                else:
+                    for motion_field in motion_fields:
+                        motion_value = motion.get(motion_field)
+                        if isinstance(motion_value, bool) or not isinstance(motion_value, (int, float)) or not math.isfinite(motion_value):
+                            errors.append(f"{item_prefix}.motion.{motion_field} must be a finite number")
+                    if all(isinstance(motion.get(field), (int, float)) and not isinstance(motion.get(field), bool) and math.isfinite(motion[field]) for field in motion_fields):
+                        if motion["start_seconds"] < 0 or motion["end_seconds"] <= motion["start_seconds"]:
+                            errors.append(f"{item_prefix}.motion timing must be non-negative and end after start")
             for timing_field in ("start_seconds", "draw_seconds"):
                 if timing_field in element:
                     timing_value = element[timing_field]
