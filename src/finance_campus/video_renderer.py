@@ -240,9 +240,11 @@ def render_video(
                 draw = ImageDraw.Draw(drawing)
                 elapsed = frame_index / draw_fps
                 for element_index, element in enumerate(elements):
-                    # Reveal each drawing in sequence during the first 65% of its scene.
-                    reveal_window = max(0.15, duration * 0.65 / max(1, len(elements)))
-                    start = element_index * reveal_window
+                    # Timed storyboard cues let each illustration react to the matching
+                    # narration phrase. Untimed elements retain sequential fallback timing.
+                    fallback_window = max(0.15, duration * 0.65 / max(1, len(elements)))
+                    start = float(element.get("start_seconds", element_index * fallback_window))
+                    reveal_window = float(element.get("draw_seconds", fallback_window))
                     progress = min(1.0, max(0.0, (elapsed - start) / reveal_window))
                     if progress > 0:
                         _draw_element(draw, element, progress, (draw_width, draw_height), coordinate_size)
