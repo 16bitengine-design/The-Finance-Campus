@@ -9,6 +9,8 @@ from pathlib import Path
 from finance_campus.config import load_yaml, validate_branding, validate_disclaimer
 from finance_campus.narration import synthesize_storyboard
 from finance_campus.production_pipeline import produce_video_from_script
+from finance_campus.research_pipeline import refresh_topics
+from finance_campus.script_generator import generate_from_library
 from finance_campus.script_pipeline import prepare_script
 from finance_campus.script_quality import validate_script
 from finance_campus.storyboard import render_storyboard, validate_storyboard
@@ -22,11 +24,14 @@ def _read_json(path: str) -> object:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="The Finance Campus project tools")
-    parser.add_argument("command", choices=("validate-config", "validate-script", "prepare-script", "validate-storyboard", "render-storyboard", "render-video", "synthesize-narration", "produce-video"))
+    parser.add_argument("command", choices=("validate-config", "validate-script", "prepare-script", "refresh-topics", "generate-script", "validate-storyboard", "render-storyboard", "render-video", "synthesize-narration", "produce-video"))
     parser.add_argument("script_path", nargs="?", help="Input JSON script or storyboard")
     parser.add_argument("output_path", nargs="?", help="Output path for approved data, SVGs, or MP4")
     parser.add_argument("--format", choices=("short", "long"), default="short", dest="video_format")
     parser.add_argument("--fps", type=int, default=30)
+    parser.add_argument("--target", type=int, default=20, help="Number of new topics to attempt")
+    parser.add_argument("--topic-id", help="Topic ID to use for generate-script")
+    parser.add_argument("--duration", choices=("short", "long"), default="short")
     parser.add_argument("--draw-fps", type=int, default=24)
     parser.add_argument("--audio", help="Optional narration audio file to mux into the MP4")
     parser.add_argument("--captions", help="Optional SRT captions file to burn into the video")
@@ -36,6 +41,26 @@ def main() -> int:
     parser.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
     parser.add_argument("--scene-tail-seconds", type=float, default=0.35)
     args = parser.parse_args()
+    if args.command == "refresh-topics":
+        if not args.script_path:
+            parser.error("refresh-topics requires a topic-library JSON path")
+        try:
+            report = refresh_topics(args.script_path, target=args.target)
+            print(json.dumps(report, ensure_ascii=False, indent=2))
+            return 0 if report["target_met"] else 2
+        except (OSError, RuntimeError, ValueError) as exc:
+            print(f"FAIL topic research: {exc}")
+            return 1
+    if args.command == "generate-script":
+        if not args.script_path or not args.output_path or not args.topic_id:
+            parser.error("generate-script requires topic-library path, output path, and --topic-id")
+        try:
+            report = generate_from_library(args.script_path, args.topic_id, args.output_path, duration=args.duration)
+            print(json.dumps(report, ensure_ascii=False, indent=2))
+            return 0
+        except (OSError, RuntimeError, ValueError) as exc:
+            print(f"FAIL script generation: {exc}")
+            return 1
     if args.command == "produce-video":
         if not args.script_path or not args.output_path:
             parser.error("produce-video requires an approved script JSON and an output directory")
