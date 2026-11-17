@@ -141,3 +141,62 @@ def test_sentence_groups_split_very_long_sentences_without_losing_words():
     groups = _sentence_groups(sentence)
     assert all(len(group.split()) <= 24 for group in groups)
     assert [word for group in groups for word in group.split()] == sentence.split()
+
+
+def test_kokoro_token_timestamps_produce_word_synchronized_caption_groups(tmp_path):
+    from types import SimpleNamespace
+
+    class TimedPipeline:
+        def __call__(self, text, *, voice, speed):
+            audio = np.ones(24000, dtype=np.float32) * 0.08
+            tokens = [
+                SimpleNamespace(text="Money", start_ts=0.10, end_ts=0.32),
+                SimpleNamespace(text="arrives", start_ts=0.34, end_ts=0.62),
+                SimpleNamespace(text="today.", start_ts=0.64, end_ts=0.95),
+            ]
+            yield SimpleNamespace(audio=audio, tokens=tokens)
+
+    result = synthesize_storyboard(
+        {
+            "canvas": {"width": 1000, "height": 562},
+            "scenes": [{
+                "id": "timed",
+                "narration": "Money arrives today.",
+                "duration_seconds": 2,
+                "elements": [{"type": "coin", "x": 100, "y": 100, "width": 80, "height": 80}],
+            }],
+        },
+        tmp_path,
+        pipeline_factory=lambda **kwargs: TimedPipeline(),
+        transition_seconds=0,
+        scene_tail_seconds=0,
+    )
+    captions = Path(result["captions_path"]).read_text(encoding="utf-8")
+    assert "Money arrives today." in captions
+    assert "00:00:00,100 --> 00:00:00,950" in captions
+
+
+def test_kokoro_without_token_timings_uses_phrase_level_not_fake_word_timing(tmp_path):
+    class UntimedPipeline:
+        def __call__(self, text, *, voice, speed):
+            audio = np.ones(24000, dtype=np.float32) * 0.08
+            yield SimpleNamespace(audio=audio, tokens=None)
+
+    result = synthesize_storyboard(
+        {
+            "canvas": {"width": 1000, "height": 562},
+            "scenes": [{
+                "id": "untimed",
+                "narration": "Money arrives today.",
+                "duration_seconds": 2,
+                "elements": [{"type": "coin", "x": 100, "y": 100, "width": 80, "height": 80}],
+            }],
+        },
+        tmp_path,
+        pipeline_factory=lambda **kwargs: UntimedPipeline(),
+        transition_seconds=0,
+        scene_tail_seconds=0,
+    )
+    captions = Path(result["captions_path"]).read_text(encoding="utf-8")
+    assert "Money arrives today." in captions
+    assert "00:00:00,000 --> 00:00:01,000" in captions
