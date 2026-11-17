@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
+from finance_campus.caption_qc import validate_srt
 from finance_campus.config import load_yaml, validate_branding, validate_disclaimer
 from finance_campus.disclaimers import append_description_disclaimer, disclaimer_texts
 from finance_campus.narration import synthesize_storyboard
@@ -145,6 +146,15 @@ def produce_video_from_script(
     )
     media = _probe_video(video_path, video_format=video_format)
     narration_duration = float(narration["duration_seconds"])
+    timed_scenes = timed_storyboard["scenes"]
+    expected_speech_seconds = sum(
+        float(scene["narration_audio_seconds"]) for scene in timed_scenes
+    )
+    caption_report = validate_srt(
+        narration["captions_path"],
+        audio_duration_seconds=narration_duration,
+        expected_speech_seconds=expected_speech_seconds,
+    )
     duration_tolerance = max(0.15, 2 / fps)
     duration_alignment_passed = abs(media["duration_seconds"] - narration_duration) <= duration_tolerance
     if not duration_alignment_passed:
@@ -197,6 +207,9 @@ def produce_video_from_script(
             "storyboard_generated": True,
             "kokoro_narration_generated": True,
             "captions_generated": True,
+            "captions_validated": caption_report["passed"],
+            "caption_cue_count": caption_report["cue_count"],
+            "caption_speech_coverage_ratio": caption_report["speech_coverage_ratio"],
             "video_rendered": True,
             "media_streams_verified": True,
             "audio_video_duration_aligned": duration_alignment_passed,
@@ -208,6 +221,7 @@ def produce_video_from_script(
         "video_format": video_format,
         "sources": sources,
         "narration": narration,
+        "captions": caption_report,
         "media": media,
         "quality_errors": quality.errors,
         "artifacts": {
