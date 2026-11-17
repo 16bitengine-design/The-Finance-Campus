@@ -132,3 +132,16 @@ def test_all_book_inspiration_blueprints_are_compatible_with_script_generator():
         assert blueprint["inspiration"]["author"] in explanation
         assert blueprint["inspiration"]["work"] in explanation
         assert "“" not in explanation
+
+
+def test_generated_scripts_report_realistic_narration_duration():
+    short = generate_script(topic(), duration="short")
+    long = generate_script(topic(), duration="long")
+    for script in (short, long):
+        metrics = script["script_generation"]
+        assert metrics["spoken_word_count"] > 0
+        assert metrics["estimated_duration_seconds"] == round(
+            metrics["spoken_word_count"] / 145 * 60
+        )
+    assert long["script_generation"]["duration_fit"] == "under_target"
+    assert long["script_generation"]["estimated_duration_seconds"] < 300
