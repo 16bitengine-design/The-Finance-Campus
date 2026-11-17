@@ -55,6 +55,21 @@ def test_validate_srt_rejects_bad_caption_timing(tmp_path, body, message):
         )
 
 
+def test_validate_srt_allows_natural_word_timing_gaps_when_timeline_is_complete(tmp_path):
+    path = _write(
+        tmp_path,
+        "1\n00:00:00,000 --> 00:00:01,000\nThe first phrase\n\n"
+        "2\n00:00:01,500 --> 00:00:02,500\nThe second phrase\n",
+    )
+    report = validate_srt(
+        path, audio_duration_seconds=3.0, expected_speech_seconds=2.5
+    )
+    assert report["passed"] is True
+    assert report["caption_covered_seconds"] == 2.0
+    assert report["caption_timeline_span_seconds"] == 2.5
+    assert report["speech_coverage_ratio"] == 1.0
+
+
 def test_validate_srt_rejects_non_sequential_cue_numbers(tmp_path):
     path = _write(tmp_path, "2\n00:00:00,000 --> 00:00:01,000\nCaption")
     with pytest.raises(ValueError, match="numbering is not sequential"):
