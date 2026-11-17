@@ -25,6 +25,7 @@ def main() -> int:
     parser.add_argument("output_path", nargs="?", help="Output path for approved data, SVGs, or MP4")
     parser.add_argument("--format", choices=("short", "long"), default="short", dest="video_format")
     parser.add_argument("--fps", type=int, default=30)
+    parser.add_argument("--draw-fps", type=int, default=24)
     parser.add_argument("--audio", help="Optional narration audio file to mux into the MP4")
     parser.add_argument("--captions", help="Optional SRT captions file to burn into the video")
     parser.add_argument("--transition-seconds", type=float, default=0.25)
@@ -89,7 +90,7 @@ def main() -> int:
                 for output in render_storyboard(storyboard, args.output_path):
                     print(f"RENDERED SVG: {output}")
             else:
-                output = render_video(storyboard, args.output_path, video_format=args.video_format, fps=args.fps, audio_path=args.audio, captions_path=args.captions, transition_seconds=args.transition_seconds)
+                output = render_video(storyboard, args.output_path, video_format=args.video_format, fps=args.fps, draw_fps=args.draw_fps, audio_path=args.audio, captions_path=args.captions, transition_seconds=args.transition_seconds)
                 print(f"RENDERED MP4: {output} ({args.video_format}, {args.fps} fps)")
             return 0
         except (OSError, RuntimeError, ValueError) as exc:
