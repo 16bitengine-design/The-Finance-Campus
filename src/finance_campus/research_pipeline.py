@@ -17,7 +17,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
 
-from finance_campus.feed_discovery import discover_from_official_feeds
+from finance_campus.mindset_topics import MINDSET_TOPIC_BLUEPRINTS
 from finance_campus.topics import add_topic, load_topics, save_topics
 
 
@@ -134,27 +134,9 @@ def refresh_topics(
     cache: dict[str, dict[str, Any]] = {}
     added: list[dict[str, Any]] = []
     rejected: list[dict[str, str]] = []
-    discovery_feed_counts: dict[str, int] = {}
-
-    # Discover from trusted official feeds first; curated blueprints fill any shortfall.
-    if fetcher is _default_fetcher:
-        discovered, feed_rejected, discovery_feed_counts = discover_from_official_feeds(
-            existing_topics=topics,
-            target=target,
-            timestamp=timestamp,
-            article_fetcher=fetcher,
-        )
-    else:
-        discovered, feed_rejected, discovery_feed_counts = [], [], {"discovery": 0}
-    rejected.extend(feed_rejected)
-    for discovered_topic in discovered:
-        if len(added) >= target:
-            break
-        if add_topic(topics, discovered_topic):
-            added.append(discovered_topic)
-            known.add(str(discovered_topic["id"]))
-
-    for blueprint in TOPIC_BLUEPRINTS:
+    # Topic discovery is deliberately evergreen and mindset-first. News feeds are
+    # not used to set the editorial agenda; official sources only validate principles.
+    for blueprint in MINDSET_TOPIC_BLUEPRINTS:
         if len(added) >= target:
             break
         topic_id = "TFC-" + hashlib.sha1(blueprint["slug"].encode()).hexdigest()[:10].upper()
@@ -208,6 +190,7 @@ def refresh_topics(
                 "action": blueprint["action"],
             },
             "topic_slug": blueprint["slug"],
+            "discovery_metadata": {"method": "evergreen_money_mindset_blueprint", "candidate_only": True},
         }
         if add_topic(topics, topic):
             added.append(topic)
@@ -220,12 +203,12 @@ def refresh_topics(
         "library_count": len(topics),
         "added": added,
         "rejected": rejected,
-        "discovery_feed_counts": discovery_feed_counts,
-        "discovered_topic_count": sum(1 for item in added if item.get("discovery_metadata", {}).get("method") == "official_rss_atom"),
-        "curated_fallback_topic_count": sum(1 for item in added if not item.get("discovery_metadata")),
+        "discovery_method": "evergreen_money_mindset_blueprints",
+        "news_feed_topics_added": 0,
+        "mindset_topics_added": len(added),
         "target_met": len(added) >= target,
         "saved_to": str(library_path),
-        "research_limitations": "Official RSS/Atom feeds are scanned for finance-related headlines, article pages are checked for readability and trusted publisher domains, and curated topics fill any shortfall. Claim-level source support is not automatically proven; all candidates require editorial review.",
+        "research_limitations": "Topics are selected from an evergreen money-mindset library. Official source pages are checked for reachability and mapped relevance keywords; this does not prove claim-level support. Every candidate requires editorial review.",
     }
 
 
