@@ -6,7 +6,7 @@ import json
 import sys
 from pathlib import Path
 
-from finance_campus.config import load_yaml, validate_branding, validate_disclaimer
+from finance_campus.config import load_yaml, validate_branding, validate_disclaimer, validate_settings
 from finance_campus.narration import synthesize_storyboard
 from finance_campus.production_pipeline import produce_video_from_script
 from finance_campus.research_pipeline import refresh_topics
@@ -89,7 +89,7 @@ def main() -> int:
             print(f"FAIL production: {exc}")
             return 1
     if args.command == "validate-config":
-        checks = {"branding": validate_branding(load_yaml("config/branding.yaml")), "disclaimer": validate_disclaimer(load_yaml("config/disclaimer.yaml"))}
+        checks = {"branding": validate_branding(load_yaml("config/branding.yaml")), "disclaimer": validate_disclaimer(load_yaml("config/disclaimer.yaml")), "settings": validate_settings(load_yaml("config/settings.yaml"))}
         failed = False
         for name, errors in checks.items():
             if errors:
