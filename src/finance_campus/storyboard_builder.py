@@ -65,7 +65,7 @@ def _element(kind: str, x: float, y: float, width: float, height: float, color: 
 
 def _scene_elements(text: str, section: str, title: str, width: int, height: int) -> list[dict[str, Any]]:
     """Compose a distinct illustrated story beat for each part of the lesson."""
-    (first, second, third), _, _ = _visual_types(text, section)
+    _, _, _ = _visual_types(text, section)
     # A stable per-video signature varies composition and accent choices without
     # introducing randomness between retries of the same production.
     signature = hashlib.sha256(f"{title}|{section}|{text}".encode("utf-8")).hexdigest()
