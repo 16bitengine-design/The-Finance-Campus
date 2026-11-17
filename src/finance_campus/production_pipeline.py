@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 from finance_campus.caption_qc import validate_srt
 from finance_campus.config import load_yaml, validate_branding, validate_disclaimer
 from finance_campus.disclaimers import append_description_disclaimer, disclaimer_texts
+from finance_campus.final_video_qc import validate_final_video
 from finance_campus.narration import synthesize_storyboard
 from finance_campus.quality_gates import validate_video_package
 from finance_campus.script_pipeline import prepare_script
@@ -145,6 +146,9 @@ def produce_video_from_script(
         transition_seconds=transition_seconds,
     )
     media = _probe_video(video_path, video_format=video_format)
+    final_video_report = validate_final_video(
+        video_path, video_format=video_format, expected_fps=fps,
+    )
     narration_duration = float(narration["duration_seconds"])
     timed_scenes = timed_storyboard["scenes"]
     expected_speech_seconds = sum(
@@ -196,7 +200,10 @@ def produce_video_from_script(
         brand_validation_passed=not brand_errors,
         script_validation_passed=report.passed,
         audio_validation_passed=Path(narration["audio_path"]).is_file() and narration["duration_seconds"] > 0,
-        video_validation_passed=video_path.is_file() and media["duration_seconds"] > 0,
+        video_validation_passed=(
+            video_path.is_file() and media["duration_seconds"] > 0
+            and final_video_report["passed"]
+        ),
     )
     manifest = {
         "title": script["title"],
@@ -212,6 +219,7 @@ def produce_video_from_script(
             "caption_speech_coverage_ratio": caption_report["speech_coverage_ratio"],
             "video_rendered": True,
             "media_streams_verified": True,
+            "final_video_qc_passed": final_video_report["passed"],
             "audio_video_duration_aligned": duration_alignment_passed,
             "quality_gate_passed": quality.passed,
             "uploaded": False,
@@ -223,6 +231,7 @@ def produce_video_from_script(
         "narration": narration,
         "captions": caption_report,
         "media": media,
+        "final_video_qc": final_video_report,
         "quality_errors": quality.errors,
         "artifacts": {
             "approved_script": str(approved_script_path),
