@@ -49,7 +49,7 @@ def test_production_pipeline_runs_all_stages_and_fails_closed(monkeypatch, tmp_p
         "_probe_video",
         lambda path, video_format: {
             "width": 1080, "height": 1920, "audio_sample_rate": 24000,
-            "audio_channels": 1, "duration_seconds": 12.0,
+            "audio_channels": 1, "duration_seconds": 4.0,
         },
     )
 
@@ -62,6 +62,7 @@ def test_production_pipeline_runs_all_stages_and_fails_closed(monkeypatch, tmp_p
     assert manifest["stages"]["kokoro_narration_generated"]
     assert manifest["stages"]["video_rendered"]
     assert manifest["stages"]["quality_gate_passed"]
+    assert manifest["stages"]["audio_video_duration_aligned"]
     assert manifest["stages"]["uploaded"] is False
     assert Path(manifest["artifacts"]["description"]).is_file()
     assert Path(manifest["artifacts"]["video"]).is_file()
