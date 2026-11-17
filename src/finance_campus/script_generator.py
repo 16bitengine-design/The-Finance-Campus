@@ -37,11 +37,44 @@ def generate_script(topic: dict[str, Any], *, duration: str = "short") -> dict[s
     stakes = brief["stakes"]
     explanation = brief["explanation"]
     action = brief["action"]
+    inspiration = topic.get("inspiration")
+    inspiration_line = ""
+    if inspiration is not None:
+        if not isinstance(inspiration, dict):
+            raise ValueError("inspiration must be a structured, source-verified record")
+        required_inspiration = ("kind", "author", "work", "source_url", "text")
+        if any(not isinstance(inspiration.get(key), str) or not inspiration[key].strip() for key in required_inspiration):
+            raise ValueError("inspiration requires kind, author, work, source_url and text")
+        source_url = inspiration["source_url"].strip()
+        if not source_url.startswith(("https://", "http://")):
+            raise ValueError("inspiration source_url must be HTTP(S)")
+        if inspiration.get("verification") != "author_and_original_work_verified":
+            raise ValueError("inspiration author and original work must be verified")
+        if inspiration["kind"] == "paraphrase":
+            if inspiration.get("original_wording_reused") is True:
+                raise ValueError("paraphrased inspiration must use independently written wording")
+            inspiration_line = (
+                f" A useful idea discussed by {inspiration['author']} in "
+                f"{inspiration['work']} is this: {inspiration['text']}"
+            )
+        elif inspiration["kind"] == "direct_quote":
+            if inspiration.get("rights_basis") not in {"public_domain", "permission_granted", "compatible_license"}:
+                raise ValueError("direct quotation requires verified public-domain status, permission or a compatible licence")
+            if inspiration.get("rights_verified") is not True:
+                raise ValueError("direct quotation rights must be verified for the intended use and territory")
+            if len(inspiration["text"].split()) > 15:
+                raise ValueError("direct quotation exceeds the project's 15-word editorial limit")
+            inspiration_line = (
+                f" As {inspiration['author']} wrote in {inspiration['work']}: "
+                f"“{inspiration['text']}”"
+            )
+        else:
+            raise ValueError("inspiration kind must be paraphrase or direct_quote")
     if duration == "short":
         sections = {
             "relatable_financial_problem": f"Have you ever found yourself in this situation? {problem}",
             "escalating_real_world_stakes": f"Here is the part people often miss: {stakes}",
-            "clear_explanation_of_why_it_matters": f"Here is the money lesson: {explanation}",
+            "clear_explanation_of_why_it_matters": f"Here is the money lesson: {explanation}{inspiration_line}",
             "hopeful_and_realistic_possibility": "This pattern does not have to define your future. You may not control every circumstance, but you can learn to recognise the pattern and make a more deliberate next decision.",
             "practical_action_viewers_can_take": f"Try this: {action}",
             "empowering_close": "Do not measure your progress by appearances or someone else's timeline. Make the next decision with intention. Learn, apply, and grow.",
@@ -68,6 +101,7 @@ def generate_script(topic: dict[str, Any], *, duration: str = "short") -> dict[s
         "target_duration_seconds": target_seconds,
         "sections": sections,
         "sources": [item["url"] for item in source_records],
+        "inspiration": inspiration,
         "source_records": source_records,
         "claims": [
             {
