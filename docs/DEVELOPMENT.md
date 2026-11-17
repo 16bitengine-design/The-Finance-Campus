@@ -38,3 +38,16 @@ Prefer GitHub Actions for tasks that can run reliably inside this repository. Do
 - If a required step has no viable zero-cost path, stop and explain the constraint rather than activating a paid service.
 
 See config/cost-policy.md.
+## Unattended operating requirement
+The intended production mode is fully unattended after one-time setup and platform authorization. No routine human approval is required for topic selection, research, scripting, storyboarding, illustration, Kokoro narration, rendering, quality checks, scheduled publishing, or publication verification.
+
+Automation must:
+- Run the complete scheduled pipeline without waiting for a person between stages.
+- Enforce every financial accuracy, source, disclaimer, originality, audio, visual, and media-integrity gate automatically.
+- Publish automatically only when every required gate passes and platform authorization is valid.
+- Retry transient failures with bounded backoff; never loop indefinitely or duplicate a post.
+- Record each stage and retain evidence for upload acceptance and public availability.
+- Notify the operator about blocking failures, expired credentials, quota limits, or platform restrictions; do not bypass safeguards.
+- Resume safely from recorded state after interruptions.
+
+One-time setup still requires valid platform account authorization and any platform-mandated app review or permissions. These external requirements cannot be automated away. The current implementation is not yet fully operational; keep publishing disabled until end-to-end tests pass.
