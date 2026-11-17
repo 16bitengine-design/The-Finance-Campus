@@ -73,6 +73,84 @@ def _audio_array(value: Any) -> np.ndarray:
     return audio
 
 
+def _synthesize_chunk_with_timestamps(
+    pipeline: Any, text: str, voice: str, speed: float,
+) -> tuple[np.ndarray, list[tuple[str, float, float]]]:
+    """Return normalized audio and genuine Kokoro word timings when available."""
+    pieces: list[np.ndarray] = []
+    timed_words: list[tuple[str, float, float]] = []
+    audio_offset = 0.0
+    try:
+        generated = pipeline(text, voice=voice, speed=speed)
+        for item in generated:
+            if hasattr(item, "audio"):
+                chunk_audio = item.audio
+            elif isinstance(item, (tuple, list)) and len(item) >= 3:
+                chunk_audio = item[2]
+            else:
+                raise RuntimeError(
+                    "Unexpected Kokoro output; expected a Result with .audio "
+                    "or (graphemes, phonemes, audio)"
+                )
+            if chunk_audio is None:
+                continue
+            audio = _audio_array(chunk_audio)
+            pieces.append(audio)
+            tokens = getattr(item, "tokens", None) or []
+            for token in tokens:
+                word = str(getattr(token, "text", "") or "").strip()
+                start = getattr(token, "start_ts", None)
+                end = getattr(token, "end_ts", None)
+                if not word or start is None or end is None:
+                    continue
+                try:
+                    start_value, end_value = float(start), float(end)
+                except (TypeError, ValueError):
+                    continue
+                if math.isfinite(start_value) and math.isfinite(end_value) and 0 <= start_value < end_value:
+                    timed_words.append((word, audio_offset + start_value, audio_offset + end_value))
+            audio_offset += len(audio) / SAMPLE_RATE
+    except Exception as exc:
+        raise RuntimeError(f"Kokoro synthesis failed for narration chunk: {exc}") from exc
+    if not pieces:
+        raise RuntimeError("Kokoro produced no audio chunks")
+    # Kokoro exposes token timestamps for English voices. If timings are absent
+    # or materially incomplete, callers must use a truthful phrase-level cue.
+    expected_words = max(1, len(text.split()))
+    if len(timed_words) < expected_words * 0.8:
+        timed_words = []
+    return np.concatenate(pieces), timed_words
+
+
+def _group_timed_words(
+    words: list[tuple[str, float, float]], *, max_chars: int = 38, max_words: int = 5,
+) -> list[tuple[str, float, float]]:
+    """Group genuine word timings into readable caption phrases."""
+    groups: list[tuple[str, float, float]] = []
+    pending: list[tuple[str, float, float]] = []
+
+    def flush() -> None:
+        if pending:
+            groups.append((
+                " ".join(item[0] for item in pending),
+                pending[0][1],
+                pending[-1][2],
+            ))
+            pending.clear()
+
+    for word in words:
+        candidate = " ".join([item[0] for item in pending] + [word[0]])
+        pending.append(word)
+        if (
+            len(pending) >= max_words
+            or len(candidate) >= max_chars
+            or word[0][-1:] in ".!?;:"
+        ):
+            flush()
+    flush()
+    return groups
+
+
 def _synthesize_chunk(pipeline: Any, text: str, voice: str, speed: float) -> np.ndarray:
     pieces: list[np.ndarray] = []
     try:
@@ -181,15 +259,26 @@ def synthesize_storyboard(
         scene_parts: list[np.ndarray] = []
         scene_offset = 0.0
         for group in groups:
-            audio = _synthesize_chunk(pipeline, group, voice, speed)
+            audio, word_timings = _synthesize_chunk_with_timestamps(pipeline, group, voice, speed)
             duration = len(audio) / SAMPLE_RATE
             scene_parts.append(audio)
-            captions.append(
-                f"{cue_number}\n{_timestamp(timeline + scene_offset)} --> "
-                f"{_timestamp(timeline + scene_offset + duration)}\n"
-                f"{_caption_lines(group)}\n"
-            )
-            cue_number += 1
+            if word_timings:
+                for caption_text, start, end in _group_timed_words(word_timings):
+                    captions.append(
+                        f"{cue_number}\n{_timestamp(timeline + scene_offset + start)} --> "
+                        f"{_timestamp(timeline + scene_offset + end)}\n"
+                        f"{_caption_lines(caption_text)}\n"
+                    )
+                    cue_number += 1
+            else:
+                # Fallback is deliberately phrase-level. Never fabricate word
+                # timing by evenly dividing a phrase's duration.
+                captions.append(
+                    f"{cue_number}\n{_timestamp(timeline + scene_offset)} --> "
+                    f"{_timestamp(timeline + scene_offset + duration)}\n"
+                    f"{_caption_lines(group)}\n"
+                )
+                cue_number += 1
             scene_offset += duration
         speech = np.concatenate(scene_parts)
         speech_duration = len(speech) / SAMPLE_RATE
