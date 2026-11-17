@@ -5,7 +5,12 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from finance_campus.narration import (SUPPORTED_VOICES, _sentence_groups, _synthesize_chunk, synthesize_storyboard)
+from finance_campus.narration import (
+    SUPPORTED_VOICES,
+    _sentence_groups,
+    _synthesize_chunk,
+    synthesize_storyboard,
+)
 
 
 class FakeKokoroPipeline:
