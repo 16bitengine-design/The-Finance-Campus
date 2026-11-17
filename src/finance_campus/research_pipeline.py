@@ -15,6 +15,7 @@ from datetime import UTC, datetime
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 from finance_campus.mindset_topics import MINDSET_TOPIC_BLUEPRINTS
 from finance_campus.topics import add_topic, load_topics, save_topics
@@ -144,6 +145,26 @@ def refresh_topics(
             source_result = cache[source_key]
             if source_result.get("status") != 200:
                 raise ValueError("Source did not return HTTP 200")
+
+            configured_url = urlparse(source_meta["url"])
+            expected_domain = source_meta["domain"].casefold().lstrip(".")
+            if configured_url.scheme != "https" or not (
+                configured_url.hostname
+                and (
+                    configured_url.hostname.casefold() == expected_domain
+                    or configured_url.hostname.casefold().endswith("." + expected_domain)
+                )
+            ):
+                raise ValueError("Configured source URL is not HTTPS on its approved publisher domain")
+
+            final_url = str(source_result.get("final_url") or source_meta["url"])
+            final_parsed = urlparse(final_url)
+            final_host = (final_parsed.hostname or "").casefold()
+            if final_parsed.scheme != "https" or not (
+                final_host == expected_domain or final_host.endswith("." + expected_domain)
+            ):
+                raise ValueError("Source redirected away from its approved HTTPS publisher domain")
+
             page_text = str(source_result.get("text", "")).casefold()
             matched = []
             required_matches = 0
@@ -159,6 +180,7 @@ def refresh_topics(
                 raise ValueError("Source page has no extracted text for relevance checking")
             source_record = {
                 "url": source_meta["url"],
+                "final_url": final_url,
                 "matched_keywords": matched,
                 "keyword_match_threshold": required_matches,
                 "publisher": source_meta["publisher"],
