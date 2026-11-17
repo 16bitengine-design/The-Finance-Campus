@@ -22,7 +22,7 @@ SUPPORTED_VOICES = {
 
 def _sentence_groups(text: str, *, min_words: int = 12, max_words: int = 38) -> list[str]:
     """Group complete sentences into natural Kokoro chunks, avoiding tiny utterances."""
-    sentences = [part.strip() for part in re.split(r"(?<=[.!?])\\s+", text.strip()) if part.strip()]
+    sentences = [part.strip() for part in re.split(r"(?<=[.!?])\s+", text.strip()) if part.strip()]
     if not sentences:
         raise ValueError("Scene narration is empty")
     groups: list[str] = []
@@ -97,7 +97,7 @@ def _caption_lines(text: str, width: int = 42) -> str:
             current = candidate
     if current:
         lines.append(current)
-    return "\\n".join(lines[:3])
+    return "\n".join(lines[:3])
 
 
 def synthesize_storyboard(
@@ -162,9 +162,9 @@ def synthesize_storyboard(
             duration = len(audio) / SAMPLE_RATE
             scene_parts.append(audio)
             captions.append(
-                f"{cue_number}\\n{_timestamp(timeline + scene_offset)} --> "
-                f"{_timestamp(timeline + scene_offset + duration)}\\n"
-                f"{_caption_lines(group)}\\n"
+                f"{cue_number}\n{_timestamp(timeline + scene_offset)} --> "
+                f"{_timestamp(timeline + scene_offset + duration)}\n"
+                f"{_caption_lines(group)}\n"
             )
             cue_number += 1
             scene_offset += duration
@@ -198,9 +198,9 @@ def synthesize_storyboard(
     captions_path = destination / "captions.srt"
     storyboard_path = destination / "storyboard_with_audio_timing.json"
     sf.write(str(audio_path), final_audio, SAMPLE_RATE, subtype="PCM_16")
-    captions_path.write_text("\\n".join(captions), encoding="utf-8")
+    captions_path.write_text("\n".join(captions), encoding="utf-8")
     storyboard_path.write_text(
-        json.dumps(updated, ensure_ascii=False, indent=2) + "\\n",
+        json.dumps(updated, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
     info = sf.info(str(audio_path))
