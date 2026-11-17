@@ -1,4 +1,9 @@
-from finance_campus.config import load_yaml, validate_branding, validate_disclaimer, validate_settings
+from finance_campus.config import (
+    load_yaml,
+    validate_branding,
+    validate_disclaimer,
+    validate_settings,
+)
 
 
 def test_brand_configuration_passes():
