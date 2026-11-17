@@ -31,6 +31,9 @@ def test_generate_short_script_contains_all_required_sections():
         "practical_action_viewers_can_take", "empowering_close",
     }
     assert script["format"] == "short"
+    assert script["sections"]["relatable_financial_problem"].startswith("Have you ever")
+    assert script["sections"]["practical_action_viewers_can_take"].startswith("Try this:")
+    assert "your own timeline" in script["sections"]["empowering_close"]
     assert script["script_generation"]["approved_for_production"] is False
     report = validate_script(script)
     assert report.passed is False
