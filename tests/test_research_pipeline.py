@@ -4,7 +4,7 @@ from finance_campus.research_pipeline import refresh_topics
 
 
 def fake_fetch(url):
-    return {"status": 200, "title": "Official financial education guide", "text": "emergency savings cash income bills debt loan interest credit digital financial safety investing risk retirement old age budget spending goals account financial products services control freedom security values habits planning decisions familiarity performance trading panic manias momentum diversification fees research information questions progress choices literacy wellbeing business education expenses"}
+    return {"status": 200, "final_url": url, "title": "Official financial education guide", "text": "emergency savings cash income bills debt loan interest credit digital financial safety investing risk retirement old age budget spending goals account financial products services control freedom security values habits planning decisions familiarity performance trading panic manias momentum diversification fees research information questions progress choices literacy wellbeing business education expenses"}
 
 
 def test_refresh_adds_unique_researched_topics(tmp_path):
@@ -124,3 +124,25 @@ def test_new_topic_sources_are_mapped_to_authoritative_educational_sources(tmp_p
             "U.S. Securities and Exchange Commission",
         }
         assert item["research_status"] == "source_checked_needs_claim_review"
+
+
+
+def test_refresh_rejects_redirects_outside_approved_publisher_domain(tmp_path):
+    def redirected(url):
+        return {
+            "status": 200,
+            "final_url": "https://investor.gov.example-attacker.test/fake",
+            "title": "Copied financial education page",
+            "text": "financial literacy emergency savings budget investing risk habits planning decisions",
+        }
+
+    result = refresh_topics(tmp_path / "topics.json", target=1, fetcher=redirected)
+    assert result["added_count"] == 0
+    assert result["target_met"] is False
+    assert "redirected away" in result["rejected"][0]["reason"]
+
+
+def test_research_source_record_preserves_verified_final_url(tmp_path):
+    result = refresh_topics(tmp_path / "topics.json", target=1, fetcher=fake_fetch)
+    source = result["added"][0]["research_sources"][0]
+    assert source["final_url"] == source["url"]
