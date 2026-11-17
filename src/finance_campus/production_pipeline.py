@@ -6,7 +6,6 @@ import shutil
 import subprocess
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlparse
 
 from finance_campus.caption_qc import validate_srt
 from finance_campus.config import load_yaml, validate_branding, validate_disclaimer
@@ -27,17 +26,17 @@ def _source_urls(script: dict[str, Any]) -> list[str]:
     """Collect only HTTPS sources from the approved research publisher allowlist."""
     values = script.get("sources", [])
     if not isinstance(values, list):
-        raise ValueError("Script sources must be a list")
+        raise TypeError("Script sources must be a list")
     collected = list(values)
     claims = script.get("claims", [])
     if not isinstance(claims, list):
-        raise ValueError("Script claims must be a list")
+        raise TypeError("Script claims must be a list")
     for claim in claims:
         if not isinstance(claim, dict):
-            raise ValueError("Every claim must be a structured object")
+            raise TypeError("Every claim must be a structured object")
         claim_sources = claim.get("sources", [])
         if not isinstance(claim_sources, list):
-            raise ValueError("Claim sources must be a list")
+            raise TypeError("Claim sources must be a list")
         collected.extend(claim_sources)
 
     unique: list[str] = []
