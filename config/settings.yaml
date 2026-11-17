@@ -81,3 +81,42 @@ automation:
   notify_on_blocking_failures: true
   publishing_activation_requires_end_to_end_validation: true
   initial_platform_authorization_required: true
+editorial:
+  emotional_promise:
+    - "hope"
+    - "possibility"
+    - "confidence"
+    - "empowerment"
+    - "motivation"
+    - "financial_agency"
+  purpose: "Move viewers from awareness to informed, practical action."
+  escalation:
+    enabled: true
+    use_realistic_financial_stakes: true
+    show_cumulative_consequences: true
+    connect_consequences_to_viewer_decisions: true
+    prohibit_manufactured_panic: true
+  required_story_arc:
+    - "relatable_financial_problem"
+    - "escalating_real_world_stakes"
+    - "clear_explanation_of_why_it_matters"
+    - "hopeful_and_realistic_possibility"
+    - "practical_action_viewers_can_take"
+    - "empowering_close"
+  acceptable_urgency_topics:
+    - "poverty"
+    - "debt"
+    - "inflation"
+    - "unemployment"
+    - "financial_insecurity"
+    - "unexpected_expenses"
+    - "scams_and_fraud"
+  safeguards:
+    require_evidence_for_factual_claims: true
+    label_hypothetical_examples: true
+    distinguish_risk_from_certainty: true
+    prohibit_guaranteed_wealth_claims: true
+    prohibit_guaranteed_investment_returns: true
+    prohibit_shaming_people_in_financial_difficulty: true
+    prohibit_exploitative_fear: true
+    always_offer_a_realistic_next_step: true
