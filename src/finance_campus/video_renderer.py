@@ -57,6 +57,13 @@ def _motion_position(element: dict[str, Any], elapsed: float) -> dict[str, Any]:
         else:
             animated["walk_phase"] = 0.0
             animated["body_bob"] = 0
+    opening = element.get("open_animation")
+    if isinstance(opening, dict):
+        open_start, open_end = float(opening["start_seconds"]), float(opening["end_seconds"])
+        open_progress = min(1.0, max(0.0, (elapsed - open_start) / (open_end - open_start)))
+        if opening.get("easing") == "ease_out":
+            open_progress = 1 - (1 - open_progress) ** 3
+        animated["open_progress"] = open_progress
     interaction = element.get("interaction_animation")
     target = element.get("interaction_target")
     if isinstance(interaction, dict) and isinstance(target, dict):
@@ -361,8 +368,14 @@ def _draw_element(
             path((x+w//10, y+h//4), (right-w//10, y+h//4), (right, y+h//3),
                  (right, bottom-h//10), (right-w//10, bottom), (x+w//10, bottom),
                  (x, bottom-h//10), (x, y+h//3), (x+w//10, y+h//4))
-            path((cx, y+h//2), (right+w//12, y+h//2), (right+w//12, y+h*3//4),
-                 (cx, y+h*3//4), (cx, y+h//2))
+            open_progress = float(element.get("open_progress", 0.0))
+            flap_lift = round(h * .30 * open_progress)
+            if open_progress > 0.0:
+                path((cx, y+h//2), (cx+w//10, y+h//2-flap_lift),
+                     (right+w//12, y+h//2-flap_lift), (right+w//12, y+h//2))
+            else:
+                path((cx, y+h//2), (right+w//12, y+h//2), (right+w//12, y+h*3//4),
+                     (cx, y+h*3//4), (cx, y+h//2))
             ellipse((right-w//5, y+h*5//8, right-w//7, y+h*5//8+w//12))
             path((x+w//8, y+h//3), (cx-w//12, y+h//3))
             path((x+w//8, y+h//2), (cx-w//12, y+h//2))
