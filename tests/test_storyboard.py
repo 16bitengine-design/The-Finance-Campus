@@ -55,3 +55,33 @@ def test_invalid_scene_cannot_be_rendered():
     scene["elements"] = [{"type": "text", "x": 1, "y": 2, "text": "Only text"}]
     with pytest.raises(ValueError, match="text-only"):
         render_scene_svg(scene)
+
+
+def test_character_interaction_animation_metadata_is_validated():
+    data = sample_storyboard()
+    data["scenes"][0]["elements"][0].update({
+        "interaction_target": {"x": 700, "y": 300},
+        "interaction_animation": {
+            "from_x": 250, "from_y": 220,
+            "start_seconds": 1, "end_seconds": 3,
+            "easing": "ease_out",
+        },
+    })
+    assert validate_storyboard(data) == []
+    data["scenes"][0]["elements"][0]["interaction_animation"]["end_seconds"] = 0
+    assert any(
+        "interaction_animation timing" in error
+        for error in validate_storyboard(data)
+    )
+
+
+def test_character_interaction_animation_requires_a_target():
+    data = sample_storyboard()
+    data["scenes"][0]["elements"][0]["interaction_animation"] = {
+        "from_x": 250, "from_y": 220,
+        "start_seconds": 1, "end_seconds": 3,
+    }
+    assert any(
+        "requires interaction_target" in error
+        for error in validate_storyboard(data)
+    )
