@@ -105,6 +105,29 @@ def validate_storyboard(data: Any) -> list[str]:
                         and (motion["start_seconds"] < 0 or motion["end_seconds"] <= motion["start_seconds"])
                     ):
                         errors.append(f"{item_prefix}.motion timing must be non-negative and end after start")
+            walk_cycle = element.get("walk_cycle")
+            if walk_cycle is not None:
+                if not isinstance(walk_cycle, dict):
+                    errors.append(f"{item_prefix}.walk_cycle must be an object")
+                else:
+                    for field in ("start_seconds", "end_seconds", "cycle_seconds"):
+                        value = walk_cycle.get(field)
+                        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+                            errors.append(f"{item_prefix}.walk_cycle.{field} must be a finite number")
+                    if (
+                        all(
+                            isinstance(walk_cycle.get(field), (int, float))
+                            and not isinstance(walk_cycle.get(field), bool)
+                            and math.isfinite(walk_cycle[field])
+                            for field in ("start_seconds", "end_seconds", "cycle_seconds")
+                        )
+                        and (
+                            walk_cycle["start_seconds"] < 0
+                            or walk_cycle["end_seconds"] <= walk_cycle["start_seconds"]
+                            or walk_cycle["cycle_seconds"] <= 0
+                        )
+                    ):
+                        errors.append(f"{item_prefix}.walk_cycle timing and cycle must be positive and ordered")
             interaction_target = element.get("interaction_target")
             if interaction_target is not None:
                 if not isinstance(interaction_target, dict):
