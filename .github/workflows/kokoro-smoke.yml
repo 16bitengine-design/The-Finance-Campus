@@ -79,6 +79,7 @@ jobs:
               "captions_generated",
               "video_rendered",
               "media_streams_verified",
+              "final_video_qc_passed",
               "audio_video_duration_aligned",
               "quality_gate_passed",
           )
