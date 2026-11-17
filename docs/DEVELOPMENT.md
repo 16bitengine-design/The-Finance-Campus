@@ -51,3 +51,15 @@ Automation must:
 - Resume safely from recorded state after interruptions.
 
 One-time setup still requires valid platform account authorization and any platform-mandated app review or permissions. These external requirements cannot be automated away. The current implementation is not yet fully operational; keep publishing disabled until end-to-end tests pass.
+## Script production handoff
+
+The current script stage exposes two commands:
+
+- `python -m finance_campus.cli validate-script candidate.json` checks a structured candidate without writing output.
+- `python -m finance_campus.cli prepare-script candidate.json production/approved/script.json` writes an approved package only after the editorial validator passes.
+
+The expected JSON structure is illustrated in `examples/script-package.example.json`. All six editorial story sections are mandatory. Every item in `claims` must include text and at least one syntactically valid HTTP(S) source URL. Hypothetical examples must be explicitly labelled. Known guaranteed-wealth promises and shaming phrases are rejected. Urgent discussion of poverty, debt, inflation, unemployment, and financial insecurity is permitted.
+
+The approval handoff writes atomically and leaves an existing approved file untouched when a candidate fails. Future script generators must submit their output to this handoff and downstream storyboard/audio/rendering stages must read only approved files.
+
+This does not yet implement AI script generation, source retrieval, claim-to-source verification, or robust semantic review. The URL check confirms syntax only; it does not prove source authority or claim support. Do not treat this gate alone as financial fact-checking.
