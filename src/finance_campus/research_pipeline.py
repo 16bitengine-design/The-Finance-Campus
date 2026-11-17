@@ -21,6 +21,29 @@ from finance_campus.mindset_topics import MINDSET_TOPIC_BLUEPRINTS
 from finance_campus.topics import add_topic, load_topics, save_topics
 
 USER_AGENT = "TheFinanceCampusResearchBot/1.0 (educational research; contact via GitHub repository)"
+
+# Publisher domains allowed as research references in production packages.
+APPROVED_RESEARCH_DOMAINS = frozenset({
+    "consumerfinance.gov", "fdic.gov", "investor.gov", "sec.gov",
+    "bou.or.ug", "cma.go.ug", "umra.go.ug", "ira.go.ug", "ura.go.ug",
+    "nssfug.org", "worldbank.org", "imf.org", "oecd.org", "bis.org",
+    "finra.org", "fca.org.uk", "bankofengland.co.uk", "canada.ca",
+    "europa.eu", "gov.uk", "gov.au",
+})
+
+
+def is_approved_research_url(value: str) -> bool:
+    """Return whether a source is HTTPS on an explicitly approved publisher domain."""
+    if not isinstance(value, str):
+        return False
+    parsed = urlparse(value.strip())
+    host = (parsed.hostname or "").casefold().rstrip(".")
+    if parsed.scheme != "https" or not host or parsed.username or parsed.password:
+        return False
+    if parsed.port not in (None, 443):
+        return False
+    return any(host == domain or host.endswith("." + domain) for domain in APPROVED_RESEARCH_DOMAINS)
+
 SOURCE_CATALOG: dict[str, dict[str, str]] = {
     "cfpb_emergency": {
         "url": "https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/",
