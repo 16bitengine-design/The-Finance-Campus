@@ -134,7 +134,9 @@ def test_pay_yourself_first_storyboard_uses_distinct_story_scenes_and_moving_mon
         if item.get("motion")
     ]
     assert moving
-    assert moving[0]["type"] == "coin"
+    assert moving[0]["type"] == "money_note"
+    wallet = next(item for item in scenes[0]["elements"] if item["type"] == "wallet")
+    assert wallet["open_animation"]["start_seconds"] < wallet["open_animation"]["end_seconds"]
     assert validate_storyboard(storyboard) == []
 
 
