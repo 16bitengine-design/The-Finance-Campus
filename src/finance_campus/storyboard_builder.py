@@ -124,6 +124,10 @@ def build_storyboard(
         "tax or legal advice.",
         "Consult a qualified professional.",
     ]
+    normalized_lines = " ".join(lines).casefold()
+    normalized_required = " ".join(on_screen.split()).casefold()
+    if normalized_required not in normalized_lines:
+        raise ValueError("On-screen disclaimer configuration does not match the visible disclaimer layout")
     disclaimer_elements: list[dict[str, Any]] = [
         _element("bank", width * 0.37, height * 0.08, width * 0.26, height * 0.28, "navy", 0.2),
     ]
