@@ -185,7 +185,7 @@ def _timestamp(seconds: float) -> str:
     return f"{hours:02d}:{minutes:02d}:{whole_seconds:02d},{millis:03d}"
 
 
-def _caption_lines(text: str, width: int = 48) -> str:
+def _caption_lines(text: str, width: int = 36) -> str:
     words = text.split()
     lines: list[str] = []
     current = ""
