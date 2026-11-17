@@ -16,7 +16,7 @@ This document distinguishes working repository capabilities from intended archit
 | Candidate script workflow | Implemented | Repository workflow generates candidates after a successful topic refresh or manual dispatch. |
 | Script structure and editorial phrase checks | Implemented | This is not semantic fact-checking. |
 | Script duration telemetry | Implemented | Word count and estimated narration duration use a 145 words/minute planning assumption. Long-form candidates that fall short are visibly marked under target. |
-| Storyboard and whiteboard rendering | Implemented, deterministic | Current storyboard builder maps narration to a limited reusable illustration vocabulary; it is not generative semantic illustration. |
+| Storyboard and whiteboard rendering | Implemented, deterministic | Narration maps to a limited reusable illustration vocabulary. Character poses, prop-directed interactions and eased, time-based reaching gestures are rendered per frame; full-body walking, object handling and semantic illustration generation remain future work. |
 | Kokoro integration | Implemented in code | The dedicated manual CPU smoke workflow is available. A successful run and human review of its actual artifacts are still required before calling the full Kokoro path production-validated. |
 | MP4 technical QC | Implemented | FFmpeg/ffprobe, dimensions, encoding, stream, decode and audio-level checks. |
 | Caption timing and visual review evidence | Implemented | SRT validation and contact-sheet extraction are available. A contact sheet is not semantic visual approval. |
