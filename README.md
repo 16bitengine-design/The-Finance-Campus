@@ -114,4 +114,10 @@ Render each scene to a standalone animated SVG whiteboard frame:
 
 `python -m finance_campus.cli render-storyboard examples/storyboard.example.json production/storyboards/debt-example`
 
-The renderer is dependency-free and uses the Finance Campus palette. It currently produces SVG scene assets, not a finished video: narration timing, Kokoro audio, caption synchronization, transitions, and FFmpeg assembly remain separate stages to implement and test.
+The SVG renderer produces scene assets. The MP4 renderer in `src/finance_campus/video_renderer.py` draws storyboard elements progressively into raster frames with Pillow, then encodes and validates a playable H.264 MP4 with FFmpeg. It supports vertical 1080×1920 Shorts and horizontal 1920×1080 long-form layouts. The first renderer animates geometric illustration primitives (circles, rectangles, lines, arrows and labels); complex character artwork is a later upgrade.
+
+Render an MP4:
+
+`python -m finance_campus.cli render-video examples/storyboard.example.json production/renders/example.mp4 --format short`
+
+Use `--format long` for 16:9. FFmpeg and Pillow are required. Kokoro narration, audio mixing, synchronized captions, transitions, and full audiovisual quality checks remain separate stages.
