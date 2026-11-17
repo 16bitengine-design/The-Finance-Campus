@@ -1,4 +1,4 @@
-from finance_campus.feed_discovery import discover_from_official_feeds, parse_feed
+from finance_campus.feed_discovery import OFFICIAL_FEEDS, discover_from_official_feeds, parse_feed
 
 
 RSS = """<?xml version="1.0"?>
@@ -8,6 +8,15 @@ RSS = """<?xml version="1.0"?>
 <description>Learn to identify fraudulent investment offers and protect investors.</description>
 <pubDate>Mon, 16 Nov 2026 10:00:00 GMT</pubDate>
 </item></channel></rss>"""
+
+
+def test_uganda_regulator_feeds_are_included_with_local_geography():
+    feeds = {feed["name"]: feed for feed in OFFICIAL_FEEDS}
+    assert feeds["Capital Markets Authority Uganda"]["url"] == "https://cmauganda.co.ug/feed/"
+    assert feeds["Insurance Regulatory Authority Uganda"]["url"] == "https://ira.go.ug/feed/"
+    assert "Uganda" in feeds["Capital Markets Authority Uganda"]["geography"]
+    assert "Uganda" in feeds["Insurance Regulatory Authority Uganda"]["geography"
+
 
 
 def test_parse_rss_feed():
