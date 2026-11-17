@@ -73,6 +73,67 @@ def _ellipse_path(box: tuple[int, int, int, int], steps: int = 48) -> list[tuple
     ]
 
 
+def _progress_endpoint(
+    strokes: list[list[tuple[int, int]]], progress: float,
+) -> tuple[int, int] | None:
+    """Find the current tip position along the ordered drawing path."""
+    if not strokes or progress <= 0:
+        return None
+    lengths = [sum(math.dist(a, b) for a, b in itertools.pairwise(path)) for path in strokes]
+    total = sum(lengths)
+    if total <= 0:
+        return None
+    remaining = min(1.0, progress) * total
+    endpoint = strokes[0][0]
+    for path, length in zip(strokes, lengths):
+        if not path or length <= 0:
+            continue
+        endpoint = path[0]
+        if remaining >= length:
+            remaining -= length
+            endpoint = path[-1]
+            continue
+        for first, second in itertools.pairwise(path):
+            segment = math.dist(first, second)
+            if segment <= 0:
+                continue
+            if remaining <= segment:
+                fraction = remaining / segment
+                return (
+                    round(first[0] + (second[0] - first[0]) * fraction),
+                    round(first[1] + (second[1] - first[1]) * fraction),
+                )
+            remaining -= segment
+            endpoint = second
+        return endpoint
+    return endpoint
+
+
+def _draw_pen_hand(
+    draw: ImageDraw.ImageDraw,
+    tip: tuple[int, int],
+    color: tuple[int, int, int],
+    scale: float,
+) -> None:
+    """Draw a small hand gripping a colored marker at the active stroke tip."""
+    x, y = tip
+    unit = max(2, round(13 * scale))
+    skin = (224, 176, 137)
+    dark = (111, 77, 58)
+    # Marker points into the board; the hand follows behind its nib.
+    draw.line((x - unit * 2, y + unit * 2, x, y), fill=dark, width=max(2, unit // 3))
+    draw.line((x - unit * 2, y + unit * 2, x - unit * 5, y + unit * 5),
+              fill=color, width=max(3, unit // 2))
+    draw.ellipse((x - unit * 5, y + unit * 3, x + unit * 2, y + unit * 10),
+                 fill=skin, outline=dark, width=max(1, unit // 5))
+    # Curled fingers around the marker barrel.
+    for offset in (0, 1, 2):
+        px = x - unit * (3 + offset)
+        py = y + unit * (4 + offset)
+        draw.arc((px - unit, py - unit, px + unit * 2, py + unit * 2),
+                 start=190, end=350, fill=dark, width=max(1, unit // 5))
+
+
 def _draw_progressive_strokes(
     draw: ImageDraw.ImageDraw,
     strokes: list[list[tuple[int, int]]],
@@ -83,15 +144,11 @@ def _draw_progressive_strokes(
     """Reveal ordered pen strokes by travelled path length, not by wiping an image."""
     if not strokes or progress <= 0:
         return
-    lengths = [
-        sum(math.dist(a, b) for a, b in itertools.pairwise(path))
-        for path in strokes
-    ]
-    total = sum(lengths)
-    if total <= 0:
-        return
-    remaining = min(1.0, progress) * total
-    for path, length in zip(strokes, lengths):
+    remaining = min(1.0, progress) * sum(
+        sum(math.dist(a, b) for a, b in itertools.pairwise(path)) for path in strokes
+    )
+    for path in strokes:
+        length = sum(math.dist(a, b) for a, b in itertools.pairwise(path))
         if remaining <= 0:
             break
         if length <= 0:
@@ -119,6 +176,19 @@ def _draw_progressive_strokes(
         break
 
 
+def _draw_active_hand(
+    draw: ImageDraw.ImageDraw,
+    strokes: list[list[tuple[int, int]]],
+    progress: float,
+    color: tuple[int, int, int],
+    scale: float,
+) -> None:
+    if 0 < progress < 1:
+        tip = _progress_endpoint(strokes, progress)
+        if tip is not None:
+            _draw_pen_hand(draw, tip, color, scale)
+
+
 def _draw_element(
     draw: ImageDraw.ImageDraw,
     element: dict[str, Any],
@@ -144,6 +214,7 @@ def _draw_element(
         radius = max(1, round(element["r"] * min(sx, sy)))
         path = _ellipse_path((cx-radius, cy-radius, cx+radius, cy+radius))
         _draw_progressive_strokes(draw, [path], progress, color, width)
+        _draw_active_hand(draw, [path], progress, color, min(sx, sy))
         return
 
     if kind in ILLUSTRATION_TYPES:
@@ -247,6 +318,7 @@ def _draw_element(
             path((cx-w//5, y+h//3), (cx+w//5, y+h//3))
 
         _draw_progressive_strokes(draw, strokes, progress, color, width)
+        _draw_active_hand(draw, strokes, progress, color, min(sx, sy))
         return
 
     if kind == "rect":
@@ -256,12 +328,15 @@ def _draw_element(
         if w > 0 and h > 0:
             points = [(x,y), (x+w,y), (x+w,y+h), (x,y+h), (x,y)]
             _draw_progressive_strokes(draw, [points], progress, color, width)
+            _draw_active_hand(draw, [points], progress, color, min(sx, sy))
         return
 
     x1, y1 = _point(element["x1"], element["y1"], sx, sy)
     x2, y2 = _point(element["x2"], element["y2"], sx, sy)
     end = (round(x1 + (x2 - x1) * progress), round(y1 + (y2 - y1) * progress))
     draw.line((x1, y1, end[0], end[1]), fill=color, width=width)
+    if 0 < progress < 1:
+        _draw_pen_hand(draw, end, color, min(sx, sy))
     if kind == "arrow" and progress >= 1:
         _draw_arrow(draw, (x1, y1, end[0], end[1]), color, width)
 
