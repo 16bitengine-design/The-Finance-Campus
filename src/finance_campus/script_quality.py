@@ -1,8 +1,8 @@
 """Deterministic editorial checks for scripts before production."""
 
-from dataclasses import dataclass, field
-from typing import Any
-from urllib.parse import urlparse
+import dataclasses
+import typing
+import urllib.parse
 
 
 REQUIRED_SECTIONS = (
@@ -36,22 +36,22 @@ SHAMING_PHRASES = (
 )
 
 
-@dataclass
+@dataclasses.dataclass
 class ScriptQualityReport:
     """Result of the deterministic script editorial checks."""
 
     passed: bool
-    errors: list[str] = field(default_factory=list)
+    errors: list[str] = dataclasses.field(default_factory=list)
 
 
-def _has_text(value: Any) -> bool:
+def _has_text(value: typing.Any) -> bool:
     return isinstance(value, str) and bool(value.strip())
 
 
 def _is_http_url(value: Any) -> bool:
     if not isinstance(value, str):
         return False
-    parsed = urlparse(value.strip())
+    parsed = urllib.parse.urlparse(value.strip())
     return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
 
 
