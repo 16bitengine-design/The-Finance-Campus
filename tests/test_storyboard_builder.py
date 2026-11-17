@@ -206,3 +206,14 @@ def test_character_interactions_have_timed_eased_reach_choreography():
         assert animation["start_seconds"] < animation["end_seconds"]
         assert animation["easing"] == "ease_out"
         assert (animation["from_x"], animation["from_y"]) != (target["x"], target["y"])
+
+
+def test_hopeful_and_practical_scenes_include_walking_choreography():
+    storyboard = build_storyboard(
+        _script(), video_format="short",
+        disclaimer_config=load_yaml("config/disclaimer.yaml"),
+    )
+    for scene in storyboard["scenes"][3:5]:
+        character = next(item for item in scene["elements"] if item["type"] == "person")
+        assert character["motion"]["to_x"] > character["motion"]["from_x"]
+        assert character["walk_cycle"]["cycle_seconds"] > 0
