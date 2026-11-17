@@ -101,3 +101,17 @@ The first calculation layer is implemented in `src/finance_campus/calculations.p
 - Monthly savings deposits for a target under an explicitly assumed return.
 
 Run its automated checks with `python -m pytest -q`. Inputs are validated and invalid or non-finite values are rejected. Loan estimates use nominal APR divided by 12; savings deposits are assumed to occur at month-end and the annual return is converted to an equivalent monthly rate. These are educational mathematical models, not quotes or forecasts. Actual fees, taxes, variable rates, deposit timing, and product terms may change outcomes. Any assumed return must be clearly labelled hypothetical and never presented as guaranteed.
+
+## Illustrated whiteboard storyboard pipeline
+
+Storyboards map each spoken scene to a duration and a sequence of visual elements. A scene containing only text is rejected; it must include at least one illustration such as a shape, line, or arrow.
+
+Validate a storyboard:
+
+`python -m finance_campus.cli validate-storyboard examples/storyboard.example.json`
+
+Render each scene to a standalone animated SVG whiteboard frame:
+
+`python -m finance_campus.cli render-storyboard examples/storyboard.example.json production/storyboards/debt-example`
+
+The renderer is dependency-free and uses the Finance Campus palette. It currently produces SVG scene assets, not a finished video: narration timing, Kokoro audio, caption synchronization, transitions, and FFmpeg assembly remain separate stages to implement and test.
