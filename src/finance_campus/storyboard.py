@@ -113,6 +113,29 @@ def _render_element(element: dict[str, Any], index: int) -> str:
     if kind in {"line", "arrow"}:
         marker = ' marker-end="url(#arrowhead)"' if kind == "arrow" else ""
         return f'<line x1="{_number(element["x1"])}" y1="{_number(element["y1"])}" x2="{_number(element["x2"])}" y2="{_number(element["y2"])}" {common}{marker} {animation}/>'
+    if kind in ILLUSTRATION_TYPES:
+        x, y = element["x"], element["y"]
+        w, h = element["width"], element["height"]
+        right, bottom = x + w, y + h
+        cx, cy = x + w / 2, y + h / 2
+        if kind == "person":
+            head = min(w, h) / 7
+            art = f'<circle cx="{_number(cx)}" cy="{_number(y+head)}" r="{_number(head)}" {common}/><path d="M {_number(cx)} {_number(y+2*head)} L {_number(cx)} {_number(y+h*.66)} M {_number(cx)} {_number(y+2*head+8)} L {_number(x+w*.12)} {_number(y+h*.55)} M {_number(cx)} {_number(y+2*head+8)} L {_number(right-w*.12)} {_number(y+h*.55)} M {_number(cx)} {_number(y+h*.66)} L {_number(x+w*.25)} {_number(bottom)} M {_number(cx)} {_number(y+h*.66)} L {_number(right-w*.25)} {_number(bottom)}" {common}/>'
+        elif kind == "bank":
+            roof = y + h / 4
+            art = f'<path d="M {_number(x)} {_number(roof)} L {_number(cx)} {_number(y)} L {_number(right)} {_number(roof)} M {_number(x)} {_number(roof)} H {_number(right)} M {_number(x)} {_number(bottom-h/6)} H {_number(right)} M {_number(x-w*.05)} {_number(bottom)} H {_number(right+w*.05)}" {common}/>' + "".join(f'<path d="M {_number(x+w*(i+.5)/4)} {_number(roof)} V {_number(bottom-h/6)}" {common}/>' for i in range(4))
+        elif kind == "wallet":
+            art = f'<rect x="{_number(x)}" y="{_number(y+h/4)}" width="{_number(w)}" height="{_number(h*3/4)}" rx="10" {common}/><rect x="{_number(cx)}" y="{_number(y+h/2)}" width="{_number(w/2)}" height="{_number(h/4)}" rx="6" {common}/><circle cx="{_number(right-w/8)}" cy="{_number(y+h*5/8)}" r="{_number(w/25)}" {common}/>'
+        elif kind == "house":
+            roof = y + h/3
+            art = f'<path d="M {_number(x)} {_number(roof)} L {_number(cx)} {_number(y)} L {_number(right)} {_number(roof)} M {_number(x+w/8)} {_number(roof)} V {_number(bottom)} H {_number(right-w/8)} V {_number(roof)} M {_number(cx-w/10)} {_number(bottom)} V {_number(bottom-h/3)} H {_number(cx+w/10)} V {_number(bottom)}" {common}/>'
+        elif kind == "coin":
+            art = f'<circle cx="{_number(cx)}" cy="{_number(cy)}" r="{_number(min(w,h)/2)}" {common}/><circle cx="{_number(cx)}" cy="{_number(cy)}" r="{_number(min(w,h)/3)}" {common}/><text x="{_number(cx)}" y="{_number(cy+h*.16)}" text-anchor="middle" fill="{color}" font-size="{_number(h*.45)}">$</text>'
+        elif kind == "money_note":
+            art = f'<rect x="{_number(x)}" y="{_number(y+h/6)}" width="{_number(w)}" height="{_number(h*2/3)}" rx="8" {common}/><circle cx="{_number(cx)}" cy="{_number(cy)}" r="{_number(h/8)}" {common}/><path d="M {_number(x+w/8)} {_number(y+h/3)} h {_number(w/8)} M {_number(right-w/4)} {_number(bottom-h/3)} h {_number(w/8)}" {common}/>'
+        else:
+            art = f'<path d="M {_number(x+w/4)} {_number(y+h/5)} H {_number(right-w/4)} M {_number(x+w/5)} {_number(y+h/4)} Q {_number(x)} {_number(y+h/4)} {_number(x+w/5)} {_number(bottom)} H {_number(right-w/5)} Q {_number(right)} {_number(y+h/4)} {_number(right-w/5)} {_number(y+h/4)}" {common}/><path d="M {_number(cx-w/8)} {_number(y+h/5)} H {_number(cx+w/8)}" {common}/><circle cx="{_number(cx)}" cy="{_number(cy)}" r="{_number(w/8)}" {common}/>'
+        return f'<g {animation}>{art}</g>'
     x, y = _number(element["x"]), _number(element["y"])
     label = html.escape(element["text"])
     return f'<text x="{x}" y="{y}" fill="{color}" font-family="Arial,sans-serif" font-size="25" font-weight="600" opacity="0" style="animation:appear .35s ease-out {delay:.2f}s forwards">{label}</text>'
