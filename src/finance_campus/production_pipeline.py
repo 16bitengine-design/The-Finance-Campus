@@ -9,7 +9,7 @@ from typing import Any
 
 from finance_campus.caption_qc import validate_srt
 from finance_campus.config import load_yaml, validate_branding, validate_disclaimer
-from finance_campus.disclaimers import append_description_disclaimer, disclaimer_texts
+from finance_campus.disclaimers import disclaimer_texts
 from finance_campus.final_video_qc import validate_final_video
 from finance_campus.narration import synthesize_storyboard
 from finance_campus.post_metadata import generate_post_metadata
@@ -207,7 +207,7 @@ def produce_video_from_script(
             "Consult a qualified professional",
         )
     )
-    post_metadata = generate_post_metadata(script, disclaimer_config)
+    post_metadata = generate_post_metadata(\n        script, disclaimer_config, video_format=video_format,\n    )
     youtube_metadata = post_metadata["platforms"]["youtube"]
     description = youtube_metadata["description"]
     description_path = destination / "description.txt"
