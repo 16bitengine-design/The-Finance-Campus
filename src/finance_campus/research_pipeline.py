@@ -145,21 +145,29 @@ def refresh_topics(
             if source_result.get("status") != 200:
                 raise ValueError("Source did not return HTTP 200")
             page_text = str(source_result.get("text", "")).casefold()
+            matched = []
+            required_matches = 0
             if page_text:
                 matched = [word for word in blueprint["keywords"] if word.casefold() in page_text]
-                if len(matched) < min(1, len(blueprint["keywords"])):
-                    raise ValueError("Source page did not contain the topic's expected evidence keywords")
-            elif not source_meta["url"].endswith(".pdf"):
+                required_matches = min(2, len(blueprint["keywords"]))
+                if len(matched) < required_matches:
+                    raise ValueError(
+                        f"Source page matched {len(matched)} topic keywords; "
+                        f"at least {required_matches} are required"
+                    )
+            elif not source_meta["url"].casefold().endswith(".pdf"):
                 raise ValueError("Source page has no extracted text for relevance checking")
             source_record = {
                 "url": source_meta["url"],
+                "matched_keywords": matched,
+                "keyword_match_threshold": required_matches,
                 "publisher": source_meta["publisher"],
                 "domain": source_meta["domain"],
                 "http_status": 200,
                 "checked_at": timestamp,
                 "page_title": source_result.get("title", ""),
                 "verification": ("reachable_pdf_needs_text_review" if not page_text and source_meta["url"].casefold().endswith(".pdf") else "reachable_and_keyword_checked"),
-                "evidence_note": "Official source page was reachable and contained at least one mapped topic keyword; claim-level support still requires editorial review.",
+                "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support.",
             }
         except (OSError, ValueError, TimeoutError, urllib.error.URLError) as exc:  # Fail closed.
             rejected.append({"title": blueprint["title"], "reason": str(exc)})
