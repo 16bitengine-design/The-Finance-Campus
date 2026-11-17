@@ -207,7 +207,9 @@ def produce_video_from_script(
             "Consult a qualified professional",
         )
     )
-    post_metadata = generate_post_metadata(\n        script, disclaimer_config, video_format=video_format,\n    )
+    post_metadata = generate_post_metadata(
+        script, disclaimer_config, video_format=video_format,
+    )
     youtube_metadata = post_metadata["platforms"]["youtube"]
     description = youtube_metadata["description"]
     description_path = destination / "description.txt"
