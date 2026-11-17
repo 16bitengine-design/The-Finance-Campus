@@ -68,3 +68,33 @@ def test_semantic_illustration_requires_positive_dimensions():
         "elements": [{"type": "wallet", "x": 10, "y": 10, "width": 0, "height": 80}],
     }
     assert any("width and height must be positive" in error for error in validate_storyboard({"scenes": [scene]}))
+
+
+
+@pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="FFmpeg is not installed")
+def test_render_video_muxes_narration_and_burns_captions(tmp_path):
+    audio = tmp_path / "narration.mp3"
+    generated = subprocess.run(
+        [
+            "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+            "-f", "lavfi", "-i", "sine=frequency=440:duration=2",
+            "-q:a", "8", "-acodec", "libmp3lame", str(audio),
+        ],
+        capture_output=True, text=True, check=False,
+    )
+    assert generated.returncode == 0
+    captions = tmp_path / "captions.srt"
+    captions.write_text(
+        "1\\n00:00:00,000 --> 00:00:01,800\\nA practical money lesson\\n",
+        encoding="utf-8",
+    )
+    output = render_video(
+        _storyboard(), tmp_path / "with-audio.mp4", fps=12, draw_fps=6,
+        audio_path=audio, captions_path=captions,
+    )
+    probe = subprocess.run(
+        ["ffmpeg", "-hide_banner", "-i", str(output), "-f", "null", "-"],
+        capture_output=True, text=True, check=False,
+    )
+    assert "Video:" in probe.stderr
+    assert "Audio:" in probe.stderr
