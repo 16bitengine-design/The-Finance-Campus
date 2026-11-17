@@ -209,3 +209,39 @@ Use `--format long` for 16:9. FFmpeg and Pillow are required. Narration audio an
 `python -m finance_campus.cli render-video storyboard.json output.mp4 --format short --audio narration.wav --captions captions.srt`
 
 The renderer validates the requested audio stream and the final MP4 playback. Drawing defaults to 24 progressive frames per second, with 30 fps output; tune it using `--draw-fps` and `--fps`. Tune scene fades using `--transition-seconds`. Kokoro narration generation is available as a separate command and is also integrated into the end-to-end `produce-video` command. Captions are generated from the synthesized narration and burned into the rendered video. A gentle whiteboard cross-dissolve is applied at scene boundaries and can be tuned with `--transition-seconds`. More advanced hand-drawn character animation and broader audiovisual quality checks remain outstanding. CI renders and stores a sample illustrated portrait video as a workflow artifact.
+
+
+## Automated topic research and script drafting
+
+The first zero-cost topic and script drafting modules are now implemented.
+
+### Weekly topic refresh
+
+GitHub Actions runs `.github/workflows/weekly-topic-refresh.yml` every Monday at 08:30 Africa/Kampala time. It can also be started manually from the Actions tab. The workflow:
+- checks a curated catalogue of authoritative sources, including the Consumer Financial Protection Bureau, Bank of Uganda and the U.S. SEC's Investor.gov;
+- creates distinct topic candidates from 20 editorially defined learning briefs;
+- checks source reachability and mapped keyword relevance;
+- rejects unavailable or irrelevant source pages;
+- checks the persistent JSON library for duplicate IDs and normalized titles;
+- saves new topics with category, audience, geographic relevance, source metadata and research/production/publication states.
+
+The weekly target is 20 new topics. The workflow reports the actual number added; it does not invent replacements when sources are unavailable. Some sources, particularly PDFs, still need text extraction and manual relevance review. URL reachability and keyword presence are not proof that a source supports every claim. Topic records therefore remain marked for claim-level review.
+
+### Generate a script candidate
+
+After a topic has been added to `data/topics.json`, generate a short script candidate:
+
+```bash
+python -m finance_campus.cli generate-script data/topics.json production/script-candidates/emergency-fund.json --topic-id TFC-<TOPIC_ID> --duration short
+```
+
+Use `--duration long` for a 5–10 minute script candidate. Replace the example topic ID with an actual ID in the topic library.
+
+The current generator is a deterministic editorial-template engine, not an LLM. It builds the six required story sections from the researched editorial brief and includes source metadata. It does not call a paid API, does not invent numerical statistics, and does not mark its output production-approved. Generated candidates are deliberately rejected by the production script validator until claim-level source verification and editorial approval are completed.
+
+### Current limitations
+
+- Research currently uses a curated source catalogue and editorial topic blueprints; it is not yet an open-ended web discovery or news-monitoring agent.
+- Source checks verify HTTP reachability and keyword presence, not semantic claim support.
+- Script drafts are structured and ready for editorial refinement, but are not yet fully original long-form narrative writing.
+- No generated script is automatically sent to Kokoro or video production. Topic refresh and script drafting do not publish or produce videos.
