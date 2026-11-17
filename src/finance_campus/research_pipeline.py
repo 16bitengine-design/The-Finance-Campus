@@ -138,12 +138,15 @@ def refresh_topics(
     discovery_feed_counts: dict[str, int] = {}
 
     # Discover from trusted official feeds first; curated blueprints fill any shortfall.
-    discovered, feed_rejected, discovery_feed_counts = discover_from_official_feeds(
-        existing_topics=topics,
-        target=target,
-        timestamp=timestamp,
-        article_fetcher=fetcher,
-    )
+    if fetcher is _default_fetcher:
+        discovered, feed_rejected, discovery_feed_counts = discover_from_official_feeds(
+            existing_topics=topics,
+            target=target,
+            timestamp=timestamp,
+            article_fetcher=fetcher,
+        )
+    else:
+        discovered, feed_rejected, discovery_feed_counts = [], [], {"discovery": 0}
     rejected.extend(feed_rejected)
     for discovered_topic in discovered:
         if len(added) >= target:
