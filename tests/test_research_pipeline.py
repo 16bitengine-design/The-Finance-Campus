@@ -79,7 +79,7 @@ def test_inspiration_blueprints_are_carried_into_topic_records(tmp_path):
         and item["inspiration"]["source_url"].startswith("https://")
         and item["inspiration"]["verification"] == "author_and_original_work_verified"
         and item["inspiration"]["original_wording_reused"] is False
-        for item in result["added"] if item.get("inspiration)
+        for item in result["added"] if item.get("inspiration")
     )
     assert all(
         item["inspiration"]["use"] == "paraphrased_idea_no_direct_quote"
