@@ -67,3 +67,13 @@ The required story arc is: relatable financial problem → escalating real-world
 Urgency must be evidence-based, not manufactured. Never shame people facing hardship, present risks as certainties, exploit fear, or promise guaranteed wealth or investment returns. Every video should leave viewers with a realistic next step and a sense that improvement is possible.
 
 See `config/editorial-policy.md`. The policy describes the target editorial standard; automated script-level enforcement is still to be implemented and tested.
+
+## Script editorial quality gate
+
+Structured scripts are checked before production with:
+
+`python -m finance_campus.cli validate-script path/to/script.json`
+
+The JSON package must include all six editorial story sections, a claims list (which may be empty), and explicit labels for hypothetical examples. Every listed factual claim must have at least one valid HTTP(S) source URL. The gate rejects a defined set of guaranteed-wealth promises and shaming phrases. It intentionally permits honest discussion of poverty, fear, debt, inflation, unemployment, and financial insecurity.
+
+This is a deterministic first-line gate. It checks required structure, source metadata, and known prohibited phrases; it does not prove that a source supports a claim or reliably understand every possible manipulative statement. Independent research verification and deeper semantic review remain necessary before publishing.
