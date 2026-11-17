@@ -163,7 +163,7 @@ def refresh_topics(
                 "http_status": 200,
                 "checked_at": timestamp,
                 "page_title": source_result.get("title", ""),
-                "verification": "reachable_and_keyword_checked",
+                "verification": ("reachable_pdf_needs_text_review" if not page_text and source_meta["url"].casefold().endswith(".pdf") else "reachable_and_keyword_checked"),
                 "evidence_note": "Official source page was reachable and contained at least one mapped topic keyword; claim-level support still requires editorial review.",
             }
         except (OSError, ValueError, TimeoutError, urllib.error.URLError) as exc:  # Fail closed.
@@ -178,7 +178,7 @@ def refresh_topics(
             "geographic_relevance": blueprint["geo"],
             "research_sources": [source_record],
             "sources": [source_meta["url"]],
-            "research_status": "source_checked_needs_claim_review",
+            "research_status": ("source_reachable_needs_manual_review" if not page_text and source_meta["url"].casefold().endswith(".pdf") else "source_checked_needs_claim_review"),
             "research_checked_at": timestamp,
             "production_status": "not_started",
             "publication_status": "not_published",
