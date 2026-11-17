@@ -192,3 +192,17 @@ def test_story_scenes_assign_protagonist_interactions_to_financial_props():
         for scene in scenes
     ]
     assert len(set(interactions)) == 6
+
+
+def test_character_interactions_have_timed_eased_reach_choreography():
+    storyboard = build_storyboard(
+        _script(), video_format="short",
+        disclaimer_config=load_yaml("config/disclaimer.yaml"),
+    )
+    for scene in storyboard["scenes"][:-1]:
+        character = next(item for item in scene["elements"] if item["type"] == "person")
+        animation = character["interaction_animation"]
+        target = character["interaction_target"]
+        assert animation["start_seconds"] < animation["end_seconds"]
+        assert animation["easing"] == "ease_out"
+        assert (animation["from_x"], animation["from_y"]) != (target["x"], target["y"])
