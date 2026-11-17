@@ -1,0 +1,49 @@
+project:
+  name: "The Finance Campus"
+  language: "en"
+  timezone: "Africa/Kampala"
+  audience:
+    - "global"
+    - "Uganda"
+    - "East Africa"
+platforms:
+  youtube:
+    enabled: false
+    shorts:
+      width: 1080
+      height: 1920
+      fps: 30
+    long_form:
+      width: 1920
+      height: 1080
+      fps: 30
+  tiktok:
+    enabled: false
+    width: 1080
+    height: 1920
+    fps: 30
+audio:
+  provider: "kokoro"
+  allow_provider_replacement: false
+  voice_profiles:
+    - "male"
+    - "female"
+production:
+  shorts_target_seconds: [45, 90]
+  long_form_target_minutes: [5, 10]
+  publishing_enabled: false
+  require_quality_gate: true
+  require_publication_verification: true
+schedule:
+  shorts_per_day: 2
+  shorts_publish_times_eat: ["09:00", "18:00"]
+  youtube_long_form_per_week: 3
+research:
+  weekly_new_topic_target: 20
+  require_sources: true
+  preferred_sources:
+    - "central banks"
+    - "financial regulators"
+    - "government agencies"
+    - "academic research"
+    - "established financial education institutions"
