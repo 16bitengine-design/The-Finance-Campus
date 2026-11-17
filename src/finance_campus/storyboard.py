@@ -21,6 +21,13 @@ def validate_storyboard(data: Any) -> list[str]:
     errors: list[str] = []
     if not isinstance(data, dict):
         return ["storyboard must be a JSON object"]
+    canvas = data.get("canvas", {"width": WIDTH, "height": HEIGHT})
+    if not isinstance(canvas, dict):
+        return ["canvas must be an object with positive width and height"]
+    for dimension in ("width", "height"):
+        value = canvas.get(dimension, WIDTH if dimension == "width" else HEIGHT)
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value <= 0:
+            return [f"canvas.{dimension} must be a positive finite number"]
     scenes = data.get("scenes")
     if not isinstance(scenes, list) or not scenes:
         return ["storyboard must contain a non-empty scenes list"]
