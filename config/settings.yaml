@@ -9,6 +9,8 @@ project:
 platforms:
   youtube:
     enabled: false
+    short_videos_per_day: 2
+    cross_publish_daily_shorts: true
     shorts:
       width: 1080
       height: 1920
@@ -19,6 +21,8 @@ platforms:
       fps: 30
   tiktok:
     enabled: false
+    short_videos_per_day: 2
+    cross_publish_daily_shorts: true
     width: 1080
     height: 1920
     fps: 30
@@ -35,7 +39,9 @@ production:
   require_quality_gate: true
   require_publication_verification: true
 schedule:
-  shorts_per_day: 2
+  unique_short_videos_per_day: 2
+  short_posts_per_platform_per_day: 2
+  cross_publish_each_short_to_both_platforms: true
   shorts_publish_times_eat: ["09:00", "18:00"]
   youtube_long_form_per_week: 3
 research:
