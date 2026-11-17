@@ -99,12 +99,12 @@ The storyboard mapper is deliberately deterministic: it selects suitable financi
 
 Use an approved script package with at least one reputable source URL (see examples/script-package.example.json):
 
-\`\`\`bash
-python -m finance_campus.cli produce-video \\
-  examples/script-package.example.json production/emergency-fund-short \\
-  --format short --voice af_heart --device cpu \\
+```bash
+python -m finance_campus.cli produce-video \
+  examples/script-package.example.json production/emergency-fund-short \
+  --format short --voice af_heart --device cpu \
   --fps 30 --draw-fps 24 --transition-seconds 0.25
-\`\`\`
+```
 
 For a YouTube long-form video, use --format long. Available voice IDs are af_heart, am_michael, bf_emma, and bm_george.
 
