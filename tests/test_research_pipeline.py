@@ -34,3 +34,41 @@ def test_refresh_is_idempotent(tmp_path):
     second = refresh_topics(path, target=20, fetcher=fake_fetch)
     assert first["added_count"] == 20
     assert second["added_count"] == 0
+
+
+
+def test_refresh_persists_discovered_feed_topics_before_curated_fallback(tmp_path, monkeypatch):
+    discovered_topic = {
+        "id": "TFC-FEED000001",
+        "title": "How consumer investment fraud works",
+        "category": "Financial Scams and Fraud Prevention",
+        "target_audience": ["global adults"],
+        "geographic_relevance": ["global"],
+        "research_sources": [{"url": "https://www.sec.gov/example", "publisher": "SEC"}],
+        "sources": ["https://www.sec.gov/example"],
+        "research_status": "discovered_needs_claim_review",
+        "production_status": "not_started",
+        "publication_status": "not_published",
+        "editorial_brief": {
+            "problem": "A financial issue needs explanation.",
+            "stakes": "Only evidence-backed risks should be described.",
+            "explanation": "Explain the issue in plain language.",
+            "action": "Check official sources.",
+        },
+        "discovery_metadata": {"method": "official_rss_atom"},
+    }
+
+    def fake_discover(**kwargs):
+        assert kwargs["target"] == 1
+        return [discovered_topic], [], {"SEC investor alerts": 1}
+
+    monkeypatch.setattr(
+        "finance_campus.research_pipeline.discover_from_official_feeds",
+        fake_discover,
+    )
+    path = tmp_path / "topics.json"
+    result = refresh_topics(path, target=1)
+    assert result["added_count"] == 1
+    assert result["discovered_topic_count"] == 1
+    assert result["curated_fallback_topic_count"] == 0
+    assert result["added"][0]["research_status"] == "discovered_needs_claim_review"
