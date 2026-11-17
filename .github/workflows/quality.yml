@@ -29,11 +29,38 @@ jobs:
       - name: Check formatting and lint
         run: ruff check src tests
 
-      - name: Render illustrated portrait sample
-        run: python -m finance_campus.cli render-video examples/illustrated-savings-short.json /tmp/finance-campus-sample.mp4 --format short --fps 30
-      - name: Upload rendered sample for visual review
+      - name: Render illustrated portrait sample and review frames
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageOps, ImageDraw
+          from finance_campus.video_renderer import render_video
+          import json
+          storyboard = json.loads(Path("examples/illustrated-savings-short.json").read_text(encoding="utf-8"))
+          output = Path("/tmp/finance-campus-sample.mp4")
+          render_video(storyboard, output, video_format="short", fps=30, draw_fps=24, keep_frames=True)
+          frames = sorted(Path("/tmp").glob(".finance-campus-sample_frames/frame_*.png"))
+          if not frames:
+              raise SystemExit("No rendered preview frames were produced")
+          picks = [frames[min(len(frames)-1, int((len(frames)-1)*p))] for p in (0.08, 0.24, 0.40, 0.56, 0.72, 0.90)]
+          tiles = []
+          for frame in picks:
+              image = Image.open(frame).convert("RGB")
+              image.thumbnail((270, 480))
+              tile = Image.new("RGB", (290, 520), "white")
+              tile.paste(image, ((290-image.width)//2, 8))
+              ImageDraw.Draw(tile).text((10, 495), frame.stem, fill=(16,43,85))
+              tiles.append(tile)
+          sheet = Image.new("RGB", (290*3, 520*2), (238,242,247))
+          for index, tile in enumerate(tiles):
+              sheet.paste(tile, ((index%3)*290, (index//3)*520))
+          sheet.save("/tmp/finance-campus-contact-sheet.jpg", quality=92)
+          PY
+      - name: Upload rendered sample and visual review frames
         uses: actions/upload-artifact@v4
         with:
           name: finance-campus-illustrated-sample
-          path: /tmp/finance-campus-sample.mp4
+          path: |
+            /tmp/finance-campus-sample.mp4
+            /tmp/finance-campus-contact-sheet.jpg
           if-no-files-found: error
