@@ -162,6 +162,26 @@ def _scene_elements(text: str, section: str, title: str, width: int, height: int
             _element("coin", width*.75, height*.21, width*.08, height*.05, "gold", 1.7),
             _element("coin", width*.70, height*.30, width*.08, height*.05, "gold", 2.35)]
 
+    # Give the protagonist a specific physical relationship with the key prop.
+    # Targets are expressed in storyboard canvas coordinates and are consumed by
+    # the renderer when drawing the character's arm and hand.
+    interaction_targets = {
+        "relatable_financial_problem": ("receives_paycheck", width * .63, height * .285),
+        "escalating_real_world_stakes": ("reaches_for_bill", width * .705, height * .605),
+        "clear_explanation_of_why_it_matters": ("moves_money_to_savings", width * .825, height * .57),
+        "hopeful_and_realistic_possibility": ("reaches_savings_jar", width * .725, height * .39),
+        "practical_action_viewers_can_take": ("deposits_money", width * .815, height * .64),
+        "empowering_close": ("protects_savings", width * .73, height * .48),
+    }
+    interaction, target_x, target_y = interaction_targets.get(
+        section, ("neutral", width * .5, height * .5),
+    )
+    person["interaction"] = interaction
+    person["interaction_target"] = {
+        "x": round(target_x + shift_x),
+        "y": round(target_y + shift_y),
+    }
+
     # The scene title is deliberately kept above the reserved caption area.
     elements.append({
         "type": "text", "x": round(width*.08), "y": round(height*.83),
