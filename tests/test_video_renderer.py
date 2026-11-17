@@ -85,7 +85,7 @@ def test_render_video_muxes_narration_and_burns_captions(tmp_path):
     assert generated.returncode == 0
     captions = tmp_path / "captions.srt"
     captions.write_text(
-        "1\\n00:00:00,000 --> 00:00:01,800\\nA practical money lesson\\n",
+        "1\n00:00:00,000 --> 00:00:01,800\nA practical money lesson\n",
         encoding="utf-8",
     )
     output = render_video(
