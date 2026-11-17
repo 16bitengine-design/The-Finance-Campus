@@ -15,7 +15,7 @@ def test_uganda_regulator_feeds_are_included_with_local_geography():
     assert feeds["Capital Markets Authority Uganda"]["url"] == "https://cmauganda.co.ug/feed/"
     assert feeds["Insurance Regulatory Authority Uganda"]["url"] == "https://ira.go.ug/feed/"
     assert "Uganda" in feeds["Capital Markets Authority Uganda"]["geography"]
-    assert "Uganda" in feeds["Insurance Regulatory Authority Uganda"]["geography"
+    assert "Uganda" in feeds["Insurance Regulatory Authority Uganda"]["geography"]
 
 
 
