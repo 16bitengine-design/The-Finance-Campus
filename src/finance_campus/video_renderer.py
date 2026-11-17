@@ -79,7 +79,7 @@ def _draw_element(
         if w <= 0 or h <= 0 or progress <= 0:
             return
         right, bottom = x + w, y + h
-        layer = Image.new("RGB", draw._image.size, PALETTE["white"])
+        layer = Image.new("RGBA", draw._image.size, (255, 255, 255, 0))
         art = ImageDraw.Draw(layer)
         cx, cy = x + w // 2, y + h // 2
         if kind == "person":
@@ -95,6 +95,12 @@ def _draw_element(
             waist = y + int(h*.66)
             art.line((cx, neck_y, cx, shoulder), fill=color, width=width)
             art.polygon(((cx-w//4, shoulder), (cx+w//4, shoulder), (cx+w//6, waist), (cx-w//6, waist)), outline=color)
+            art.line((cx-w//12, shoulder+width, cx, shoulder+width*4, cx+w//12, shoulder+width), fill=color, width=width)
+            art.line((cx, shoulder+width*4, cx, waist-h//14), fill=color, width=width)
+            art.rectangle((cx+w//12, shoulder+h//12, cx+w//4, shoulder+h//5), outline=color, width=max(1,width//2))
+            art.arc((cx-head, y-width, cx+head, y+head), 185, 355, fill=color, width=width)
+            art.ellipse((cx-head-width, y+head//2, cx-head+width, y+head), outline=color, width=width)
+            art.ellipse((cx+head-width, y+head//2, cx+head+width, y+head), outline=color, width=width)
             elbow_y = y + int(h*.43)
             hand_r = max(4, width*2)
             left_hand = (x+w//10, y+int(h*.56))
@@ -116,10 +122,17 @@ def _draw_element(
                 art.line((round(px), roof_y+width, round(px), bottom-h//6), fill=color, width=width)
             art.line((x, bottom-h//6, right, bottom-h//6), fill=color, width=width)
             art.line((x-w//20, bottom, right+w//20, bottom), fill=color, width=width)
+            sign_box = (cx-w//5, roof_y+h//14, cx+w//5, roof_y+h//5)
+            art.rounded_rectangle(sign_box, radius=max(2,width), outline=color, width=width)
+            art.text((cx-w//10, roof_y+h//13), "BANK", fill=color, font=_font(max(10,w//15)))
+            art.rectangle((cx-w//10, bottom-h//3, cx+w//10, bottom-h//6), outline=color, width=width)
         elif kind == "wallet":
             art.rounded_rectangle((x, y+h//4, right, bottom), radius=max(4,h//10), outline=color, width=width)
             art.rounded_rectangle((cx, y+h//2, right+w//12, y+h*3//4), radius=max(3,h//16), outline=color, width=width)
             art.ellipse((right-w//5, y+h*5//8, right-w//7, y+h*5//8+w//12), outline=color, width=width)
+            art.line((x+w//8, y+h//3, cx-w//12, y+h//3), fill=color, width=width)
+            art.line((x+w//8, y+h//2, cx-w//12, y+h//2), fill=color, width=width)
+            art.line((x+w//3, y+h//5, x+w//2, y+h//12, x+w*2//3, y+h//5), fill=color, width=width)
         elif kind == "house":
             roof_y = y+h//3
             art.line((x, roof_y, cx, y), fill=color, width=width)
@@ -129,20 +142,32 @@ def _draw_element(
         elif kind == "coin":
             art.ellipse((x, y, right, bottom), outline=color, width=width)
             art.ellipse((x+w//5, y+h//5, right-w//5, bottom-h//5), outline=color, width=width)
-            art.text((cx-w//8, cy-h//4), "$", fill=color, font=_font(max(12,w//2)))
+            art.text((cx-w//8, cy-h//4), "¤", fill=color, font=_font(max(12,w//2)))
         elif kind == "money_note":
             art.rounded_rectangle((x, y+h//6, right, bottom-h//6), radius=max(3,h//12), outline=color, width=width)
             art.ellipse((cx-w//9, cy-h//8, cx+w//9, cy+h//8), outline=color, width=width)
             art.line((x+w//8, y+h//3, x+w//4, y+h//3), fill=color, width=width)
             art.line((right-w//4, bottom-h//3, right-w//8, bottom-h//3), fill=color, width=width)
+            art.line((cx-w//12, y+h//4, cx+w//12, y+h//4), fill=color, width=width)
+            art.line((cx-w//12, bottom-h//4, cx+w//12, bottom-h//4), fill=color, width=width)
         elif kind == "savings_jar":
             art.line((x+w//4, y+h//5, right-w//4, y+h//5), fill=color, width=width)
             art.rounded_rectangle((x+w//5, y+h//4, right-w//5, bottom), radius=max(4,w//8), outline=color, width=width)
             art.line((cx-w//8, y+h//5, cx+w//8, y+h//5), fill=color, width=width)
             art.ellipse((cx-w//7, cy-h//8, cx+w//7, cy+h//8), outline=color, width=width)
+            coin_y = bottom-h//5
+            for offset in (-w//12, 0, w//12):
+                art.ellipse((cx+offset-w//12, coin_y-h//12, cx+offset+w//12, coin_y+h//12), outline=color, width=width)
+            art.line((cx-w//5, y+h//3, cx+w//5, y+h//3), fill=color, width=width)
+        mask = Image.new("L", draw._image.size, 0)
+        mask_draw = ImageDraw.Draw(mask)
         visible_right = x + max(1, round(w * progress))
-        crop = layer.crop((x, y, min(right, visible_right), bottom))
-        draw._image.paste(crop, (x, y))
+        slant = max(1, round(h * 0.12))
+        mask_draw.polygon(((x, y), (visible_right, y), (min(right, visible_right + slant), bottom), (x, bottom)), fill=255)
+        crop_box = (x, y, right, bottom)
+        art_layer = layer.crop(crop_box)
+        art_mask = mask.crop(crop_box)
+        draw._image.paste(art_layer.convert("RGB"), (x, y), art_mask)
         return
 
     if kind == "rect":
