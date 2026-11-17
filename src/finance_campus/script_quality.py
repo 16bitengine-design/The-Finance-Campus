@@ -18,6 +18,9 @@ REQUIRED_SECTIONS = (
 # These are explicit claims of guaranteed outcomes, not ordinary urgency words.
 PROHIBITED_PHRASES = (
     "guaranteed wealth",
+    "guarantees wealth",
+    "guarantee wealth",
+    "guaranteeing wealth",
     "get rich overnight",
     "become rich overnight",
     "risk-free investment returns",
