@@ -45,6 +45,18 @@ def _motion_position(element: dict[str, Any], elapsed: float) -> dict[str, Any]:
     progress = min(1.0, max(0.0, (elapsed - start) / (end - start)))
     animated["x"] = round(float(motion["from_x"]) + (float(motion["to_x"]) - float(motion["from_x"])) * progress)
     animated["y"] = round(float(motion["from_y"]) + (float(motion["to_y"]) - float(motion["from_y"])) * progress)
+    interaction = element.get("interaction_animation")
+    target = element.get("interaction_target")
+    if isinstance(interaction, dict) and isinstance(target, dict):
+        action_start = float(interaction["start_seconds"])
+        action_end = float(interaction["end_seconds"])
+        action_progress = min(1.0, max(0.0, (elapsed - action_start) / (action_end - action_start)))
+        if interaction.get("easing") == "ease_out":
+            action_progress = 1 - (1 - action_progress) ** 3
+        animated["interaction_target"] = {
+            "x": round(float(interaction["from_x"]) + (float(target["x"]) - float(interaction["from_x"])) * action_progress),
+            "y": round(float(interaction["from_y"]) + (float(target["y"]) - float(interaction["from_y"])) * action_progress),
+        }
     return animated
 
 
