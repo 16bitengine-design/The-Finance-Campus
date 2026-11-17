@@ -314,7 +314,7 @@ def _draw_element(
             # When a scene specifies an interaction, the protagonist's hand
             # reaches the actual prop instead of stopping at a generic pose.
             target = element.get("interaction_target")
-            if isinstance(target, dict) and pose not in {"worried", "overwhelmed", "celebrating"}:
+            if isinstance(target, dict) and pose != "celebrating":
                 target_x = round(float(target["x"]) * sx)
                 target_y = round(float(target["y"]) * sy)
                 elbow = (
