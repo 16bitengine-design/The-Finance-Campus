@@ -36,7 +36,11 @@ Kokoro is the project's only approved narration engine. The integration supports
 ### Install
 
 1. Install FFmpeg and `espeak-ng` (the latter provides pronunciation fallback for unfamiliar English words).
-2. Install the project with the Kokoro extra:
+2. Install the CPU build of PyTorch, suitable for machines without a supported GPU:
+
+   `python -m pip install torch --index-url https://download.pytorch.org/whl/cpu`
+
+3. Install the project with the Kokoro extra:
 
    `python -m pip install -e ".[dev,tts]"`
 
