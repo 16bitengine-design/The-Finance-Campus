@@ -152,7 +152,7 @@ def render_video(
     *,
     video_format: str = "short",
     fps: int = 30,
-    draw_fps: int = 12,
+    draw_fps: int = 24,
     ffmpeg: str = "ffmpeg",
     keep_frames: bool = False,
     audio_path: str | Path | None = None,
