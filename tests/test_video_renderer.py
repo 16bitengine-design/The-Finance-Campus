@@ -238,3 +238,21 @@ def test_scene_transition_inserts_smooth_crossfade_frames(tmp_path):
     assert outgoing != incoming
     assert halfway != outgoing
     assert halfway != incoming
+
+
+
+def test_illustration_motion_interpolates_between_start_and_destination():
+    from finance_campus.video_renderer import _motion_position
+
+    element = {
+        "type": "coin", "x": 10, "y": 20, "width": 40, "height": 40,
+        "motion": {
+            "from_x": 100, "from_y": 200, "to_x": 300, "to_y": 600,
+            "start_seconds": 2, "end_seconds": 6,
+        },
+    }
+    assert (_motion_position(element, 2)["x"], _motion_position(element, 2)["y"]) == (100, 200)
+    halfway = _motion_position(element, 4)
+    assert (halfway["x"], halfway["y"]) == (200, 400)
+    finish = _motion_position(element, 8)
+    assert (finish["x"], finish["y"]) == (300, 600)
