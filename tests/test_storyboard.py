@@ -85,3 +85,12 @@ def test_character_interaction_animation_requires_a_target():
         "requires interaction_target" in error
         for error in validate_storyboard(data)
     )
+
+
+def test_walking_cycle_rejects_invalid_timing():
+    data = sample_storyboard()
+    data["scenes"][0]["elements"][0]["walk_cycle"] = {
+        "start_seconds": 2, "end_seconds": 1, "cycle_seconds": 0,
+    }
+    errors = validate_storyboard(data)
+    assert any("walk_cycle timing" in error for error in errors)
