@@ -23,7 +23,7 @@ def generate_script(topic: dict[str, Any], *, duration: str = "short") -> dict[s
         raise ValueError("duration must be 'short' or 'long'")
     brief = topic.get("editorial_brief")
     if not isinstance(brief, dict):
-        raise ValueError("Topic has no editorial_brief; research and approve its brief first")
+        raise TypeError("Topic has no editorial_brief; research and approve its brief first")
     required = ("problem", "stakes", "explanation", "action")
     if any(not isinstance(brief.get(key), str) or not brief[key].strip() for key in required):
         raise ValueError("Topic editorial brief is incomplete")
