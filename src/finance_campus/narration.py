@@ -22,7 +22,7 @@ SUPPORTED_VOICES = {
 
 def _sentence_groups(text: str, *, min_words: int = 12, max_words: int = 24) -> list[str]:
     """Group complete sentences into natural chunks and split unusually long sentences."""
-    sentences = [part.strip() for part in re.split(r"(?<=[.!?])\\s+", text.strip()) if part.strip()]
+    sentences = [part.strip() for part in re.split(r"(?<=[.!?])\s+", text.strip()) if part.strip()]
     if not sentences:
         raise ValueError("Scene narration is empty")
     groups: list[str] = []
@@ -181,7 +181,10 @@ def synthesize_storyboard(
             scene_offset += duration
         speech = np.concatenate(scene_parts)
         speech_duration = len(speech) / SAMPLE_RATE
-        visual_duration = math.ceil((speech_duration + tail_gap) * draw_fps) / draw_fps
+        minimum_duration = float(scene.get("minimum_duration_seconds", 0.0))
+        if not math.isfinite(minimum_duration) or minimum_duration < 0:
+            raise ValueError(f"Scene {scene['id']} has invalid minimum_duration_seconds")
+        visual_duration = math.ceil(max(speech_duration + tail_gap, minimum_duration) * draw_fps) / draw_fps
         actual_tail = max(0.0, visual_duration - speech_duration)
         audio_parts.append(speech)
         if actual_tail:
