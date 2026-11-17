@@ -174,3 +174,21 @@ def test_character_performance_changes_with_the_emotional_story_arc():
         character = next(item for item in scene["elements"] if item["type"] == "person")
         actual.append((character["pose"], character["expression"]))
     assert actual == expected
+
+
+def test_story_scenes_assign_protagonist_interactions_to_financial_props():
+    storyboard = build_storyboard(
+        _script(), video_format="short",
+        disclaimer_config=load_yaml("config/disclaimer.yaml"),
+    )
+    scenes = storyboard["scenes"][:-1]
+    assert len(scenes) == 6
+    assert all(
+        isinstance(next(item for item in scene["elements"] if item["type"] == "person").get("interaction_target"), dict)
+        for scene in scenes
+    )
+    interactions = [
+        next(item for item in scene["elements"] if item["type"] == "person")["interaction"]
+        for scene in scenes
+    ]
+    assert len(set(interactions)) == 6
