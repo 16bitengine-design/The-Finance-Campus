@@ -2,6 +2,7 @@ import shutil
 import subprocess
 
 import pytest
+from PIL import Image, ImageChops
 
 from finance_campus.storyboard import render_scene_svg, validate_storyboard
 from finance_campus.video_renderer import render_video
@@ -23,11 +24,14 @@ def _storyboard():
 
 @pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="FFmpeg is not installed")
 def test_render_video_creates_playable_mp4(tmp_path):
-    output = render_video(_storyboard(), tmp_path / "sample.mp4", fps=12, draw_fps=6)
+    output = render_video(_storyboard(), tmp_path / "sample.mp4", fps=12, draw_fps=6, keep_frames=True)
     assert output.is_file()
     assert output.stat().st_size > 1024
     result = subprocess.run(["ffmpeg", "-hide_banner", "-i", str(output), "-f", "null", "-"], capture_output=True, text=True, check=False)
     assert "Video:" in result.stderr
+    final_frame = Image.open(tmp_path / ".sample_frames" / "frame_000023.png").convert("RGB")
+    white = Image.new("RGB", final_frame.size, (255, 255, 255))
+    assert ImageChops.difference(final_frame, white).getbbox() is not None
 
 def test_video_renderer_rejects_text_only_storyboard(tmp_path):
     storyboard = _storyboard()
