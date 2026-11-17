@@ -14,7 +14,7 @@ from typing import Any
 
 from PIL import Image, ImageDraw, ImageFont
 
-from finance_campus.storyboard import ALLOWED_COLORS, validate_storyboard
+from finance_campus.storyboard import validate_storyboard
 
 PALETTE = {
     "navy": (16, 43, 85),
