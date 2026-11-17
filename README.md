@@ -53,3 +53,8 @@ The actual rendering engine, Kokoro integration, research automation, and platfo
 - Each of the two videos is cross-published to YouTube Shorts and TikTok, resulting in two posts per day on each platform (four platform posts total).
 - The configured target slots remain 09:00 and 18:00 Africa/Kampala time.
 - Publishing is still disabled until the full pipeline, account access, quality gates, and public-verification checks are tested.
+
+## Unattended operation
+After one-time setup and platform authorization, the target system runs end to end without routine human intervention: research, topic selection, scriptwriting, illustration, Kokoro narration, rendering, quality control, scheduled publishing, and public-post verification. It retries recoverable failures safely, prevents duplicate uploads, resumes from recorded state, and reports blocking failures.
+
+Publishing remains disabled until end-to-end tests pass and platform authorization is configured. Initial account authorization and any platform-mandated app review cannot be skipped or guaranteed by code.
