@@ -56,3 +56,21 @@ def test_refresh_adds_evergreen_mindset_topics_not_news_headlines(tmp_path):
     )
     assert any("looking rich" in item["title"].casefold() for item in result["added"])
     assert any("comparison" in item["title"].casefold() for item in result["added"])
+
+
+def test_inspiration_blueprints_are_carried_into_topic_records(tmp_path):
+    result = refresh_topics(tmp_path / "topics.json", target=40, fetcher=fake_fetch)
+    inspired = {
+        item["topic_slug"]: item["inspiration"]
+        for item in result["added"]
+        if item.get("inspiration")
+    }
+    assert "pay-yourself-first" in inspired
+    assert inspired["pay-yourself-first"]["author"] == "George S. Clason"
+    assert "every-purchase-costs-time" in inspired
+    assert inspired["every-purchase-costs-time"]["authors"] == ["Vicki Robin", "Joe Dominguez"]
+    assert all(
+        item["inspiration"]["use"] == "paraphrased_idea_no_direct_quote"
+        for item in result["added"]
+        if item.get("inspiration")
+    )
