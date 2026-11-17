@@ -146,7 +146,7 @@ def _draw_element(
         return
 
     if kind == "rect":
-        x, y = _point(element["x"], sx, sy)
+        x, y = _point(element["x"], element["y"], sx, sy)
         w = round(element["width"] * progress * sx)
         h = round(element["height"] * progress * sy)
         if w > 0 and h > 0:
