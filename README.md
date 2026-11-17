@@ -104,7 +104,7 @@ Run its automated checks with `python -m pytest -q`. Inputs are validated and in
 
 ## Illustrated whiteboard storyboard pipeline
 
-Storyboards map each spoken scene to a duration and a sequence of visual elements. A scene containing only text is rejected; it must include at least one illustration such as a shape, line, or arrow.
+Storyboards map each spoken scene to a duration and a sequence of visual elements. A scene containing only text is rejected. Supported visual elements include geometric primitives plus line-art people, banks, wallets, houses, coins, banknotes and savings jars. Set the storyboard canvas to 1000×1778 for native portrait composition or 1000×562 for landscape composition.
 
 Validate a storyboard:
 
@@ -114,10 +114,14 @@ Render each scene to a standalone animated SVG whiteboard frame:
 
 `python -m finance_campus.cli render-storyboard examples/storyboard.example.json production/storyboards/debt-example`
 
-The SVG renderer produces scene assets. The MP4 renderer in `src/finance_campus/video_renderer.py` draws storyboard elements progressively into raster frames with Pillow, then encodes and validates a playable H.264 MP4 with FFmpeg. It supports vertical 1080×1920 Shorts and horizontal 1920×1080 long-form layouts. The first renderer animates geometric illustration primitives (circles, rectangles, lines, arrows and labels); complex character artwork is a later upgrade.
+The SVG renderer produces scene assets at the storyboard canvas aspect ratio. The MP4 renderer in `src/finance_campus/video_renderer.py` progressively reveals the line-art illustrations into raster frames with Pillow, then encodes and validates a playable H.264 MP4 with FFmpeg. It supports vertical 1080×1920 Shorts and horizontal 1920×1080 long-form layouts, preserving the composition rather than stretching it. The built-in person and financial-object drawings are intentionally simple reusable line-art assets; richer custom character artwork and scene transitions remain visual-quality upgrades.
 
 Render an MP4:
 
-`python -m finance_campus.cli render-video examples/storyboard.example.json production/renders/example.mp4 --format short`
+`python -m finance_campus.cli render-video examples/illustrated-savings-short.json production/renders/example.mp4 --format short`
 
-Use `--format long` for 16:9. FFmpeg and Pillow are required. Kokoro narration, audio mixing, synchronized captions, transitions, and full audiovisual quality checks remain separate stages.
+Use `--format long` for 16:9. FFmpeg and Pillow are required. Narration audio and SRT captions can be supplied to the same render command and will be muxed/burned into the MP4:
+
+`python -m finance_campus.cli render-video storyboard.json output.mp4 --format short --audio narration.wav --captions captions.srt`
+
+The renderer validates the requested audio stream and the final MP4 playback. Kokoro narration generation remains a separate stage that will provide the audio file; caption timing must be generated and quality-checked upstream. Scene transitions and broader audiovisual quality checks are still outstanding. CI renders and stores a sample illustrated portrait video as a workflow artifact.
