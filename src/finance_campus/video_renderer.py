@@ -239,8 +239,11 @@ def render_video(
             [executable, "-hide_banner", "-i", str(target), "-f", "null", "-"],
             capture_output=True, text=True, check=False,
         )
-        if "Video:" not in (probe.stderr + probe.stdout):
+        probe_output = probe.stderr + probe.stdout
+        if "Video:" not in probe_output:
             raise RuntimeError("Rendered MP4 failed FFmpeg playback/stream validation")
+        if audio is not None and "Audio:" not in probe_output:
+            raise RuntimeError("Rendered MP4 is missing its requested narration audio stream")
         return target
     finally:
         if not keep_frames:
