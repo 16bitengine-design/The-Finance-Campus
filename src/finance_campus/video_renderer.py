@@ -74,7 +74,7 @@ def _draw_element(
         return
 
     if kind in ILLUSTRATION_TYPES:
-        x, y = _point(element["x"], sx, sy)
+        x, y = _point(element["x"], element["y"], sx, sy)
         w, h = round(element["width"] * sx), round(element["height"] * sy)
         if w <= 0 or h <= 0 or progress <= 0:
             return
@@ -147,7 +147,8 @@ def _draw_element(
 
     if kind == "rect":
         x, y = _point(element["x"], sx, sy)
-        w, h = _point(element["width"] * progress, sx, sy)
+        w = round(element["width"] * progress * sx)
+        h = round(element["height"] * progress * sy)
         if w > 0 and h > 0:
             draw.rounded_rectangle((x, y, x + w, y + h), radius=max(2, width * 2), outline=color, width=width)
         return
