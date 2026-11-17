@@ -11,7 +11,7 @@ from finance_campus.script_pipeline import prepare_script
 from finance_campus.script_quality import validate_script
 from finance_campus.storyboard import render_storyboard, validate_storyboard
 from finance_campus.video_renderer import render_video
-from finance_campus.narration import synthesize_storyboard
+from finance_campus.narration import synthesize_storyboard\nfrom finance_campus.production_pipeline import produce_video_from_script
 
 
 def _read_json(path: str) -> object:
@@ -21,7 +21,7 @@ def _read_json(path: str) -> object:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="The Finance Campus project tools")
-    parser.add_argument("command", choices=("validate-config", "validate-script", "prepare-script", "validate-storyboard", "render-storyboard", "render-video", "synthesize-narration"))
+    parser.add_argument("command", choices=("validate-config", "validate-script", "prepare-script", "validate-storyboard", "render-storyboard", "render-video", "synthesize-narration", "produce-video"))
     parser.add_argument("script_path", nargs="?", help="Input JSON script or storyboard")
     parser.add_argument("output_path", nargs="?", help="Output path for approved data, SVGs, or MP4")
     parser.add_argument("--format", choices=("short", "long"), default="short", dest="video_format")
@@ -34,7 +34,7 @@ def main() -> int:
     parser.add_argument("--speed", type=float, default=1.0)
     parser.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
     parser.add_argument("--scene-tail-seconds", type=float, default=0.35)
-    args = parser.parse_args()
+    args = parser.parse_args()\n    if args.command == "produce-video":\n        if not args.script_path or not args.output_path:\n            parser.error("produce-video requires an approved script JSON and an output directory")\n        try:\n            script = _read_json(args.script_path)\n            result = produce_video_from_script(\n                script, args.output_path, video_format=args.video_format,\n                voice=args.voice, speed=args.speed, device=args.device,\n                fps=args.fps, draw_fps=args.draw_fps,\n                transition_seconds=args.transition_seconds,\n                scene_tail_seconds=args.scene_tail_seconds,\n            )\n            print(json.dumps(result, indent=2))\n            return 0\n        except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as exc:\n            print(f"FAIL production: {exc}")\n            return 1
     if args.command == "validate-config":
         checks = {"branding": validate_branding(load_yaml("config/branding.yaml")), "disclaimer": validate_disclaimer(load_yaml("config/disclaimer.yaml"))}
         failed = False
