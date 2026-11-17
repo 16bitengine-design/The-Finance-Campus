@@ -6,7 +6,12 @@ import json
 import sys
 from pathlib import Path
 
-from finance_campus.config import load_yaml, validate_branding, validate_disclaimer, validate_settings
+from finance_campus.config import (
+    load_yaml,
+    validate_branding,
+    validate_disclaimer,
+    validate_settings,
+)
 from finance_campus.narration import synthesize_storyboard
 from finance_campus.production_pipeline import produce_video_from_script
 from finance_campus.research_pipeline import refresh_topics
