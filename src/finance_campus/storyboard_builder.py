@@ -188,6 +188,23 @@ def _scene_elements(text: str, section: str, title: str, width: int, height: int
         "end_seconds": 3.2,
         "easing": "ease_out",
     }
+    if section in {"hopeful_and_realistic_possibility", "practical_action_viewers_can_take"}:
+        walk_from_x = round(person["x"])
+        person["motion"] = {
+            "from_x": walk_from_x,
+            "from_y": round(person["y"]),
+            "to_x": round(walk_from_x + width * .075),
+            "to_y": round(person["y"]),
+            "start_seconds": .8,
+            "end_seconds": 2.4,
+            "easing": "ease_in_out",
+        }
+        person["walk_cycle"] = {
+            "start_seconds": .8,
+            "end_seconds": 2.4,
+            "cycle_seconds": .52,
+            "stride": .075,
+        }
 
     # The scene title is deliberately kept above the reserved caption area.
     elements.append({
