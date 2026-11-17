@@ -1,7 +1,7 @@
 """Frame-based whiteboard video renderer using Pillow and FFmpeg.
 
 This renderer draws storyboard geometry progressively into real raster frames,
-then encodes a playable MP4. Audio narration is intentionally a separate stage.
+then encodes a playable MP4. Narration generation is upstream; supplied audio and SRT captions can be muxed and burned in during rendering.
 """
 from __future__ import annotations
 
