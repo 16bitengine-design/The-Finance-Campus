@@ -12,10 +12,11 @@ import json
 import re
 import urllib.error
 import urllib.request
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from finance_campus.topics import add_topic, load_topics, save_topics
 
@@ -129,7 +130,7 @@ def refresh_topics(
         raise ValueError("target must be at least 1")
     topics = load_topics(library_path)
     known = {str(item.get("id")) for item in topics}
-    timestamp = (now or datetime.now(timezone.utc)).isoformat()
+    timestamp = (now or datetime.now(UTC)).isoformat()
     cache: dict[str, dict[str, Any]] = {}
     added: list[dict[str, Any]] = []
     rejected: list[dict[str, str]] = []
@@ -165,7 +166,7 @@ def refresh_topics(
                 "verification": "reachable_and_keyword_checked",
                 "evidence_note": "Official source page was reachable and contained at least one mapped topic keyword; claim-level support still requires editorial review.",
             }
-        except Exception as exc:  # A failed source must never silently enter the library.
+        except (OSError, ValueError, TimeoutError, urllib.error.URLError) as exc:  # Fail closed.
             rejected.append({"title": blueprint["title"], "reason": str(exc)})
             continue
 
