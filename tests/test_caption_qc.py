@@ -41,7 +41,7 @@ def test_validate_srt_accepts_ordered_cues_matching_speech(tmp_path):
         ),
         (
             "1\n00:00:00,000 --> 00:00:01,000\nOnly half",
-            "coverage does not match",
+            "coverage is incomplete",
         ),
     ],
 )
