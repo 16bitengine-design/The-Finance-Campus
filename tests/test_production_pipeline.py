@@ -18,7 +18,7 @@ def test_production_pipeline_runs_all_stages_and_fails_closed(monkeypatch, tmp_p
         captions = root / "captions.srt"
         timed = root / "storyboard_with_audio_timing.json"
         audio.write_bytes(b"fake audio")
-        captions.write_text("1\n00:00:00,000 --> 00:00:01,000\nExample captions\n", encoding="utf-8")
+        captions.write_text("1\n00:00:00,000 --> 00:00:03,500\nExample captions\n", encoding="utf-8")
         updated = {**storyboard, "scenes": []}
         for scene in storyboard["scenes"]:
             item = dict(scene)
