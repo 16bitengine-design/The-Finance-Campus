@@ -335,3 +335,19 @@ def test_character_reach_interpolates_over_time_without_object_motion():
     assert halfway["x"] > 500 and halfway["x"] < 700
     assert halfway["y"] > 250 and halfway["y"] < 500
     assert after == {"x": 700, "y": 500}
+
+
+def test_walking_cycle_produces_distinct_gait_phases_and_body_bob():
+    from finance_campus.video_renderer import _motion_position
+
+    character = {
+        "type": "person",
+        "walk_cycle": {
+            "start_seconds": 1, "end_seconds": 3,
+            "cycle_seconds": .5,
+        },
+    }
+    first = _motion_position(character, 1.125)
+    second = _motion_position(character, 1.375)
+    assert first["walk_phase"] != second["walk_phase"]
+    assert first["body_bob"] != second["body_bob"]
