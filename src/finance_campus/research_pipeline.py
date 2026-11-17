@@ -12,12 +12,13 @@ import json
 import re
 import urllib.error
 import urllib.request
+from collections.abc import Callable
 from datetime import UTC, datetime
 from html.parser import HTMLParser
 from pathlib import Path
-from collections.abc import Callable
 from typing import Any
 
+from finance_campus.feed_discovery import discover_from_official_feeds
 from finance_campus.topics import add_topic, load_topics, save_topics
 
 
@@ -105,13 +106,13 @@ def fetch_source(url: str, timeout: int = 15) -> dict[str, Any]:
         if "pdf" in content_type.casefold() or url.casefold().endswith(".pdf"):
             # PDFs are accepted as reachable official sources, but text extraction is
             # deliberately not claimed here; PDF evidence needs a separate parser/review.
-            return {"url": url, "status": response.status, "content_type": content_type, "text": ""}
+            return {"url": url, "final_url": response.geturl(), "status": response.status, "content_type": content_type, "text": ""}
         parser = _TextExtractor()
         parser.feed(body.decode("utf-8", errors="replace"))
         text = re.sub(r"\s+", " ", " ".join(parser.parts))
         if len(text) < 200:
             raise ValueError(f"Source page returned too little readable text: {url}")
-        return {"url": url, "status": response.status, "content_type": content_type, "text": text[:50000]}
+        return {"url": url, "final_url": response.geturl(), "status": response.status, "content_type": content_type, "text": text[:50000]}
 
 
 def _default_fetcher(url: str) -> dict[str, Any]:
@@ -134,8 +135,26 @@ def refresh_topics(
     cache: dict[str, dict[str, Any]] = {}
     added: list[dict[str, Any]] = []
     rejected: list[dict[str, str]] = []
+    discovery_feed_counts: dict[str, int] = {}
+
+    # Discover from trusted official feeds first; curated blueprints fill any shortfall.
+    discovered, feed_rejected, discovery_feed_counts = discover_from_official_feeds(
+        existing_topics=topics,
+        target=target,
+        timestamp=timestamp,
+        article_fetcher=fetcher,
+    )
+    rejected.extend(feed_rejected)
+    for discovered_topic in discovered:
+        if len(added) >= target:
+            break
+        if add_topic(topics, discovered_topic):
+            added.append(discovered_topic)
+            known.add(str(discovered_topic["id"]))
 
     for blueprint in TOPIC_BLUEPRINTS:
+        if len(added) >= target:
+            break
         if len(added) >= target:
             break
         topic_id = "TFC-" + hashlib.sha1(blueprint["slug"].encode()).hexdigest()[:10].upper()
@@ -201,9 +220,12 @@ def refresh_topics(
         "library_count": len(topics),
         "added": added,
         "rejected": rejected,
+        "discovery_feed_counts": discovery_feed_counts,
+        "discovered_topic_count": sum(1 for item in added if item.get("discovery_metadata", {}).get("method") == "official_rss_atom"),
+        "curated_fallback_topic_count": sum(1 for item in added if not item.get("discovery_metadata")),
         "target_met": len(added) >= target,
         "saved_to": str(library_path),
-        "research_limitations": "URL reachability and keyword presence are checked; claim-level source support is not automatically proven.",
+        "research_limitations": "Official RSS/Atom feeds are scanned for finance-related headlines, article pages are checked for readability and trusted publisher domains, and curated topics fill any shortfall. Claim-level source support is not automatically proven; all candidates require editorial review.",
     }
 
 
