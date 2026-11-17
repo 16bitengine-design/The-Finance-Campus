@@ -94,7 +94,7 @@ def _scene_elements(text: str, section: str, title: str, width: int, height: int
         {
             "type": "text",
             "x": round(width * 0.08),
-            "y": round(height * 0.91),
+            "y": round(height * 0.84),
             "text": title,
             "color": "navy",
             "start_seconds": 3.7,
