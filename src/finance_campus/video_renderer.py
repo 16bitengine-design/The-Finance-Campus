@@ -39,12 +39,11 @@ def _motion_position(element: dict[str, Any], elapsed: float) -> dict[str, Any]:
     """Return an element positioned along its optional, time-based motion path."""
     animated = dict(element)
     motion = element.get("motion")
-    if not isinstance(motion, dict):
-        return animated
-    start, end = float(motion["start_seconds"]), float(motion["end_seconds"])
-    progress = min(1.0, max(0.0, (elapsed - start) / (end - start)))
-    animated["x"] = round(float(motion["from_x"]) + (float(motion["to_x"]) - float(motion["from_x"])) * progress)
-    animated["y"] = round(float(motion["from_y"]) + (float(motion["to_y"]) - float(motion["from_y"])) * progress)
+    if isinstance(motion, dict):
+        start, end = float(motion["start_seconds"]), float(motion["end_seconds"])
+        progress = min(1.0, max(0.0, (elapsed - start) / (end - start)))
+        animated["x"] = round(float(motion["from_x"]) + (float(motion["to_x"]) - float(motion["from_x"])) * progress)
+        animated["y"] = round(float(motion["from_y"]) + (float(motion["to_y"]) - float(motion["from_y"])) * progress)
     interaction = element.get("interaction_animation")
     target = element.get("interaction_target")
     if isinstance(interaction, dict) and isinstance(target, dict):
