@@ -58,3 +58,34 @@ def validate_disclaimer(config: dict[str, Any]) -> list[str]:
     if int(disclaimer.get("minimum_on_screen_seconds", 0)) < 6:
         errors.append("On-screen disclaimer duration must be at least 6 seconds")
     return errors
+
+
+def validate_settings(config: dict[str, Any]) -> list[str]:
+    """Reject unsafe or misleading operating settings until integrations are validated."""
+    errors: list[str] = []
+    project = config.get("project", {})
+    if project.get("timezone") != "Africa/Kampala":
+        errors.append("Project timezone must remain Africa/Kampala")
+    audio = config.get("audio", {})
+    if audio.get("provider") != "kokoro" or audio.get("allow_provider_replacement") is not False:
+        errors.append("Kokoro must remain the only approved narration provider")
+    cost = config.get("cost_policy", {})
+    for key in ("allow_paid_services", "allow_paid_api_keys", "allow_paid_assets",
+                "allow_paid_hosting", "allow_paid_compute"):
+        if cost.get(key) is not False:
+            errors.append(f"Zero-cost policy requires cost_policy.{key} to be false")
+    production = config.get("production", {})
+    platforms = config.get("platforms", {})
+    if production.get("publishing_enabled") is not False:
+        errors.append("Publishing must remain disabled until platform adapters and release tests pass")
+    for platform in ("youtube", "tiktok"):
+        if platforms.get(platform, {}).get("enabled") is not False:
+            errors.append(f"{platform} publishing must remain disabled until its adapter is validated")
+    automation = config.get("automation", {})
+    if automation.get("auto_publish_after_all_gates_pass") is not False:
+        errors.append("Automatic publishing cannot be enabled before platform release validation")
+    if automation.get("auto_publication_verification") is not False:
+        errors.append("Automatic publication verification is not implemented yet")
+    if automation.get("require_routine_human_approval") is not True:
+        errors.append("Human visual review must remain required until semantic visual QC is validated")
+    return errors
