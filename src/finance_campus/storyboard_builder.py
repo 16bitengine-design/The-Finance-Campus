@@ -163,6 +163,11 @@ def _scene_elements(text: str, section: str, title: str, width: int, height: int
             item["x"] = round(item["x"] + shift_x)
         if "y" in item and item["type"] != "text":
             item["y"] = round(item["y"] + shift_y)
+        if isinstance(item.get("motion"), dict):
+            for coordinate in ("from_x", "to_x"):
+                item["motion"][coordinate] = round(item["motion"][coordinate] + shift_x)
+            for coordinate in ("from_y", "to_y"):
+                item["motion"][coordinate] = round(item["motion"][coordinate] + shift_y)
         if item["type"] in {"coin", "money_note", "savings_jar"}:
             item["color"] = accent
     elements.sort(key=lambda item: float(item.get("start_seconds", 0)))
