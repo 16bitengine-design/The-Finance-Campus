@@ -108,3 +108,35 @@ def generate_from_library(
     temporary.write_text(json.dumps(script, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     temporary.replace(destination)
     return {"script": script, "saved_to": str(destination), "status": "candidate_needs_review"}
+
+def generate_pending_scripts(
+    library_path: str | Path,
+    output_dir: str | Path,
+    *,
+    duration: str = "short",
+) -> dict[str, Any]:
+    """Draft candidates for eligible topics, skipping existing files and unreviewed PDFs."""
+    topics = load_topics(library_path)
+    destination = Path(output_dir)
+    destination.mkdir(parents=True, exist_ok=True)
+    generated: list[str] = []
+    skipped: list[dict[str, str]] = []
+    for topic in topics:
+        topic_id = str(topic.get("id", ""))
+        if not topic_id:
+            skipped.append({"topic_id": "", "reason": "missing topic ID"})
+            continue
+        output = destination / f"{_safe_slug(topic_id)}-{duration}.json"
+        if output.exists():
+            continue
+        try:
+            generate_from_library(library_path, topic_id, output, duration=duration)
+            generated.append(str(output))
+        except ValueError as exc:
+            skipped.append({"topic_id": topic_id, "reason": str(exc)})
+    return {
+        "generated_count": len(generated),
+        "generated": generated,
+        "skipped": skipped,
+        "status": "candidate_only_no_production_or_publishing",
+    }
