@@ -181,6 +181,13 @@ def _scene_elements(text: str, section: str, title: str, width: int, height: int
         "x": round(target_x + shift_x),
         "y": round(target_y + shift_y),
     }
+    person["interaction_animation"] = {
+        "from_x": round(person["x"] + person["width"]),
+        "from_y": round(person["y"] + person["height"] * .32),
+        "start_seconds": 1.8,
+        "end_seconds": 3.2,
+        "easing": "ease_out",
+    }
 
     # The scene title is deliberately kept above the reserved caption area.
     elements.append({
