@@ -1,7 +1,10 @@
 import shutil
 import subprocess
+
 import pytest
+
 from finance_campus.video_renderer import render_video
+
 
 def _storyboard():
     return {"scenes": [{
