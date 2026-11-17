@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from finance_campus.research_pipeline import refresh_topics
 
@@ -11,7 +11,7 @@ def test_refresh_adds_unique_researched_topics(tmp_path):
     path = tmp_path / "topics.json"
     result = refresh_topics(
         path, target=5, fetcher=fake_fetch,
-        now=datetime(2026, 11, 17, tzinfo=timezone.utc),
+        now=datetime(2026, 11, 17, tzinfo=UTC),
     )
     assert result["added_count"] == 5
     assert result["target_met"] is True
