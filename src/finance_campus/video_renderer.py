@@ -14,7 +14,7 @@ from typing import Any
 
 from PIL import Image, ImageDraw, ImageFont
 
-from finance_campus.storyboard import validate_storyboard
+from finance_campus.storyboard import ILLUSTRATION_TYPES, validate_storyboard
 
 PALETTE = {
     "navy": (16, 43, 85),
@@ -70,6 +70,63 @@ def _draw_element(
         cx, cy = _point(element["cx"], sx, sy)
         radius = max(1, round(element["r"] * min(sx, sy) * progress))
         draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), outline=color, width=width)
+        return
+
+    if kind in ILLUSTRATION_TYPES:
+        x, y = _point(element["x"], sx, sy)
+        w, h = _point(element["width"], sx, sy)
+        if w <= 0 or h <= 0 or progress <= 0:
+            return
+        right, bottom = x + w, y + h
+        layer = Image.new("RGB", draw._image.size, PALETTE["white"])
+        art = ImageDraw.Draw(layer)
+        cx, cy = x + w // 2, y + h // 2
+        if kind == "person":
+            head = max(5, w // 7)
+            art.ellipse((cx-head, y, cx+head, y+2*head), outline=color, width=width)
+            shoulder = y + 2*head + 5
+            waist = y + int(h*.66)
+            art.line((cx, shoulder, cx, waist), fill=color, width=width)
+            art.line((cx, shoulder+8, x+w//8, y+int(h*.55)), fill=color, width=width)
+            art.line((cx, shoulder+8, right-w//8, y+int(h*.55)), fill=color, width=width)
+            art.line((cx, waist, x+w//4, bottom), fill=color, width=width)
+            art.line((cx, waist, right-w//4, bottom), fill=color, width=width)
+        elif kind == "bank":
+            roof_y = y + h//4
+            art.polygon(((x, roof_y), (cx, y), (right, roof_y)), outline=color)
+            art.line((x, roof_y, right, roof_y), fill=color, width=width)
+            for col in range(4):
+                px = x + w*(col+0.5)/4
+                art.line((round(px), roof_y+width, round(px), bottom-h//6), fill=color, width=width)
+            art.line((x, bottom-h//6, right, bottom-h//6), fill=color, width=width)
+            art.line((x-w//20, bottom, right+w//20, bottom), fill=color, width=width)
+        elif kind == "wallet":
+            art.rounded_rectangle((x, y+h//4, right, bottom), radius=max(4,h//10), outline=color, width=width)
+            art.rounded_rectangle((cx, y+h//2, right+w//12, y+h*3//4), radius=max(3,h//16), outline=color, width=width)
+            art.ellipse((right-w//5, y+h*5//8, right-w//7, y+h*5//8+w//12), outline=color, width=width)
+        elif kind == "house":
+            roof_y = y+h//3
+            art.line((x, roof_y, cx, y), fill=color, width=width)
+            art.line((cx, y, right, roof_y), fill=color, width=width)
+            art.rectangle((x+w//8, roof_y, right-w//8, bottom), outline=color, width=width)
+            art.rectangle((cx-w//10, bottom-h//3, cx+w//10, bottom), outline=color, width=width)
+        elif kind == "coin":
+            art.ellipse((x, y, right, bottom), outline=color, width=width)
+            art.ellipse((x+w//5, y+h//5, right-w//5, bottom-h//5), outline=color, width=width)
+            art.text((cx-w//8, cy-h//4), "$", fill=color, font=_font(max(12,w//2)))
+        elif kind == "money_note":
+            art.rounded_rectangle((x, y+h//6, right, bottom-h//6), radius=max(3,h//12), outline=color, width=width)
+            art.ellipse((cx-w//9, cy-h//8, cx+w//9, cy+h//8), outline=color, width=width)
+            art.line((x+w//8, y+h//3, x+w//4, y+h//3), fill=color, width=width)
+            art.line((right-w//4, bottom-h//3, right-w//8, bottom-h//3), fill=color, width=width)
+        elif kind == "savings_jar":
+            art.line((x+w//4, y+h//5, right-w//4, y+h//5), fill=color, width=width)
+            art.rounded_rectangle((x+w//5, y+h//4, right-w//5, bottom), radius=max(4,w//8), outline=color, width=width)
+            art.line((cx-w//8, y+h//5, cx+w//8, y+h//5), fill=color, width=width)
+            art.ellipse((cx-w//7, cy-h//8, cx+w//7, cy+h//8), outline=color, width=width)
+        visible_right = x + max(1, round(w * progress))
+        crop = layer.crop((x, y, min(right, visible_right), bottom))
+        draw._image.paste(crop, (x, y))
         return
 
     if kind == "rect":
