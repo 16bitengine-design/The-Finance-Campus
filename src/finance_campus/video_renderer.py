@@ -35,6 +35,19 @@ def _font(size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
     return ImageFont.load_default()
 
 
+def _motion_position(element: dict[str, Any], elapsed: float) -> dict[str, Any]:
+    """Return an element positioned along its optional, time-based motion path."""
+    animated = dict(element)
+    motion = element.get("motion")
+    if not isinstance(motion, dict):
+        return animated
+    start, end = float(motion["start_seconds"]), float(motion["end_seconds"])
+    progress = min(1.0, max(0.0, (elapsed - start) / (end - start)))
+    animated["x"] = round(float(motion["from_x"]) + (float(motion["to_x"]) - float(motion["from_x"])) * progress)
+    animated["y"] = round(float(motion["from_y"]) + (float(motion["to_y"]) - float(motion["from_y"])) * progress)
+    return animated
+
+
 def _point(x: float, y: float, scale_x: float, scale_y: float) -> tuple[int, int]:
     return round(x * scale_x), round(y * scale_y)
 
@@ -318,14 +331,7 @@ def render_video(
                     reveal_window = float(element.get("draw_seconds", fallback_window))
                     progress = min(1.0, max(0.0, (elapsed - start) / reveal_window))
                     if progress > 0:
-                        animated = dict(element)
-                        motion = element.get("motion")
-                        if isinstance(motion, dict):
-                            motion_start = float(motion["start_seconds"])
-                            motion_end = float(motion["end_seconds"])
-                            travel = min(1.0, max(0.0, (elapsed-motion_start)/(motion_end-motion_start)))
-                            animated["x"] = round(float(motion["from_x"]) + (float(motion["to_x"])-float(motion["from_x"]))*travel)
-                            animated["y"] = round(float(motion["from_y"]) + (float(motion["to_y"])-float(motion["from_y"]))*travel)
+                        animated = _motion_position(element, elapsed)
                         _draw_element(draw, animated, progress, (draw_width, draw_height), coordinate_size)
                 image = Image.new("RGB", (width, height), PALETTE["white"])
                 image.paste(drawing, ((width - draw_width) // 2, (height - draw_height) // 2))
