@@ -74,7 +74,7 @@ def _draw_element(
 
     if kind in ILLUSTRATION_TYPES:
         x, y = _point(element["x"], sx, sy)
-        w, h = _point(element["width"], sx, sy)
+        w, h = round(element["width"] * sx), round(element["height"] * sy)
         if w <= 0 or h <= 0 or progress <= 0:
             return
         right, bottom = x + w, y + h
