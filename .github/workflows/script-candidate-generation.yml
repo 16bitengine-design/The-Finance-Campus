@@ -1,0 +1,60 @@
+name: Generate researched script candidates
+
+on:
+  workflow_run:
+    workflows: ["Weekly researched topic refresh"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      duration:
+        description: "Script candidate format"
+        required: false
+        type: choice
+        options: [short, long]
+        default: short
+
+permissions:
+  contents: write
+
+concurrency:
+  group: finance-campus-script-candidates
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out latest topic library
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install project
+        run: python -m pip install -e .
+      - name: Generate uncreated script candidates
+        env:
+          SCRIPT_DURATION: ${{ github.event.inputs.duration || 'short' }}
+        run: |
+          mkdir -p data/script-candidates
+          python -m finance_campus.cli generate-pending-scripts data/topics.json data/script-candidates --duration "$SCRIPT_DURATION" | tee script-generation-report.json
+      - name: Commit new script candidates and report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/script-candidates script-generation-report.json
+          if git diff --cached --quiet; then
+            echo "No new script candidates."
+          else
+            git commit -m "chore: generate researched script candidates"
+            git push
+          fi
+      - name: Upload script generation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: finance-campus-script-generation-report
+          path: script-generation-report.json
+          if-no-files-found: ignore
