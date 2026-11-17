@@ -104,3 +104,10 @@ def test_kokoro_synthesis_rejects_invalid_speed(tmp_path):
             speed=2.0,
             pipeline_factory=fake_pipeline_factory,
         )
+
+
+def test_sentence_groups_split_very_long_sentences_without_losing_words():
+    sentence = " ".join(f"word{index}" for index in range(61))
+    groups = _sentence_groups(sentence)
+    assert all(len(group.split()) <= 24 for group in groups)
+    assert [word for group in groups for word in group.split()] == sentence.split()
