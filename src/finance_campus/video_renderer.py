@@ -157,6 +157,7 @@ def render_video(
     keep_frames: bool = False,
     audio_path: str | Path | None = None,
     captions_path: str | Path | None = None,
+    transition_seconds: float = 0.25,
 ) -> Path:
     """Render a storyboard into an MP4 using progressive drawing frames."""
     errors = validate_storyboard(storyboard)
@@ -166,6 +167,8 @@ def render_video(
         raise ValueError("video_format must be 'short' or 'long'")
     if fps < 1 or draw_fps < 1 or draw_fps > fps:
         raise ValueError("fps and draw_fps must be positive and draw_fps cannot exceed fps")
+    if not math.isfinite(transition_seconds) or transition_seconds < 0:
+        raise ValueError("transition_seconds must be a finite non-negative number")
     executable = shutil.which(ffmpeg)
     if not executable:
         raise RuntimeError("FFmpeg was not found. Install FFmpeg and ensure it is on PATH.")
@@ -258,10 +261,12 @@ def render_video_from_file(
     fps: int = 30,
     audio_path: str | Path | None = None,
     captions_path: str | Path | None = None,
+    transition_seconds: float = 0.25,
 ) -> Path:
     with Path(storyboard_path).open("r", encoding="utf-8") as handle:
         storyboard = json.load(handle)
     return render_video(
         storyboard, output_path, video_format=video_format, fps=fps,
         audio_path=audio_path, captions_path=captions_path,
+        transition_seconds=transition_seconds,
     )
