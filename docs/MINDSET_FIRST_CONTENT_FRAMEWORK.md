@@ -18,7 +18,7 @@ Every video should help viewers recognise a money behaviour or belief, understan
 
 ## Topic selection rule
 
-Choose topics from recurring human problems and audience questions, not from the latest headlines. Official feeds and publications may suggest a relevant issue, but they are optional research signals—not the editorial agenda. If a news item does not reveal a durable lesson about money behaviour, do not turn it into a video.
+Choose topics from recurring human problems and audience questions, not from the latest headlines. News feeds do not drive the topic calendar. Official educational publications may be consulted only when they help verify a durable lesson about money behaviour.
 
 ## Research rule
 
