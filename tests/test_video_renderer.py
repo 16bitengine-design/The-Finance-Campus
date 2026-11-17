@@ -270,3 +270,25 @@ def test_pen_hand_is_drawn_at_the_active_stroke_tip():
     region = image.crop((90, 25, 190, 140))
     white = Image.new("RGB", region.size, (255, 255, 255))
     assert ImageChops.difference(region, white).getbbox() is not None
+
+
+def test_character_poses_render_different_body_language():
+    from finance_campus.video_renderer import _draw_element
+
+    worried = Image.new("RGB", (300, 420), (255, 255, 255))
+    determined = Image.new("RGB", (300, 420), (255, 255, 255))
+    base = {
+        "type": "person", "x": 60, "y": 35, "width": 180, "height": 340,
+        "color": "navy",
+    }
+    _draw_element(
+        ImageDraw.Draw(worried),
+        {**base, "pose": "worried", "expression": "worried"},
+        1.0, worried.size,
+    )
+    _draw_element(
+        ImageDraw.Draw(determined),
+        {**base, "pose": "determined", "expression": "determined"},
+        1.0, determined.size,
+    )
+    assert ImageChops.difference(worried, determined).getbbox() is not None
