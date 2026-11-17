@@ -1,8 +1,7 @@
-"""Zero-cost topic discovery from official feeds with a curated source fallback.
+"""Zero-cost, evergreen money-mindset topic discovery with authoritative source checks.
 
-Official RSS/Atom headlines are filtered, linked articles are checked for trusted
-publisher domains and readable text, and candidates remain unapproved pending claim
-verification. Curated topic blueprints fill any remaining weekly target.
+Topics are selected from human money behaviours and beliefs. Official educational
+sources are checked for relevance; candidates remain unapproved pending claim review.
 """
 from __future__ import annotations
 
