@@ -69,7 +69,9 @@ jobs:
 
           root = Path("artifacts/kokoro")
           manifest = json.loads((root / "production-manifest.json").read_text(encoding="utf-8"))
-          assert manifest["status"] == "quality_approved", manifest["quality_errors"]
+          assert manifest["status"] == "awaiting_visual_review", manifest["quality_errors"]
+          assert manifest["technical_quality_approved"] is True
+          assert manifest["human_visual_review_required"] is True
           stages = manifest["stages"]
           required = (
               "script_validated",
@@ -80,6 +82,8 @@ jobs:
               "video_rendered",
               "media_streams_verified",
               "final_video_qc_passed",
+              "visual_review_sheet_generated",
+              "human_visual_review_required",
               "audio_video_duration_aligned",
               "quality_gate_passed",
           )
@@ -87,7 +91,8 @@ jobs:
           assert stages["uploaded"] is False
           assert stages["publicly_accessible"] is False
           for name in ("approved_script.json", "storyboard.json", "narration.wav",
-                       "captions.srt", "finance-campus-video.mp4", "description.txt"):
+                       "captions.srt", "finance-campus-video.mp4", "description.txt",
+                       "visual-review-contact-sheet.jpg"):
               path = root / name
               assert path.is_file() and path.stat().st_size > 0, f"Missing artifact: {path}"
           print(json.dumps({"status": manifest["status"], "voice": manifest["voice"],
