@@ -19,7 +19,7 @@ def load_topics(path: str | Path) -> list[dict[str, Any]]:
     with file_path.open("r", encoding="utf-8") as handle:
         data = json.load(handle)
     if not isinstance(data, list):
-        raise ValueError("Topic library must contain a JSON array")
+        raise TypeError("Topic library must contain a JSON array")
     return data
 
 
