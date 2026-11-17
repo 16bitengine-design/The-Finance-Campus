@@ -77,7 +77,7 @@ The synthesis step checks for empty/non-finite audio, silence, peak level and ou
 
 ### Real-model verification
 
-The manually triggered GitHub Actions workflow `Kokoro CPU narration smoke test` installs Kokoro and `espeak-ng`, downloads the actual model, synthesizes the sample storyboard on CPU, renders the MP4 with narration and captions, and uploads the resulting files for review. The normal lightweight test suite uses a mocked Kokoro pipeline so it does not download model weights on every commit.
+The manually triggered GitHub Actions workflow `Kokoro end-to-end production test` installs Kokoro and `espeak-ng`, downloads the actual model, synthesizes the sample storyboard on CPU, renders the MP4 with narration and captions, and uploads the resulting files for review. The normal lightweight test suite uses a mocked Kokoro pipeline so it does not download model weights on every commit.
 
 
 ## End-to-end narrated video production
@@ -110,7 +110,7 @@ For a YouTube long-form video, use --format long. Available voice IDs are af_hea
 
 A successful run writes approved_script.json, storyboard.json, storyboard_with_audio_timing.json, narration.wav, captions.srt, finance-campus-video.mp4, description.txt, and production-manifest.json. The manifest records generated, rendered, and quality-approved states separately from upload and public availability. Publishing remains disabled.
 
-The real-model Kokoro smoke test remains a separate manual GitHub Actions workflow. It downloads the model and performs actual CPU synthesis; mocked unit tests do not count as proof of real voice quality.
+The real-model Kokoro end-to-end production test remains a separate manual GitHub Actions workflow. It downloads the model and performs actual CPU synthesis; mocked unit tests do not count as proof of real voice quality.
 
 ## Development status
 Publishing remains disabled until the production pipeline and platform integrations pass end-to-end quality checks.
