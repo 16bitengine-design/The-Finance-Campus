@@ -1,0 +1,6 @@
+disclaimer:
+  spoken: "This content is for educational and informational purposes only. It is not personalized financial, investment, tax, or legal advice. Your circumstances may differ, so consult a qualified professional before making financial decisions."
+  on_screen: "Educational content only — not personalized financial, investment, tax or legal advice. Consult a qualified professional."
+  description: "This video is for educational and informational purposes only and does not constitute personalized financial, investment, tax, or legal advice. Consider your circumstances and consult a qualified professional before making financial decisions."
+  minimum_on_screen_seconds: 6
+  required_in_every_video: true
