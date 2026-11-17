@@ -53,8 +53,9 @@ def _draw_element(
     element: dict[str, Any],
     progress: float,
     size: tuple[int, int],
+    coordinate_size: tuple[float, float] = (1000, 562),
 ) -> None:
-    sx, sy = size[0] / 1000, size[1] / 562
+    sx, sy = size[0] / coordinate_size[0], size[1] / coordinate_size[1]
     color = PALETTE[element.get("color", "navy")]
     width = max(2, round(4 * min(sx, sy)))
     kind = element["type"]
@@ -168,7 +169,11 @@ def render_video(
         raise RuntimeError("FFmpeg was not found. Install FFmpeg and ensure it is on PATH.")
 
     width, height = (1080, 1920) if video_format == "short" else (1920, 1080)
-    draw_width, draw_height = (1080, 607) if video_format == "short" else (1920, 1080)
+    canvas = storyboard.get("canvas", {"width": 1000, "height": 562})
+    coordinate_size = (float(canvas.get("width", 1000)), float(canvas.get("height", 562)))
+    scale = min(width / coordinate_size[0], height / coordinate_size[1])
+    draw_width = max(1, round(coordinate_size[0] * scale))
+    draw_height = max(1, round(coordinate_size[1] * scale))
     target = Path(output_path)
     target.parent.mkdir(parents=True, exist_ok=True)
     frame_dir = target.parent / f".{target.stem}_frames"
@@ -189,12 +194,9 @@ def render_video(
                     start = element_index * reveal_window
                     progress = min(1.0, max(0.0, (elapsed - start) / reveal_window))
                     if progress > 0:
-                        _draw_element(draw, element, progress, (draw_width, draw_height))
-                if video_format == "short":
-                    image = Image.new("RGB", (width, height), PALETTE["white"])
-                    image.paste(drawing, (0, (height - draw_height) // 2))
-                else:
-                    image = drawing
+                        _draw_element(draw, element, progress, (draw_width, draw_height), coordinate_size)
+                image = Image.new("RGB", (width, height), PALETTE["white"])
+                image.paste(drawing, ((width - draw_width) // 2, (height - draw_height) // 2))
                 image.save(frame_dir / f"frame_{frame_number:06d}.png", optimize=True)
                 frame_number += 1
 
