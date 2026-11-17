@@ -51,11 +51,15 @@ jobs:
       - name: Install project and Kokoro
         run: python -m pip install -e ".[dev,tts]"
       - name: Produce the complete narrated video with real Kokoro
+        env:
+          SCRIPT_PATH: ${{ inputs.script_path }}
+          VIDEO_FORMAT: ${{ inputs.format }}
+          KOKORO_VOICE: ${{ inputs.voice }}
         run: |
           python -m finance_campus.cli produce-video \
-            "${{ inputs.script_path }}" artifacts/kokoro \
-            --format "${{ inputs.format }}" \
-            --voice "${{ inputs.voice }}" --device cpu \
+            "$SCRIPT_PATH" artifacts/kokoro \
+            --format "$VIDEO_FORMAT" \
+            --voice "$KOKORO_VOICE" --device cpu \
             --fps 30 --draw-fps 24 --transition-seconds 0.25
       - name: Verify quality-approved production manifest and media
         run: |
