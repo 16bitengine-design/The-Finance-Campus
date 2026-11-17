@@ -127,7 +127,21 @@ def _render_element(element: dict[str, Any], index: int) -> str:
         cx, cy = x + w / 2, y + h / 2
         if kind == "person":
             head = min(w, h) / 7
-            art = f'<circle cx="{_number(cx)}" cy="{_number(y+head)}" r="{_number(head)}" {common}/><path d="M {_number(cx)} {_number(y+2*head)} L {_number(cx)} {_number(y+h*.66)} M {_number(cx)} {_number(y+2*head+8)} L {_number(x+w*.12)} {_number(y+h*.55)} M {_number(cx)} {_number(y+2*head+8)} L {_number(right-w*.12)} {_number(y+h*.55)} M {_number(cx)} {_number(y+h*.66)} L {_number(x+w*.25)} {_number(bottom)} M {_number(cx)} {_number(y+h*.66)} L {_number(right-w*.25)} {_number(bottom)}" {common}/>'
+            eye_y = y + head
+            eye_r = head / 12
+            shoulder = y + 2 * head + h / 24
+            waist = y + h * .66
+            art = (
+                f'<circle cx="{_number(cx)}" cy="{_number(y+head)}" r="{_number(head)}" {common}/>'
+                f'<circle cx="{_number(cx-head/3)}" cy="{_number(eye_y)}" r="{_number(eye_r)}" fill="{color}"/>'
+                f'<circle cx="{_number(cx+head/3)}" cy="{_number(eye_y)}" r="{_number(eye_r)}" fill="{color}"/>'
+                f'<path d="M {_number(cx-head/3)} {_number(y+head*1.35)} Q {_number(cx)} {_number(y+head*1.75)} {_number(cx+head/3)} {_number(y+head*1.35)}" {common}/>'
+                f'<path d="M {_number(cx)} {_number(y+2*head)} V {_number(shoulder)} M {_number(cx-w*.25)} {_number(shoulder)} L {_number(cx+w*.25)} {_number(shoulder)} L {_number(cx+w*.16)} {_number(waist)} L {_number(cx-w*.16)} {_number(waist)} Z" {common}/>'
+                f'<path d="M {_number(cx-w*.25)} {_number(shoulder)} L {_number(x+w*.2)} {_number(y+h*.43)} L {_number(x+w*.1)} {_number(y+h*.56)} M {_number(cx+w*.25)} {_number(shoulder)} L {_number(right-w*.2)} {_number(y+h*.43)} L {_number(right-w*.1)} {_number(y+h*.56)}" {common}/>'
+                f'<circle cx="{_number(x+w*.1)}" cy="{_number(y+h*.56)}" r="{_number(head/5)}" {common}/>'
+                f'<circle cx="{_number(right-w*.1)}" cy="{_number(y+h*.56)}" r="{_number(head/5)}" {common}/>'
+                f'<path d="M {_number(cx-w*.16)} {_number(waist)} L {_number(x+w*.25)} {_number(bottom-h*.08)} L {_number(x+w*.12)} {_number(bottom-h*.03)} M {_number(cx+w*.16)} {_number(waist)} L {_number(right-w*.25)} {_number(bottom-h*.08)} L {_number(right-w*.12)} {_number(bottom-h*.03)}" {common}/>'
+            )
         elif kind == "bank":
             roof = y + h / 4
             art = f'<path d="M {_number(x)} {_number(roof)} L {_number(cx)} {_number(y)} L {_number(right)} {_number(roof)} M {_number(x)} {_number(roof)} H {_number(right)} M {_number(x)} {_number(bottom-h/6)} H {_number(right)} M {_number(x-w*.05)} {_number(bottom)} H {_number(right+w*.05)}" {common}/>' + "".join(f'<path d="M {_number(x+w*(i+.5)/4)} {_number(roof)} V {_number(bottom-h/6)}" {common}/>' for i in range(4))
