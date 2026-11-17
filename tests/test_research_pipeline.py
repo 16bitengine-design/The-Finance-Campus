@@ -4,7 +4,7 @@ from finance_campus.research_pipeline import refresh_topics
 
 
 def fake_fetch(url):
-    return {"status": 200, "title": "Official financial education guide", "text": "emergency savings cash income bills debt loan interest credit digital financial safety investing risk retirement old age budget spending goals account financial products services control freedom security values habits planning decisions familiarity performance trading panic manias momentum diversification fees research information questions progress choices"}
+    return {"status": 200, "title": "Official financial education guide", "text": "emergency savings cash income bills debt loan interest credit digital financial safety investing risk retirement old age budget spending goals account financial products services control freedom security values habits planning decisions familiarity performance trading panic manias momentum diversification fees research information questions progress choices literacy wellbeing business education expenses"}
 
 
 def test_refresh_adds_unique_researched_topics(tmp_path):
@@ -17,6 +17,11 @@ def test_refresh_adds_unique_researched_topics(tmp_path):
     assert result["target_met"] is True
     assert len(result["added"]) == 5
     assert all(item["research_status"] == "source_checked_needs_claim_review" for item in result["added"])
+    assert all(
+        len(item["research_sources"][0]["matched_keywords"])
+        >= item["research_sources"][0]["keyword_match_threshold"]
+        for item in result["added"]
+    )
 
 
 def test_refresh_skips_unreachable_sources_and_does_not_claim_target(tmp_path):
