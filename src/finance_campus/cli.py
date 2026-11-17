@@ -10,7 +10,8 @@ from finance_campus.config import load_yaml, validate_branding, validate_disclai
 from finance_campus.script_pipeline import prepare_script
 from finance_campus.script_quality import validate_script
 from finance_campus.storyboard import render_storyboard, validate_storyboard
-from finance_campus.video_renderer import render_video\nfrom finance_campus.narration import synthesize_storyboard
+from finance_campus.video_renderer import render_video
+from finance_campus.narration import synthesize_storyboard
 
 
 def _read_json(path: str) -> object:
@@ -28,7 +29,11 @@ def main() -> int:
     parser.add_argument("--draw-fps", type=int, default=24)
     parser.add_argument("--audio", help="Optional narration audio file to mux into the MP4")
     parser.add_argument("--captions", help="Optional SRT captions file to burn into the video")
-    parser.add_argument("--transition-seconds", type=float, default=0.25)\n    parser.add_argument("--voice", choices=("af_heart", "am_michael", "bf_emma", "bm_george"), default="af_heart")\n    parser.add_argument("--speed", type=float, default=1.0)\n    parser.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")\n    parser.add_argument("--scene-tail-seconds", type=float, default=0.35)
+    parser.add_argument("--transition-seconds", type=float, default=0.25)
+    parser.add_argument("--voice", choices=("af_heart", "am_michael", "bf_emma", "bm_george"), default="af_heart")
+    parser.add_argument("--speed", type=float, default=1.0)
+    parser.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
+    parser.add_argument("--scene-tail-seconds", type=float, default=0.35)
     args = parser.parse_args()
     if args.command == "validate-config":
         checks = {"branding": validate_branding(load_yaml("config/branding.yaml")), "disclaimer": validate_disclaimer(load_yaml("config/disclaimer.yaml"))}
