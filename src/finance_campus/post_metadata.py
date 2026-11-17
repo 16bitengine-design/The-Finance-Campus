@@ -61,8 +61,15 @@ def _topic_hashtags(title: str, category: str, limit: int) -> list[str]:
     return result
 
 
-def generate_post_metadata(\n    script: dict[str, Any], disclaimer_config: dict[str, Any], *, video_format: str = "short"\n) -> dict[str, Any]:
-    """Create distinct YouTube and TikTok copy, with the required disclaimer on both."""
+def generate_post_metadata(
+    script: dict[str, Any],
+    disclaimer_config: dict[str, Any],
+    *,
+    video_format: str = "short",
+) -> dict[str, Any]:
+    """Create distinct platform copy, with the required disclaimer on each destination."""
+    if video_format not in {"short", "long"}:
+        raise ValueError("video_format must be short or long")
     title = _clean_text(script.get("title"))
     category = _clean_text(script.get("category")) or "Financial Literacy"
     if not title:
@@ -95,34 +102,43 @@ def generate_post_metadata(\n    script: dict[str, Any], disclaimer_config: dict
     tiktok_caption = append_description_disclaimer(tiktok_body, disclaimer_config)
     if len(youtube_description) > 5000:
         raise ValueError("Generated YouTube description exceeds the conservative 5,000-character limit")
-    if len(tiktok_caption) > 2200:
+    if video_format == "short" and len(tiktok_caption) > 2200:
         raise ValueError("Generated TikTok caption exceeds the conservative 2,200-character limit")
 
+    platforms = {
+        "youtube": {
+            "description": youtube_description,
+            "hashtags": youtube_hashtags,
+            "search_tags": keywords,
+            "character_count": len(youtube_description),
+        }
+    }
+    if video_format == "short":
+        platforms["tiktok"] = {
+            "caption": tiktok_caption,
+            "hashtags": tiktok_hashtags,
+            "character_count": len(tiktok_caption),
+        }
     return {
         "title": title,
         "category": category,
-        "platforms": {
-            "youtube": {
-                "description": youtube_description,
-                "hashtags": youtube_hashtags,
-                "search_tags": keywords,
-                "character_count": len(youtube_description),
-            },
-            "tiktok": {
-                "caption": tiktok_caption,
-                "hashtags": tiktok_hashtags,
-                "character_count": len(tiktok_caption),
-            },
-        },
+        "video_format": video_format,
+        "platforms": platforms,
         "validation": {
-            "platform_copy_is_distinct": youtube_description != tiktok_caption,
+            "platform_copy_is_distinct": video_format != "short" or youtube_description != tiktok_caption,
             "youtube_disclaimer_present": disclaimer_config["disclaimer"]["description"].casefold()
                 in youtube_description.casefold(),
-            "tiktok_disclaimer_present": disclaimer_config["disclaimer"]["description"].casefold()
-                in tiktok_caption.casefold(),
+            "tiktok_disclaimer_present": (
+                video_format != "short"
+                or disclaimer_config["disclaimer"]["description"].casefold()
+                in tiktok_caption.casefold()
+            ),
             "hashtags_are_unique": (
                 len({tag.casefold() for tag in youtube_hashtags}) == len(youtube_hashtags)
-                and len({tag.casefold() for tag in tiktok_hashtags}) == len(tiktok_hashtags)
+                and (
+                    video_format != "short"
+                    or len({tag.casefold() for tag in tiktok_hashtags}) == len(tiktok_hashtags)
+                )
             ),
             "status": "generated_needs_editorial_review",
         },
