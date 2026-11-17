@@ -167,7 +167,7 @@ def discover_from_official_feeds(
                 article_text = str(article.get("text", "")).strip()
                 if article.get("status") != 200 or len(article_text) < 350:
                     raise ValueError("Official article did not provide enough readable text")
-                article_url = str(article.get("url") or entry["url"])
+                article_url = str(article.get("final_url") or article.get("url") or entry["url"])
                 if not _trusted_link(article_url, feed["domain"]):
                     raise ValueError("Article redirected outside the trusted publisher domain")
             except (OSError, ValueError, TimeoutError, urllib.error.URLError) as exc:
@@ -180,7 +180,7 @@ def discover_from_official_feeds(
             snippet = re.sub(r"\\s+", " ", entry["summary"]).strip()
             topic = {
                 "id": topic_id,
-                "title": title if title.endswith("?") else f"What {title[0].lower() + title[1:]} means for your money",
+                "title": title,
                 "category": category,
                 "target_audience": ["global adults", "young adults", "households", "entrepreneurs"],
                 "geographic_relevance": [feed["geography"]],
