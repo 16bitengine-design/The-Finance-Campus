@@ -1,4 +1,5 @@
 import pytest
+
 from finance_campus.topics import add_topic, normalize_title
 
 
