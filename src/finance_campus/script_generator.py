@@ -92,7 +92,7 @@ def generate_script(topic: dict[str, Any], *, duration: str = "short") -> dict[s
         target_seconds = [300, 600]
 
     spoken_text = " ".join(sections.values())
-    spoken_word_count = len(re.findall(r"\\b[\\w’'-]+\\b", spoken_text))
+    spoken_word_count = len(re.findall(r"\b[\w’'-]+\b", spoken_text))
     estimated_duration_seconds = round(spoken_word_count / 145 * 60)
     duration_fit = (
         "under_target" if estimated_duration_seconds < target_seconds[0]
