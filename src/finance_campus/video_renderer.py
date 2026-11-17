@@ -42,8 +42,21 @@ def _motion_position(element: dict[str, Any], elapsed: float) -> dict[str, Any]:
     if isinstance(motion, dict):
         start, end = float(motion["start_seconds"]), float(motion["end_seconds"])
         progress = min(1.0, max(0.0, (elapsed - start) / (end - start)))
+        if motion.get("easing") == "ease_in_out":
+            progress = progress * progress * (3 - 2 * progress)
         animated["x"] = round(float(motion["from_x"]) + (float(motion["to_x"]) - float(motion["from_x"])) * progress)
         animated["y"] = round(float(motion["from_y"]) + (float(motion["to_y"]) - float(motion["from_y"])) * progress)
+    walk = element.get("walk_cycle")
+    if isinstance(walk, dict):
+        walk_start, walk_end = float(walk["start_seconds"]), float(walk["end_seconds"])
+        if walk_start <= elapsed <= walk_end:
+            cycle = max(.1, float(walk.get("cycle_seconds", .52)))
+            walk_progress = (elapsed - walk_start) / cycle
+            animated["walk_phase"] = walk_progress % 1.0
+            animated["body_bob"] = round(math.sin(walk_progress * 2 * math.pi) * 3)
+        else:
+            animated["walk_phase"] = 0.0
+            animated["body_bob"] = 0
     interaction = element.get("interaction_animation")
     target = element.get("interaction_target")
     if isinstance(interaction, dict) and isinstance(target, dict):
@@ -229,7 +242,8 @@ def _draw_element(
         return
 
     if kind in ILLUSTRATION_TYPES:
-        x, y = _point(element["x"], element["y"], sx, sy)
+        y_position = float(element["y"]) + float(element.get("body_bob", 0))
+        x, y = _point(element["x"], y_position, sx, sy)
         w, h = round(element["width"] * sx), round(element["height"] * sy)
         if w <= 0 or h <= 0:
             return
@@ -325,8 +339,10 @@ def _draw_element(
                 path(right_shoulder, elbow, right_hand)
             for hx, hy in (left_hand, right_hand):
                 ellipse((hx-width*2, hy-width*2, hx+width*2, hy+width*2))
-            path((cx-w//7, waist), (x+w//4, bottom-h//12), (x+w//8, bottom-h//20))
-            path((cx+w//7, waist), (right-w//4, bottom-h//12), (right-w//8, bottom-h//20))
+            walk_phase = float(element.get("walk_phase", 0.0))
+            stride = round(math.sin(walk_phase * 2 * math.pi) * w * .075)
+            path((cx-w//7, waist), (x+w//4-stride, bottom-h//12), (x+w//8-stride, bottom-h//20))
+            path((cx+w//7, waist), (right-w//4+stride, bottom-h//12), (right-w//8+stride, bottom-h//20))
         elif kind == "bank":
             roof_y = y + h//4
             path((x, roof_y), (cx, y), (right, roof_y), (x, roof_y))
