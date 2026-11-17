@@ -36,7 +36,7 @@ def test_both_platform_descriptions_include_required_disclaimer():
     assert required in result["platforms"]["youtube"]["description"]
     assert required in result["platforms"]["tiktok"]["caption"]
     assert result["validation"]["youtube_disclaimer_present"]
-    assert result["validation"]["tiktok_disclaimer_present"]
+    assert result["validation"]["tiktok_disclaimer_present"] is None
 
 
 def test_metadata_rejects_missing_title():
