@@ -39,7 +39,7 @@ def test_refresh_uses_new_topics_without_repeating_previous_batch(tmp_path):
     assert {item["id"] for item in first["added"]}.isdisjoint(
         {item["id"] for item in second["added"]}
     )
-    assert third["added_count"] == 2
+    assert third["added_count"] == 5
     assert fourth["added_count"] == 0
 
 
@@ -61,7 +61,7 @@ def test_refresh_adds_evergreen_mindset_topics_not_news_headlines(tmp_path):
 
 
 def test_inspiration_blueprints_are_carried_into_topic_records(tmp_path):
-    result = refresh_topics(tmp_path / "topics.json", target=42, fetcher=fake_fetch)
+    result = refresh_topics(tmp_path / "topics.json", target=45, fetcher=fake_fetch)
     inspired = {
         item["topic_slug"]: item["inspiration"]
         for item in result["added"]
@@ -70,7 +70,17 @@ def test_inspiration_blueprints_are_carried_into_topic_records(tmp_path):
     assert "pay-yourself-first" in inspired
     assert inspired["pay-yourself-first"]["author"] == "George S. Clason"
     assert "every-purchase-costs-time" in inspired
-    assert inspired["every-purchase-costs-time"]["authors"] == ["Vicki Robin", "Joe Dominguez"]
+    assert inspired["every-purchase-costs-time"]["author"] == "Vicki Robin and Joe Dominguez"
+    assert "know-when-to-walk-away" in inspired
+    assert "judge-the-decision-not-only-the-result" in inspired
+    assert "luck-is-not-a-repeatable-money-plan" in inspired
+    assert all(
+        item["inspiration"]["kind"] == "paraphrase"
+        and item["inspiration"]["source_url"].startswith("https://")
+        and item["inspiration"]["verification"] == "author_and_original_work_verified"
+        and item["inspiration"]["original_wording_reused"] is False
+        for item in result["added"] if item.get("inspiration)
+    )
     assert all(
         item["inspiration"]["use"] == "paraphrased_idea_no_direct_quote"
         for item in result["added"]
