@@ -1,4 +1,6 @@
 import numpy as np
+from pathlib import Path
+
 import pytest
 import soundfile as sf
 
@@ -76,10 +78,10 @@ def test_kokoro_synthesis_writes_valid_audio_captions_and_timed_storyboard(tmp_p
 
     import json
 
-    updated = json.loads(open(result["storyboard_path"], encoding="utf-8").read())
+    updated = json.loads(Path(result["storyboard_path"]).read_text(encoding="utf-8"))
     assert all(scene["duration_seconds"] > 0.5 for scene in updated["scenes"])
     assert all(scene["narration_audio_seconds"] == 0.25 for scene in updated["scenes"])
-    captions = open(result["captions_path"], encoding="utf-8").read()
+    captions = Path(result["captions_path"]).read_text(encoding="utf-8")
     assert "00:00:00,000" in captions
     assert "Money arrives" in captions
     assert "Move a manageable amount" in captions
