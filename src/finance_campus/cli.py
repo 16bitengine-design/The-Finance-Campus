@@ -1,18 +1,22 @@
 """Command-line checks and rendering tools for The Finance Campus."""
 from __future__ import annotations
+
 import argparse
 import json
 import sys
 from pathlib import Path
+
 from finance_campus.config import load_yaml, validate_branding, validate_disclaimer
 from finance_campus.script_pipeline import prepare_script
 from finance_campus.script_quality import validate_script
 from finance_campus.storyboard import render_storyboard, validate_storyboard
 from finance_campus.video_renderer import render_video
 
+
 def _read_json(path: str) -> object:
     with Path(path).open("r", encoding="utf-8") as handle:
         return json.load(handle)
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="The Finance Campus project tools")
