@@ -124,4 +124,4 @@ Use `--format long` for 16:9. FFmpeg and Pillow are required. Narration audio an
 
 `python -m finance_campus.cli render-video storyboard.json output.mp4 --format short --audio narration.wav --captions captions.srt`
 
-The renderer validates the requested audio stream and the final MP4 playback. Kokoro narration generation remains a separate stage that will provide the audio file; caption timing must be generated and quality-checked upstream. Scene transitions and broader audiovisual quality checks are still outstanding. CI renders and stores a sample illustrated portrait video as a workflow artifact.
+The renderer validates the requested audio stream and the final MP4 playback. Kokoro narration generation remains a separate stage that will provide the audio file; caption timing must be generated and quality-checked upstream. A gentle whiteboard fade transition is applied at scene boundaries and can be tuned with `--transition-seconds`. More advanced hand-drawn character animation and broader audiovisual quality checks remain outstanding. CI renders and stores a sample illustrated portrait video as a workflow artifact.
