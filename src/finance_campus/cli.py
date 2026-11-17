@@ -91,7 +91,15 @@ def main() -> int:
             print("PASS storyboard: narration and actual illustrations found in every scene")
             return 0
         try:
-            if args.command == "synthesize-narration":\n                result = synthesize_storyboard(\n                    storyboard, args.output_path, voice=args.voice, speed=args.speed,\n                    device=args.device, transition_seconds=args.transition_seconds,\n                    scene_tail_seconds=args.scene_tail_seconds, draw_fps=args.draw_fps,\n                )\n                print(json.dumps(result, indent=2))\n                return 0\n            if args.command == "render-storyboard":
+            if args.command == "synthesize-narration":
+                result = synthesize_storyboard(
+                    storyboard, args.output_path, voice=args.voice, speed=args.speed,
+                    device=args.device, transition_seconds=args.transition_seconds,
+                    scene_tail_seconds=args.scene_tail_seconds, draw_fps=args.draw_fps,
+                )
+                print(json.dumps(result, indent=2))
+                return 0
+            if args.command == "render-storyboard":
                 for output in render_storyboard(storyboard, args.output_path):
                     print(f"RENDERED SVG: {output}")
             else:
