@@ -351,3 +351,34 @@ def test_walking_cycle_produces_distinct_gait_phases_and_body_bob():
     second = _motion_position(character, 1.375)
     assert first["walk_phase"] != second["walk_phase"]
     assert first["body_bob"] != second["body_bob"]
+
+
+def test_wallet_opening_animation_progresses_over_time():
+    from finance_campus.video_renderer import _motion_position
+
+    wallet = {
+        "type": "wallet",
+        "open_animation": {
+            "start_seconds": 2, "end_seconds": 4, "easing": "ease_out",
+        },
+    }
+    before = _motion_position(wallet, 1)
+    halfway = _motion_position(wallet, 3)
+    after = _motion_position(wallet, 4)
+    assert before["open_progress"] == 0
+    assert 0 < halfway["open_progress"] < 1
+    assert after["open_progress"] == 1
+
+
+def test_open_wallet_render_differs_from_closed_wallet():
+    from finance_campus.video_renderer import _draw_element
+
+    wallet = {
+        "type": "wallet", "x": 40, "y": 40, "width": 220, "height": 140,
+        "color": "navy",
+    }
+    closed = Image.new("RGB", (320, 240), (255, 255, 255))
+    opened = Image.new("RGB", (320, 240), (255, 255, 255))
+    _draw_element(ImageDraw.Draw(closed), {**wallet, "open_progress": 0}, 1, closed.size)
+    _draw_element(ImageDraw.Draw(opened), {**wallet, "open_progress": 1}, 1, opened.size)
+    assert ImageChops.difference(closed, opened).getbbox() is not None
