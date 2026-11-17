@@ -1,5 +1,7 @@
 import pytest
 
+from finance_campus.script_quality import validate_script
+
 from finance_campus.script_generator import generate_script
 
 
@@ -31,6 +33,9 @@ def test_generate_short_script_contains_all_required_sections():
     }
     assert script["format"] == "short"
     assert script["script_generation"]["approved_for_production"] is False
+    report = validate_script(script)
+    assert report.passed is False
+    assert any("still a candidate" in error for error in report.errors)
 
 
 def test_generate_long_script():
