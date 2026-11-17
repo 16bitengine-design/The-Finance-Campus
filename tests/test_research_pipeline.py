@@ -30,7 +30,7 @@ def test_refresh_skips_unreachable_sources_and_does_not_claim_target(tmp_path):
 
 def test_refresh_is_idempotent(tmp_path):
     path = tmp_path / "topics.json"
-    first = refresh_topics(path, target=4, fetcher=fake_fetch)
-    second = refresh_topics(path, target=4, fetcher=fake_fetch)
-    assert first["added_count"] == 4
+    first = refresh_topics(path, target=20, fetcher=fake_fetch)
+    second = refresh_topics(path, target=20, fetcher=fake_fetch)
+    assert first["added_count"] == 20
     assert second["added_count"] == 0
