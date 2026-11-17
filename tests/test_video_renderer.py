@@ -5,7 +5,7 @@ import pytest
 from PIL import Image, ImageChops
 
 from finance_campus.storyboard import render_scene_svg, validate_storyboard
-from finance_campus.video_renderer import _point, render_video
+from finance_campus.video_renderer import _draw_progressive_strokes, _point, render_video
 
 
 def _storyboard():
@@ -181,3 +181,19 @@ def test_storyboard_rejects_invalid_illustration_timing():
     errors = validate_storyboard({"scenes": [scene]})
     assert any("start_seconds" in error for error in errors)
     assert any("draw_seconds" in error for error in errors)
+
+
+
+def test_progressive_strokes_reveal_pen_path_in_order():
+    image = Image.new("RGB", (120, 30), (255, 255, 255))
+    draw = ImageDraw.Draw(image)
+    _draw_progressive_strokes(
+        draw,
+        [[(10, 15), (50, 15)], [(70, 15), (110, 15)]],
+        0.5,
+        (16, 43, 85),
+        3,
+    )
+    # At 50% the first stroke is complete and the second has not started.
+    assert image.getpixel((45, 15)) != (255, 255, 255)
+    assert image.getpixel((75, 15)) == (255, 255, 255)
