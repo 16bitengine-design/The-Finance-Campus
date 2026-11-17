@@ -29,7 +29,7 @@ def test_render_video_creates_playable_mp4(tmp_path):
     assert output.stat().st_size > 1024
     result = subprocess.run(["ffmpeg", "-hide_banner", "-i", str(output), "-f", "null", "-"], capture_output=True, text=True, check=False)
     assert "Video:" in result.stderr
-    final_frame = Image.open(tmp_path / ".sample_frames" / "frame_000023.png").convert("RGB")
+    final_frame = Image.open(tmp_path / ".sample_frames" / "frame_000011.png").convert("RGB")
     white = Image.new("RGB", final_frame.size, (255, 255, 255))
     assert ImageChops.difference(final_frame, white).getbbox() is not None
 
