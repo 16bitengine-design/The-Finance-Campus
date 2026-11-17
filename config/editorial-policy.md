@@ -89,3 +89,50 @@ Before a topic or script advances, ask:
 6. Does it leave viewers informed and hopeful rather than frightened or ashamed?
 
 A topic should not be selected merely because a financial institution published something new. A strong evergreen lesson is more valuable than an irrelevant news headline.
+
+
+## Official narration voice: compassionate mentor and powerful speaker
+
+The Finance Campus uses a deliberate blend of two complementary voices. The narrator should sound like a compassionate mentor who understands the viewer's circumstances and, when the lesson calls for it, a confident motivational speaker who can challenge, energise and inspire action. These are not competing personas; they are two registers of one trustworthy voice.
+
+### The mentor register
+
+Lead with this register when the viewer may feel vulnerable, ashamed, overwhelmed or financially unsafe.
+
+- Recognise real circumstances before offering solutions.
+- Speak with dignity, warmth, patience and respect; never talk down to the audience.
+- Acknowledge that low income, unemployment, illness, debt, caregiving and structural barriers can limit available choices.
+- Do not prescribe saving or investing money needed for food, shelter, medicine, transport or immediate safety.
+- Ask the viewer to consider one realistic next step rather than pretending every problem can be solved at once.
+- Reassure without making promises the channel cannot support.
+
+### The motivational-speaker register
+
+Use this register when the lesson benefits from conviction, momentum, a memorable challenge or a strong call to action.
+
+- Deliver clear, energetic statements with purposeful emphasis and confident pacing.
+- Challenge avoidable habits and limiting beliefs without attacking the viewer's character.
+- Use vivid, original language and concrete examples rather than empty slogans.
+- Make the stakes understandable without fearmongering, humiliation or false urgency.
+- Inspire action while keeping the proposed action proportionate to the viewer's circumstances.
+
+### How the two registers work together
+
+1. **Understand:** Open by recognising the viewer's real situation or inner conflict.
+2. **Connect:** Establish trust through a relatable story or observation.
+3. **Explain:** Teach the principle clearly and accurately, like a knowledgeable mentor.
+4. **Challenge:** Raise the energy when it is useful to confront an unhelpful belief or behaviour.
+5. **Empower:** Give a practical, achievable action and close with dignity and hope.
+
+The balance must respond to the subject and emotional stakes. A lesson about food insecurity, debt distress or financial shame should remain especially gentle and grounded. A lesson about procrastination, consistency or intentional spending may carry more motivational force. Even the most energetic delivery must remain compassionate; even the gentlest delivery must retain clarity and conviction.
+
+### Performance and production direction
+
+- Use natural conversational delivery, not a constant high-energy sales pitch.
+- Vary pacing, pauses, emphasis and vocal intensity to match the story.
+- Let emotional moments breathe; do not shout over a vulnerable story.
+- Build energy progressively toward the central insight or practical challenge.
+- Keep the narrator's identity and tone consistent across videos, while adapting the balance of warmth and intensity to each lesson.
+- Do not use guilt, humiliation, threats, exaggerated promises or pressure tactics as motivational devices.
+
+**Guiding principle: Speak to the person's heart before challenging their habits.**
