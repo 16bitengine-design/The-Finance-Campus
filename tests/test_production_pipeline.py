@@ -49,6 +49,13 @@ def test_production_pipeline_runs_all_stages_and_fails_closed(monkeypatch, tmp_p
         lambda *args, **kwargs: {"passed": True, "video_codec": "h264"},
     )
     monkeypatch.setattr(
+        production_pipeline, "create_visual_review_sheet",
+        lambda video, output: {
+            "path": str(output), "sample_count": 8,
+            "human_review_required": True,
+        },
+    )
+    monkeypatch.setattr(
         production_pipeline,
         "_probe_video",
         lambda path, video_format: {
@@ -60,19 +67,23 @@ def test_production_pipeline_runs_all_stages_and_fails_closed(monkeypatch, tmp_p
     manifest = production_pipeline.produce_video_from_script(
         _script(), tmp_path, pipeline_factory=object(),
     )
-    assert manifest["status"] == "quality_approved"
+    assert manifest["status"] == "awaiting_visual_review"
+    assert manifest["technical_quality_approved"] is True
+    assert manifest["human_visual_review_required"] is True
     assert manifest["stages"]["script_approved"]
     assert manifest["stages"]["storyboard_generated"]
     assert manifest["stages"]["kokoro_narration_generated"]
     assert manifest["stages"]["video_rendered"]
     assert manifest["stages"]["final_video_qc_passed"]
+    assert manifest["stages"]["visual_review_sheet_generated"]
+    assert manifest["stages"]["human_visual_review_passed"] is False
     assert manifest["stages"]["quality_gate_passed"]
     assert manifest["stages"]["audio_video_duration_aligned"]
     assert manifest["stages"]["uploaded"] is False
     assert Path(manifest["artifacts"]["description"]).is_file()
     assert Path(manifest["artifacts"]["video"]).is_file()
     saved = json.loads((tmp_path / "production-manifest.json").read_text(encoding="utf-8"))
-    assert saved["status"] == "quality_approved"
+    assert saved["status"] == "awaiting_visual_review"
 
 
 def test_production_pipeline_rejects_scripts_without_research_sources(tmp_path):
