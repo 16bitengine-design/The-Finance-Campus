@@ -295,11 +295,16 @@ def render_video(
     frame_dir = target.parent / f".{target.stem}_frames"
     frame_dir.mkdir(parents=True, exist_ok=True)
     frame_number = 0
+    transition_frames = round(transition_seconds * draw_fps)
+    scene_frame_paths: list[list[Path]] = []
     try:
-        for scene in storyboard["scenes"]:
+        # Render each scene independently first. This gives the transition compositor
+        # clean incoming/outgoing frames without changing the drawing animation.
+        for scene_index, scene in enumerate(storyboard["scenes"]):
             duration = float(scene["duration_seconds"])
             total_frames = max(1, math.ceil(duration * draw_fps))
             elements = scene["elements"]
+            scene_paths: list[Path] = []
             for frame_index in range(total_frames):
                 drawing = Image.new("RGB", (draw_width, draw_height), PALETTE["white"])
                 draw = ImageDraw.Draw(drawing)
@@ -315,8 +320,26 @@ def render_video(
                         _draw_element(draw, element, progress, (draw_width, draw_height), coordinate_size)
                 image = Image.new("RGB", (width, height), PALETTE["white"])
                 image.paste(drawing, ((width - draw_width) // 2, (height - draw_height) // 2))
-                image.save(frame_dir / f"frame_{frame_number:06d}.png", optimize=True)
+                scene_path = frame_dir / f"scene_{scene_index:03d}_frame_{frame_index:06d}.png"
+                image.save(scene_path, optimize=True)
+                scene_paths.append(scene_path)
+            scene_frame_paths.append(scene_paths)
+
+        # Insert true frame-by-frame cross dissolves between scenes. Original scene
+        # frames remain intact, so the transition is a short bridge, not a wipe.
+        for scene_index, paths in enumerate(scene_frame_paths):
+            for source_path in paths:
+                frame = Image.open(source_path).convert("RGB")
+                frame.save(frame_dir / f"frame_{frame_number:06d}.png", optimize=True)
                 frame_number += 1
+            if transition_frames and scene_index < len(scene_frame_paths) - 1:
+                outgoing = Image.open(paths[-1]).convert("RGB")
+                incoming = Image.open(scene_frame_paths[scene_index + 1][0]).convert("RGB")
+                for step in range(1, transition_frames + 1):
+                    alpha = step / (transition_frames + 1)
+                    blended = Image.blend(outgoing, incoming, alpha)
+                    blended.save(frame_dir / f"frame_{frame_number:06d}.png", optimize=True)
+                    frame_number += 1
 
         if frame_number == 0:
             raise RuntimeError("Renderer produced no frames")
@@ -333,7 +356,7 @@ def render_video(
             command.extend(["-i", str(audio)])
         command.extend(["-vf", filter_chain, "-map", "0:v:0"])
         if audio is not None:
-            total_duration = sum(float(scene["duration_seconds"]) for scene in storyboard["scenes"])
+            total_duration = sum(float(scene["duration_seconds"]) for scene in storyboard["scenes"]) + transition_frames * max(0, len(scene_frame_paths) - 1) / draw_fps
             command.extend(["-map", "1:a:0", "-af", "apad", "-t", f"{total_duration:.3f}", "-c:a", "aac", "-b:a", "192k"])
         else:
             command.append("-an")
