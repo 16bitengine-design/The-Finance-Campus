@@ -232,7 +232,7 @@ def test_scene_transition_inserts_smooth_crossfade_frames(tmp_path):
     frames = sorted((tmp_path / ".crossfade_frames").glob("frame_*.png"))
     # Four frames per scene plus two cross-dissolve frames.
     assert len(frames) == 10
-    outgoing = Image.open(frames[3]).convert("RGB").getpixel((1133, 539))
+    outgoing = Image.open(frames[3]).convert("RGB").getpixel((637, 960))
     halfway = Image.open(frames[5]).convert("RGB").getpixel((540, 960))
     incoming = Image.open(frames[7]).convert("RGB").getpixel((540, 960))
     assert outgoing != incoming
