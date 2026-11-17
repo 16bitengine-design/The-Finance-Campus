@@ -1,34 +1,185 @@
 {
-  "canvas": {"width": 1000, "height": 1778},
+  "canvas": {
+    "width": 1000,
+    "height": 1778
+  },
   "scenes": [
     {
-      "id": "income-and-choice",
-      "narration": "When income arrives, every dollar has a job. If you spend without a plan, your future goals can be left with nothing.",
+      "id": "income-arrives",
+      "narration": "Payday arrives, but the money already has responsibilities. Food, transport and bills compete with the goals you keep postponing.",
       "duration_seconds": 5,
       "elements": [
-        {"type": "person", "x": 90, "y": 130, "width": 250, "height": 520, "color": "navy"},
-        {"type": "money_note", "x": 570, "y": 220, "width": 280, "height": 170, "color": "green"},
-        {"type": "arrow", "x1": 370, "y1": 420, "x2": 550, "y2": 340, "color": "gold"},
-        {"type": "wallet", "x": 330, "y": 700, "width": 360, "height": 250, "color": "navy"},
-        {"type": "coin", "x": 170, "y": 1080, "width": 130, "height": 130, "color": "gold"},
-        {"type": "coin", "x": 435, "y": 1040, "width": 130, "height": 130, "color": "gold"},
-        {"type": "coin", "x": 700, "y": 1080, "width": 130, "height": 130, "color": "gold"},
-        {"type": "house", "x": 350, "y": 1280, "width": 300, "height": 270, "color": "green"},
-        {"type": "text", "x": 245, "y": 1690, "text": "Give your money a plan", "color": "green"}
+        {
+          "type": "person",
+          "x": 90,
+          "y": 180,
+          "width": 300,
+          "height": 650,
+          "color": "navy"
+        },
+        {
+          "type": "money_note",
+          "x": 560,
+          "y": 280,
+          "width": 340,
+          "height": 210,
+          "color": "green"
+        },
+        {
+          "type": "arrow",
+          "x1": 420,
+          "y1": 500,
+          "x2": 545,
+          "y2": 420,
+          "color": "gold"
+        },
+        {
+          "type": "wallet",
+          "x": 320,
+          "y": 920,
+          "width": 380,
+          "height": 280,
+          "color": "navy"
+        },
+        {
+          "type": "coin",
+          "x": 170,
+          "y": 1300,
+          "width": 120,
+          "height": 120,
+          "color": "gold"
+        },
+        {
+          "type": "coin",
+          "x": 440,
+          "y": 1260,
+          "width": 120,
+          "height": 120,
+          "color": "gold"
+        },
+        {
+          "type": "coin",
+          "x": 710,
+          "y": 1300,
+          "width": 120,
+          "height": 120,
+          "color": "gold"
+        },
+        {
+          "type": "text",
+          "x": 210,
+          "y": 1580,
+          "text": "Every shilling needs a job",
+          "color": "green"
+        }
       ]
     },
     {
-      "id": "build-the-buffer",
-      "narration": "Start with a small emergency buffer. Consistent saving can help you handle an unexpected bill without immediately turning to expensive debt.",
+      "id": "unexpected-bill",
+      "narration": "Then a surprise expense appears. Without savings, one broken phone, medical bill or urgent repair can push you toward costly borrowing.",
       "duration_seconds": 5,
       "elements": [
-        {"type": "bank", "x": 160, "y": 150, "width": 680, "height": 420, "color": "navy"},
-        {"type": "coin", "x": 170, "y": 690, "width": 150, "height": 150, "color": "gold"},
-        {"type": "coin", "x": 425, "y": 650, "width": 150, "height": 150, "color": "gold"},
-        {"type": "coin", "x": 680, "y": 690, "width": 150, "height": 150, "color": "gold"},
-        {"type": "arrow", "x1": 500, "y1": 850, "x2": 500, "y2": 1030, "color": "green"},
-        {"type": "savings_jar", "x": 350, "y": 1040, "width": 300, "height": 430, "color": "green"},
-        {"type": "text", "x": 245, "y": 1660, "text": "Small steps. More security.", "color": "navy"}
+        {
+          "type": "house",
+          "x": 90,
+          "y": 260,
+          "width": 340,
+          "height": 330,
+          "color": "navy"
+        },
+        {
+          "type": "money_note",
+          "x": 560,
+          "y": 300,
+          "width": 300,
+          "height": 190,
+          "color": "green"
+        },
+        {
+          "type": "arrow",
+          "x1": 500,
+          "y1": 620,
+          "x2": 500,
+          "y2": 850,
+          "color": "gold"
+        },
+        {
+          "type": "wallet",
+          "x": 300,
+          "y": 900,
+          "width": 400,
+          "height": 300,
+          "color": "navy"
+        },
+        {
+          "type": "coin",
+          "x": 430,
+          "y": 1280,
+          "width": 140,
+          "height": 140,
+          "color": "gold"
+        },
+        {
+          "type": "text",
+          "x": 190,
+          "y": 1580,
+          "text": "One shock can change the month",
+          "color": "navy"
+        }
+      ]
+    },
+    {
+      "id": "build-a-buffer",
+      "narration": "A small emergency buffer can change that outcome. Start with an amount you can manage, save regularly, and build protection one step at a time.",
+      "duration_seconds": 5,
+      "elements": [
+        {
+          "type": "person",
+          "x": 80,
+          "y": 200,
+          "width": 280,
+          "height": 620,
+          "color": "navy"
+        },
+        {
+          "type": "coin",
+          "x": 470,
+          "y": 350,
+          "width": 150,
+          "height": 150,
+          "color": "gold"
+        },
+        {
+          "type": "arrow",
+          "x1": 620,
+          "y1": 550,
+          "x2": 680,
+          "y2": 820,
+          "color": "green"
+        },
+        {
+          "type": "savings_jar",
+          "x": 390,
+          "y": 850,
+          "width": 340,
+          "height": 520,
+          "color": "green"
+        },
+        {
+          "type": "coin",
+          "x": 500,
+          "y": 1450,
+          "width": 100,
+          "height": 100,
+          "color": "gold"
+        },
+        {
+          "type": "text",
+          "x": 210,
+          "y": 1640,
+          "text": "Small steps. More security.",
+          "color": "green"
+        }
       ]
     }
   ]
