@@ -36,7 +36,7 @@ def test_discovery_creates_unapproved_topic_from_official_article():
         existing_topics=[],
         target=1,
         timestamp="2026-11-17T00:00:00+00:00",
-        feed_fetcher=lambda _url: RSS,
+        feed_fetcher=lambda url: RSS if "sec.gov" in url else '<rss version="2.0"><channel /></rss>',
         article_fetcher=lambda url: {
             "status": 200,
             "url": url,
