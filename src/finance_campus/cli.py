@@ -10,7 +10,7 @@ from finance_campus.config import load_yaml, validate_branding, validate_disclai
 from finance_campus.narration import synthesize_storyboard
 from finance_campus.production_pipeline import produce_video_from_script
 from finance_campus.research_pipeline import refresh_topics
-from finance_campus.script_generator import generate_from_library
+from finance_campus.script_generator import generate_from_library, generate_pending_scripts
 from finance_campus.script_pipeline import prepare_script
 from finance_campus.script_quality import validate_script
 from finance_campus.storyboard import render_storyboard, validate_storyboard
@@ -24,7 +24,7 @@ def _read_json(path: str) -> object:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="The Finance Campus project tools")
-    parser.add_argument("command", choices=("validate-config", "validate-script", "prepare-script", "refresh-topics", "generate-script", "validate-storyboard", "render-storyboard", "render-video", "synthesize-narration", "produce-video"))
+    parser.add_argument("command", choices=("validate-config", "validate-script", "prepare-script", "refresh-topics", "generate-script", "generate-pending-scripts", "validate-storyboard", "render-storyboard", "render-video", "synthesize-narration", "produce-video"))
     parser.add_argument("script_path", nargs="?", help="Input JSON script or storyboard")
     parser.add_argument("output_path", nargs="?", help="Output path for approved data, SVGs, or MP4")
     parser.add_argument("--format", choices=("short", "long"), default="short", dest="video_format")
@@ -60,6 +60,16 @@ def main() -> int:
             return 0
         except (OSError, RuntimeError, ValueError) as exc:
             print(f"FAIL script generation: {exc}")
+            return 1
+    if args.command == "generate-pending-scripts":
+        if not args.script_path or not args.output_path:
+            parser.error("generate-pending-scripts requires topic-library path and output directory")
+        try:
+            report = generate_pending_scripts(args.script_path, args.output_path, duration=args.duration)
+            print(json.dumps(report, ensure_ascii=False, indent=2))
+            return 0
+        except (OSError, RuntimeError, ValueError) as exc:
+            print(f"FAIL batch script generation: {exc}")
             return 1
     if args.command == "produce-video":
         if not args.script_path or not args.output_path:
