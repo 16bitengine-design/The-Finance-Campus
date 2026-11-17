@@ -64,8 +64,8 @@ cost_policy:
   prefer_open_source_and_self_hosted: true
   stop_if_zero_cost_path_unavailable: true
 automation:
-  operating_mode: "fully_unattended_after_initial_setup"
-  require_routine_human_approval: false
+  operating_mode: "staged_automation_pending_release_validation"
+  require_routine_human_approval: true
   auto_research: true
   auto_topic_selection: true
   auto_script_generation: true
@@ -74,11 +74,11 @@ automation:
   auto_kokoro_narration: true
   auto_rendering: true
   auto_quality_control: true
-  auto_publish_after_all_gates_pass: true
-  auto_publication_verification: true
-  auto_retry_recoverable_failures: true
-  prevent_duplicate_publications: true
-  notify_on_blocking_failures: true
+  auto_publish_after_all_gates_pass: false
+  auto_publication_verification: false
+  auto_retry_recoverable_failures: false
+  prevent_duplicate_publications: false
+  notify_on_blocking_failures: false
   publishing_activation_requires_end_to_end_validation: true
   initial_platform_authorization_required: true
 editorial:
