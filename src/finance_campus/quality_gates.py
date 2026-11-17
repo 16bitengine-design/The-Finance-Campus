@@ -17,6 +17,7 @@ def validate_video_package(
     on_screen_disclaimer_present: bool,
     description_disclaimer_present: bool,
     brand_validation_passed: bool,
+    script_validation_passed: bool,
     audio_validation_passed: bool,
     video_validation_passed: bool,
 ) -> QualityReport:
@@ -32,6 +33,8 @@ def validate_video_package(
         errors.append("Description disclaimer is missing")
     if not brand_validation_passed:
         errors.append("Brand validation failed")
+    if not script_validation_passed:
+        errors.append("Script editorial validation failed")
     if not audio_validation_passed:
         errors.append("Audio validation failed")
     if not video_validation_passed:
