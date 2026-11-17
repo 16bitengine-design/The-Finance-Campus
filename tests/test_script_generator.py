@@ -56,3 +56,51 @@ def test_generator_rejects_missing_editorial_brief():
     del item["editorial_brief"]
     with pytest.raises(TypeError, match="editorial_brief"):
         generate_script(item)
+
+def test_verified_paraphrased_inspiration_is_attributed_without_quote_marks():
+    item = topic()
+    item["inspiration"] = {
+        "kind": "paraphrase",
+        "author": "Example Speaker",
+        "work": "A verified book",
+        "source_url": "https://example.org/original-work",
+        "text": "clear goals can help people make more deliberate choices about money",
+        "verification": "author_and_original_work_verified",
+        "original_wording_reused": False,
+    }
+    script = generate_script(item)
+    explanation = script["sections"]["clear_explanation_of_why_it_matters"]
+    assert "Example Speaker" in explanation
+    assert "A verified book" in explanation
+    assert "clear goals can help" in explanation
+    assert "“" not in explanation
+
+
+def test_direct_quote_requires_documented_rights_review():
+    item = topic()
+    item["inspiration"] = {
+        "kind": "direct_quote",
+        "author": "Example Author",
+        "work": "Example Work",
+        "source_url": "https://example.org/work",
+        "text": "A short verified line.",
+        "verification": "author_and_original_work_verified",
+    }
+    with pytest.raises(ValueError, match="requires verified"):
+        generate_script(item)
+
+
+def test_direct_quote_rejects_more_than_fifteen_words():
+    item = topic()
+    item["inspiration"] = {
+        "kind": "direct_quote",
+        "author": "Example Author",
+        "work": "Example Work",
+        "source_url": "https://example.org/work",
+        "text": "one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen",
+        "verification": "author_and_original_work_verified",
+        "rights_basis": "permission_granted",
+        "rights_verified": True,
+    }
+    with pytest.raises(ValueError, match="15-word"):
+        generate_script(item)
