@@ -21,30 +21,40 @@ SUPPORTED_VOICES = {
 
 
 def _sentence_groups(text: str, *, min_words: int = 12, max_words: int = 24) -> list[str]:
-    """Group complete sentences into natural Kokoro chunks, avoiding tiny utterances."""
-    sentences = [part.strip() for part in re.split(r"(?<=[.!?])\s+", text.strip()) if part.strip()]
+    """Group complete sentences into natural chunks and split unusually long sentences."""
+    sentences = [part.strip() for part in re.split(r"(?<=[.!?])\\s+", text.strip()) if part.strip()]
     if not sentences:
         raise ValueError("Scene narration is empty")
     groups: list[str] = []
     pending: list[str] = []
     count = 0
+
+    def flush() -> None:
+        nonlocal pending, count
+        if pending:
+            groups.append(" ".join(pending))
+            pending, count = [], 0
+
     for sentence in sentences:
-        words = len(sentence.split())
-        if pending and count + words > max_words and count >= min_words:
-            groups.append(" ".join(pending))
-            pending, count = [], 0
+        words = sentence.split()
+        if len(words) > max_words:
+            flush()
+            for offset in range(0, len(words), max_words):
+                groups.append(" ".join(words[offset:offset + max_words]))
+            continue
+        if pending and count + len(words) > max_words:
+            flush()
         pending.append(sentence)
-        count += words
+        count += len(words)
         if count >= min_words and count >= max_words * 0.65:
-            groups.append(" ".join(pending))
-            pending, count = [], 0
+            flush()
+
     if pending:
-        if groups and count < min_words:
+        if groups and count < min_words and len(groups[-1].split()) + count <= max_words:
             groups[-1] += " " + " ".join(pending)
         else:
-            groups.append(" ".join(pending))
+            flush()
     return groups
-
 
 def _audio_array(value: Any) -> np.ndarray:
     if hasattr(value, "detach"):
