@@ -1,10 +1,10 @@
 """Kokoro TTS narration synthesis and scene-aligned audio assembly."""
 from __future__ import annotations
 
-from collections.abc import Callable
 import json
 import math
 import re
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
