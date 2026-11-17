@@ -256,3 +256,17 @@ def test_illustration_motion_interpolates_between_start_and_destination():
     assert (halfway["x"], halfway["y"]) == (200, 400)
     finish = _motion_position(element, 8)
     assert (finish["x"], finish["y"]) == (300, 600)
+
+
+
+def test_pen_hand_is_drawn_at_the_active_stroke_tip():
+    from finance_campus.video_renderer import _draw_active_hand
+
+    image = Image.new("RGB", (240, 160), (255, 255, 255))
+    draw = ImageDraw.Draw(image)
+    strokes = [[(30, 30), (180, 30)]]
+    _draw_active_hand(draw, strokes, 0.5, (22, 140, 67), 1.0)
+    # The moving hand/marker is visible around the halfway drawing position.
+    region = image.crop((90, 25, 190, 140))
+    white = Image.new("RGB", region.size, (255, 255, 255))
+    assert ImageChops.difference(region, white).getbbox() is not None
