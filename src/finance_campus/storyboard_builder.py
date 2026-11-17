@@ -68,7 +68,7 @@ def _scene_elements(text: str, section: str, title: str, width: int, height: int
     _, _, _ = _visual_types(text, section)
     # A stable per-video signature varies composition and accent choices without
     # introducing randomness between retries of the same production.
-    signature = hashlib.sha256(f"{title}|{section}|{text}".encode("utf-8")).hexdigest()
+    signature = hashlib.sha256(f"{title}|{section}|{text}".encode()).hexdigest()
     variation = int(signature[:8], 16)
     shift_x = ((variation % 7) - 3) * width * .012
     shift_y = (((variation >> 4) % 5) - 2) * height * .009
@@ -200,7 +200,7 @@ def build_storyboard(
             "visual_intent": visual_relationship,
             "visual_objects": list(visual_objects),
             "matched_visual_terms": matched_terms,
-            "visual_signature": hashlib.sha256(f"{script['title']}|{section}|{narration}".encode("utf-8")).hexdigest()[:16],
+            "visual_signature": hashlib.sha256(f"{script['title']}|{section}|{narration}".encode()).hexdigest()[:16],
             "elements": _scene_elements(narration, section, title, width, height),
         })
 
