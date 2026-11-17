@@ -47,3 +47,13 @@ research:
     - "government agencies"
     - "academic research"
     - "established financial education institutions"
+cost_policy:
+  target: "zero monetary cost"
+  allow_paid_services: false
+  allow_paid_api_keys: false
+  allow_paid_assets: false
+  allow_paid_hosting: false
+  allow_paid_compute: false
+  require_free_tier_quota_guards: true
+  prefer_open_source_and_self_hosted: true
+  stop_if_zero_cost_path_unavailable: true
