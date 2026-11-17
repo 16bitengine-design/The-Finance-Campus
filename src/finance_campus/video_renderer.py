@@ -242,7 +242,19 @@ def _draw_element(
             eye_y, eye_r = y + head, max(2, width)
             path((cx-head//3-eye_r, eye_y), (cx-head//3+eye_r, eye_y))
             path((cx+head//3-eye_r, eye_y), (cx+head//3+eye_r, eye_y))
-            path((cx-head//3, y+int(head*1.45)), (cx, y+int(head*1.65)), (cx+head//3, y+int(head*1.45)))
+            pose = element.get("pose", "neutral")
+            expression = element.get("expression", "calm")
+            mouth_y = y + int(head*1.65)
+            if expression in {"worried", "overwhelmed"}:
+                path((cx-head//3, mouth_y+head//12), (cx, mouth_y-head//10), (cx+head//3, mouth_y+head//12))
+                path((cx-head//2, y+head//2), (cx-head//5, y+head//3))
+                path((cx+head//5, y+head//3), (cx+head//2, y+head//2))
+            elif expression == "determined":
+                path((cx-head//3, mouth_y), (cx+head//3, mouth_y))
+                path((cx-head//2, y+head//3), (cx-head//5, y+head//3))
+                path((cx+head//5, y+head//3), (cx+head//2, y+head//3))
+            else:
+                path((cx-head//3, mouth_y), (cx, mouth_y+head//8), (cx+head//3, mouth_y))
             neck_y = y + 2*head
             shoulder = neck_y + max(8, h//24)
             waist = y + int(h*.66)
@@ -255,10 +267,38 @@ def _draw_element(
             ellipse((cx-head-width, y+head//2, cx-head+width, y+head))
             ellipse((cx+head-width, y+head//2, cx+head+width, y+head))
             elbow_y = y + int(h*.43)
+            left_shoulder = (cx-w//4, shoulder+width)
+            right_shoulder = (cx+w//4, shoulder+width)
             left_hand = (x+w//10, y+int(h*.56))
             right_hand = (right-w//10, y+int(h*.56))
-            path((cx-w//4, shoulder+width), (x+w//5, elbow_y), left_hand)
-            path((cx+w//4, shoulder+width), (right-w//5, elbow_y), right_hand)
+            if pose in {"worried", "overwhelmed"}:
+                left_hand = (cx-w//2, y+int(h*.22))
+                right_hand = (cx+w//2, y+int(h*.22))
+                path(left_shoulder, (x+w//12, y+int(h*.40)), left_hand)
+                path(right_shoulder, (right-w//12, y+int(h*.40)), right_hand)
+            elif pose == "thinking":
+                left_hand = (x+w//10, y+int(h*.56))
+                right_hand = (cx+w//2, y+int(h*.25))
+                path(left_shoulder, (x+w//5, elbow_y), left_hand)
+                path(right_shoulder, (right-w//8, y+int(h*.36)), right_hand)
+            elif pose == "reaching":
+                left_hand = (x+w//10, y+int(h*.56))
+                right_hand = (right, y+int(h*.32))
+                path(left_shoulder, (x+w//5, elbow_y), left_hand)
+                path(right_shoulder, (right-w//8, y+int(h*.42)), right_hand)
+            elif pose == "determined":
+                left_hand = (x+w//10, y+int(h*.56))
+                right_hand = (right-w//5, y+int(h*.12))
+                path(left_shoulder, (x+w//5, elbow_y), left_hand)
+                path(right_shoulder, (right-w//8, y+int(h*.32)), right_hand)
+            elif pose == "celebrating":
+                left_hand = (x+w//8, y+int(h*.12))
+                right_hand = (right-w//8, y+int(h*.12))
+                path(left_shoulder, (x+w//10, y+int(h*.32)), left_hand)
+                path(right_shoulder, (right-w//10, y+int(h*.32)), right_hand)
+            else:
+                path(left_shoulder, (x+w//5, elbow_y), left_hand)
+                path(right_shoulder, (right-w//5, elbow_y), right_hand)
             for hx, hy in (left_hand, right_hand):
                 ellipse((hx-width*2, hy-width*2, hx+width*2, hy+width*2))
             path((cx-w//7, waist), (x+w//4, bottom-h//12), (x+w//8, bottom-h//20))
