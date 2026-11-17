@@ -104,3 +104,35 @@ def test_portrait_scene_titles_stay_above_the_caption_safe_zone():
     for scene in storyboard["scenes"][:-1]:
         title = next(item for item in scene["elements"] if item["type"] == "text")
         assert title["y"] <= height * 0.85
+
+
+
+def test_pay_yourself_first_storyboard_uses_distinct_story_scenes_and_moving_money():
+    script = _script()
+    script["title"] = "Why You Should Pay Yourself First"
+    script["sections"] = {
+        "relatable_financial_problem": "A worker receives a paycheck but the money disappears into daily spending.",
+        "escalating_real_world_stakes": "Bills compete with household needs and leave little money at the end.",
+        "clear_explanation_of_why_it_matters": "Paying yourself first moves money into savings before other spending.",
+        "hopeful_and_realistic_possibility": "Small regular deposits can gradually build a useful savings buffer.",
+        "practical_action_viewers_can_take": "Choose a realistic amount and move it into savings on payday.",
+        "empowering_close": "A consistent habit helps you make progress toward your goals.",
+    }
+    storyboard = build_storyboard(
+        script, video_format="short",
+        disclaimer_config=load_yaml("config/disclaimer.yaml"),
+    )
+    scenes = storyboard["scenes"][:-1]
+    assert all(any(item["type"] == "person" for item in scene["elements"]) for scene in scenes)
+    layouts = [
+        tuple((item["type"], item.get("x"), item.get("y")) for item in scene["elements"] if item["type"] != "text")
+        for scene in scenes
+    ]
+    assert len(set(layouts)) == len(layouts)
+    moving = [
+        item for scene in scenes for item in scene["elements"]
+        if item.get("motion")
+    ]
+    assert moving
+    assert moving[0]["type"] == "coin"
+    assert validate_storyboard(storyboard) == []
