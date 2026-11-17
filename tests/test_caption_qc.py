@@ -31,8 +31,8 @@ def test_validate_srt_accepts_ordered_cues_matching_speech(tmp_path):
         ("", "empty"),
         ("1\n00:00:00,000 --> 00:00:00,000\nNo duration", "zero or negative"),
         (
-            "1\n00:00:00,000 --> 00:00:01,500\nFirst\n\n"
-            "2\n00:00:01,000 --> 00:00:02,000\nSecond",
+            ("1\n00:00:00,000 --> 00:00:01,500\nFirst\n\n"
+            "2\n00:00:01,000 --> 00:00:02,000\nSecond"),
             "overlaps",
         ),
         (
