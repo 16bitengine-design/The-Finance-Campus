@@ -63,44 +63,87 @@ def _element(kind: str, x: float, y: float, width: float, height: float, color: 
 
 
 def _scene_elements(text: str, section: str, title: str, width: int, height: int) -> list[dict[str, Any]]:
+    """Compose a distinct illustrated story beat for each part of the lesson."""
     (first, second, third), _, _ = _visual_types(text, section)
-    left_x, right_x = width * 0.08, width * 0.64
-    top_y = height * 0.22
-    obj_w, obj_h = width * 0.27, height * 0.35
-    elements: list[dict[str, Any]] = [
-        _element(first, left_x, top_y, obj_w, obj_h, "navy", 0.2),
-        {
-            "type": "arrow",
-            "x1": round(width * 0.40),
-            "y1": round(height * 0.43),
-            "x2": round(width * 0.59),
-            "y2": round(height * 0.43),
-            "color": "gold",
-            "start_seconds": 0.9,
-            "draw_seconds": 0.55,
-        },
-        _element(second, right_x, top_y, obj_w, obj_h, "green", 1.5),
-        {
-            "type": "arrow",
-            "x1": round(width * 0.78),
-            "y1": round(height * 0.59),
-            "x2": round(width * 0.52),
-            "y2": round(height * 0.66),
-            "color": "green",
-            "start_seconds": 2.35,
-            "draw_seconds": 0.55,
-        },
-        _element(third, width * 0.37, height * 0.68, width * 0.22, height * 0.13, "gold", 2.95),
-        {
-            "type": "text",
-            "x": round(width * 0.08),
-            "y": round(height * 0.84),
-            "text": title,
-            "color": "navy",
-            "start_seconds": 3.7,
-            "draw_seconds": 0.2,
-        },
-    ]
+    person = _element("person", width * .08, height * .19, width * .30, height * .43, "navy", .15)
+    paycheck = _element("money_note", width * .48, height * .20, width * .30, height * .17, "green", .75)
+    wallet = _element("wallet", width * .58, height * .49, width * .29, height * .19, "navy", 1.55)
+    jar = _element("savings_jar", width * .60, height * .38, width * .27, height * .31, "green", 1.75)
+    coin = _element("coin", width * .43, height * .28, width * .09, height * .055, "gold", 1.15)
+    house = _element("house", width * .58, height * .20, width * .31, height * .27, "navy", 1.1)
+    expense = _element("money_note", width * .58, height * .54, width * .25, height * .13, "gold", 2.0)
+
+    if section == "relatable_financial_problem":
+        elements = [person, paycheck, {
+            "type": "arrow", "x1": round(width*.39), "y1": round(height*.35),
+            "x2": round(width*.53), "y2": round(height*.35), "color": "gold",
+            "start_seconds": 1.0, "draw_seconds": .45,
+        }, wallet, coin]
+    elif section == "escalating_real_world_stakes":
+        person["x"], person["y"] = round(width*.06), round(height*.27)
+        person["width"], person["height"] = round(width*.24), round(height*.38)
+        elements = [person, house, expense, {
+            "type": "arrow", "x1": round(width*.70), "y1": round(height*.49),
+            "x2": round(width*.48), "y2": round(height*.63), "color": "gold",
+            "start_seconds": 2.4, "draw_seconds": .5,
+        }, wallet]
+    elif section == "clear_explanation_of_why_it_matters":
+        person["x"], person["width"] = round(width*.05), round(width*.23)
+        paycheck["x"], paycheck["y"] = round(width*.35), round(height*.22)
+        jar["x"], jar["y"] = round(width*.67), round(height*.43)
+        coin["x"], coin["y"] = round(width*.49), round(height*.30)
+        coin["motion"] = {
+            "from_x": round(width*.49), "from_y": round(height*.30),
+            "to_x": round(width*.75), "to_y": round(height*.52),
+            "start_seconds": 2.0, "end_seconds": 4.2,
+        }
+        elements = [person, paycheck, {
+            "type": "arrow", "x1": round(width*.29), "y1": round(height*.39),
+            "x2": round(width*.43), "y2": round(height*.39), "color": "green",
+            "start_seconds": 1.35, "draw_seconds": .45,
+        }, jar, coin]
+    elif section == "hopeful_and_realistic_possibility":
+        person["x"], person["y"] = round(width*.08), round(height*.24)
+        person["width"], person["height"] = round(width*.25), round(height*.39)
+        jar["x"], jar["y"] = round(width*.57), round(height*.38)
+        jar["width"], jar["height"] = round(width*.31), round(height*.34)
+        elements = [person, jar,
+            _element("coin", width*.64, height*.29, width*.075, height*.045, "gold", 1.1),
+            _element("coin", width*.75, height*.25, width*.075, height*.045, "gold", 1.8),
+            {"type": "arrow", "x1": round(width*.38), "y1": round(height*.43),
+             "x2": round(width*.56), "y2": round(height*.43), "color": "green",
+             "start_seconds": 2.2, "draw_seconds": .5}]
+    elif section == "practical_action_viewers_can_take":
+        person["x"], person["y"] = round(width*.05), round(height*.25)
+        person["width"], person["height"] = round(width*.24), round(height*.39)
+        paycheck["x"], paycheck["y"] = round(width*.34), round(height*.18)
+        jar["x"], jar["y"] = round(width*.66), round(height*.48)
+        coin["x"], coin["y"] = round(width*.50), round(height*.34)
+        coin["motion"] = {
+            "from_x": round(width*.50), "from_y": round(height*.34),
+            "to_x": round(width*.76), "to_y": round(height*.58),
+            "start_seconds": 1.5, "end_seconds": 4.4,
+        }
+        elements = [person, paycheck, {
+            "type": "arrow", "x1": round(width*.57), "y1": round(height*.39),
+            "x2": round(width*.70), "y2": round(height*.48), "color": "gold",
+            "start_seconds": 1.0, "draw_seconds": .5,
+        }, jar, coin]
+    else:
+        person["x"], person["y"] = round(width*.12), round(height*.25)
+        person["width"], person["height"] = round(width*.27), round(height*.42)
+        jar["x"], jar["y"] = round(width*.58), round(height*.34)
+        jar["width"], jar["height"] = round(width*.30), round(height*.37)
+        elements = [person, jar,
+            _element("coin", width*.65, height*.24, width*.08, height*.05, "gold", 1.0),
+            _element("coin", width*.75, height*.21, width*.08, height*.05, "gold", 1.7),
+            _element("coin", width*.70, height*.30, width*.08, height*.05, "gold", 2.35)]
+
+    # The scene title is deliberately kept above the reserved caption area.
+    elements.append({
+        "type": "text", "x": round(width*.08), "y": round(height*.83),
+        "text": title, "color": "navy", "start_seconds": 4.45, "draw_seconds": .2,
+    })
     return elements
 
 
