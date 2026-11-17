@@ -1,8 +1,4 @@
-from finance_campus.feed_discovery import (
-    OFFICIAL_FEEDS,
-    discover_from_official_feeds,
-    parse_feed,
-)
+from finance_campus.feed_discovery import discover_from_official_feeds, parse_feed
 
 
 RSS = """<?xml version="1.0"?>
