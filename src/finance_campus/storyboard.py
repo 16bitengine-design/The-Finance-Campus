@@ -12,7 +12,8 @@ from typing import Any
 
 WIDTH = 1000
 HEIGHT = 562
-ALLOWED_TYPES = {"circle", "rect", "line", "arrow", "text"}
+ALLOWED_TYPES = {"circle", "rect", "line", "arrow", "text", "person", "bank", "wallet", "house", "coin", "money_note", "savings_jar"}
+ILLUSTRATION_TYPES = {"person", "bank", "wallet", "house", "coin", "money_note", "savings_jar"}
 ALLOWED_COLORS = {"navy": "#102B55", "green": "#168C43", "gold": "#F5B817", "white": "#FFFFFF", "black": "#17202A"}
 
 
@@ -60,13 +61,15 @@ def validate_storyboard(data: Any) -> list[str]:
             color = element.get("color", "navy")
             if color not in ALLOWED_COLORS:
                 errors.append(f"{item_prefix}.color must be a Finance Campus palette name")
-            required = {
-                "circle": ("cx", "cy", "r"),
-                "rect": ("x", "y", "width", "height"),
-                "line": ("x1", "y1", "x2", "y2"),
-                "arrow": ("x1", "y1", "x2", "y2"),
-                "text": ("x", "y", "text"),
-            }[kind]
+            required = (
+                ("x", "y", "width", "height") if kind in ILLUSTRATION_TYPES else {
+                    "circle": ("cx", "cy", "r"),
+                    "rect": ("x", "y", "width", "height"),
+                    "line": ("x1", "y1", "x2", "y2"),
+                    "arrow": ("x1", "y1", "x2", "y2"),
+                    "text": ("x", "y", "text"),
+                }[kind]
+            )
             for field in required:
                 if field not in element:
                     errors.append(f"{item_prefix}.{field} is required")
@@ -75,6 +78,11 @@ def validate_storyboard(data: Any) -> list[str]:
                         errors.append(f"{item_prefix}.text must be a non-empty string")
                 elif isinstance(element[field], bool) or not isinstance(element[field], (int, float)) or not math.isfinite(element[field]):
                     errors.append(f"{item_prefix}.{field} must be a finite number")
+            if kind in ILLUSTRATION_TYPES and any(
+                isinstance(element.get(k), (int, float)) and element[k] <= 0
+                for k in ("width", "height")
+            ):
+                errors.append(f"{item_prefix} illustration width and height must be positive")
             if kind == "circle" and isinstance(element.get("r"), (int, float)) and element["r"] <= 0:
                 errors.append(f"{item_prefix}.r must be positive")
             if kind == "rect" and any(isinstance(element.get(k), (int, float)) and element[k] <= 0 for k in ("width", "height")):
