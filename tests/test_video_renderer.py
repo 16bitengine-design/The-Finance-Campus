@@ -151,3 +151,33 @@ def test_portrait_render_places_illustration_at_lower_canvas_coordinates(tmp_pat
     lower_region = frame.crop((0, 1400, 1080, 1920))
     white = Image.new("RGB", lower_region.size, (255, 255, 255))
     assert ImageChops.difference(lower_region, white).getbbox() is not None
+
+
+def test_storyboard_accepts_narration_synchronized_illustration_cues():
+    scene = {
+        "id": "timed-money-flow",
+        "narration": "Income arrives, then moves into savings.",
+        "duration_seconds": 4,
+        "elements": [
+            {"type": "money_note", "x": 100, "y": 100, "width": 180, "height": 100,
+             "start_seconds": 0.4, "draw_seconds": 0.8},
+            {"type": "savings_jar", "x": 500, "y": 100, "width": 180, "height": 220,
+             "start_seconds": 2.0, "draw_seconds": 1.0},
+        ],
+    }
+    assert validate_storyboard({"scenes": [scene]}) == []
+
+
+def test_storyboard_rejects_invalid_illustration_timing():
+    scene = {
+        "id": "bad-timing",
+        "narration": "Money moves.",
+        "duration_seconds": 2,
+        "elements": [
+            {"type": "coin", "x": 100, "y": 100, "width": 80, "height": 80,
+             "start_seconds": -0.2, "draw_seconds": 0},
+        ],
+    }
+    errors = validate_storyboard({"scenes": [scene]})
+    assert any("start_seconds" in error for error in errors)
+    assert any("draw_seconds" in error for error in errors)
