@@ -104,18 +104,18 @@ def test_catalogue_has_enough_distinct_topics_for_three_full_weekly_batches():
 def test_new_topic_sources_are_mapped_to_authoritative_educational_sources(tmp_path):
     result = refresh_topics(tmp_path / "topics.json", target=66, fetcher=fake_fetch)
     added = {item["topic_slug"]: item for item in result["added"]}
-    expected_sources = {
-        "money-needs-a-regular-check-in": "cfpb_wellbeing",
-        "annual-expenses-are-not-surprises": "fdic_money_smart",
-        "familiar-investment-is-not-automatically-safe": "sec_behavior",
-        "routine-beats-waiting-for-motivation": "cfpb_habits",
+    expected_urls = {
+        "money-needs-a-regular-check-in": "https://www.consumerfinance.gov/consumer-tools/financial-well-being/about/",
+        "annual-expenses-are-not-surprises": "https://www.fdic.gov/consumer-resource-center/money-smart-adults",
+        "familiar-investment-is-not-automatically-safe": "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins-72",
+        "routine-beats-waiting-for-motivation": "https://www.consumerfinance.gov/consumer-tools/educator-tools/youth-financial-education/learn/financial-habits-norms/",
     }
-    for slug, source_key in expected_sources.items():
+    for slug, expected_url in expected_urls.items():
         item = added[slug]
+        assert item["research_sources"][0]["url"] == expected_url
         assert item["research_sources"][0]["publisher"] in {
             "Consumer Financial Protection Bureau",
             "Federal Deposit Insurance Corporation",
             "U.S. Securities and Exchange Commission",
         }
-        assert item["research_sources"][0]["url"].startswith("https://")
         assert item["research_status"] == "source_checked_needs_claim_review"
