@@ -155,6 +155,8 @@ def render_video(
     draw_fps: int = 12,
     ffmpeg: str = "ffmpeg",
     keep_frames: bool = False,
+    audio_path: str | Path | None = None,
+    captions_path: str | Path | None = None,
 ) -> Path:
     """Render a storyboard into an MP4 using progressive drawing frames."""
     errors = validate_storyboard(storyboard)
@@ -167,6 +169,11 @@ def render_video(
     executable = shutil.which(ffmpeg)
     if not executable:
         raise RuntimeError("FFmpeg was not found. Install FFmpeg and ensure it is on PATH.")
+    audio = Path(audio_path).resolve() if audio_path is not None else None
+    captions = Path(captions_path).resolve() if captions_path is not None else None
+    for label, media_path in (("audio", audio), ("captions", captions)):
+        if media_path is not None and (not media_path.is_file() or media_path.stat().st_size == 0):
+            raise ValueError(f"{label} file does not exist or is empty: {media_path}")
 
     width, height = (1080, 1920) if video_format == "short" else (1920, 1080)
     canvas = storyboard.get("canvas", {"width": 1000, "height": 562})
@@ -202,13 +209,27 @@ def render_video(
 
         if frame_number == 0:
             raise RuntimeError("Renderer produced no frames")
+        filter_chain = f"fps={fps},format=yuv420p"
+        if captions is not None:
+            caption_name = str(captions).replace("\\", "\\\\").replace(":", "\\:").replace("'", "\\'").replace(",", "\\,")
+            style = "FontName=DejaVu Sans,FontSize=24,PrimaryColour=&H00FFFFFF,OutlineColour=&H00102B55,BorderStyle=1,Outline=2,Alignment=2,MarginV=90"
+            filter_chain += f",subtitles='{caption_name}':force_style='{style}'"
         command = [
             executable, "-hide_banner", "-loglevel", "error", "-y",
             "-framerate", str(draw_fps), "-i", str(frame_dir / "frame_%06d.png"),
-            "-vf", f"fps={fps},format=yuv420p",
+        ]
+        if audio is not None:
+            command.extend(["-i", str(audio)])
+        command.extend(["-vf", filter_chain, "-map", "0:v:0"])
+        if audio is not None:
+            total_duration = sum(float(scene["duration_seconds"]) for scene in storyboard["scenes"])
+            command.extend(["-map", "1:a:0", "-af", "apad", "-t", f"{total_duration:.3f}", "-c:a", "aac", "-b:a", "192k"])
+        else:
+            command.append("-an")
+        command.extend([
             "-c:v", "libx264", "-preset", "medium", "-crf", "20",
             "-movflags", "+faststart", str(target),
-        ]
+        ])
         completed = subprocess.run(command, capture_output=True, text=True, check=False)
         if completed.returncode != 0:
             raise RuntimeError(f"FFmpeg encoding failed: {completed.stderr.strip()}")
@@ -232,7 +253,12 @@ def render_video_from_file(
     *,
     video_format: str = "short",
     fps: int = 30,
+    audio_path: str | Path | None = None,
+    captions_path: str | Path | None = None,
 ) -> Path:
     with Path(storyboard_path).open("r", encoding="utf-8") as handle:
         storyboard = json.load(handle)
-    return render_video(storyboard, output_path, video_format=video_format, fps=fps)
+    return render_video(
+        storyboard, output_path, video_format=video_format, fps=fps,
+        audio_path=audio_path, captions_path=captions_path,
+    )
