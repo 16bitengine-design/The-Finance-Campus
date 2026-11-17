@@ -42,3 +42,10 @@ def test_both_platform_descriptions_include_required_disclaimer():
 def test_metadata_rejects_missing_title():
     with pytest.raises(ValueError, match="title"):
         generate_post_metadata({"category": "Saving"}, load_yaml("config/disclaimer.yaml"))
+
+
+def test_long_form_metadata_targets_youtube_only():
+    config = load_yaml("config/disclaimer.yaml")
+    result = generate_post_metadata(sample_script(), config, video_format="long")
+    assert set(result["platforms"]) == {"youtube"}
+    assert result["validation"]["tiktok_disclaimer_present"]
