@@ -61,7 +61,7 @@ def _topic_hashtags(title: str, category: str, limit: int) -> list[str]:
     return result
 
 
-def generate_post_metadata(script: dict[str, Any], disclaimer_config: dict[str, Any]) -> dict[str, Any]:
+def generate_post_metadata(\n    script: dict[str, Any], disclaimer_config: dict[str, Any], *, video_format: str = "short"\n) -> dict[str, Any]:
     """Create distinct YouTube and TikTok copy, with the required disclaimer on both."""
     title = _clean_text(script.get("title"))
     category = _clean_text(script.get("category")) or "Financial Literacy"
