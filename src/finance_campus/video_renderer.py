@@ -111,6 +111,7 @@ def render_video(
         raise RuntimeError("FFmpeg was not found. Install FFmpeg and ensure it is on PATH.")
 
     width, height = (1080, 1920) if video_format == "short" else (1920, 1080)
+    draw_width, draw_height = (1080, 607) if video_format == "short" else (1920, 1080)
     target = Path(output_path)
     target.parent.mkdir(parents=True, exist_ok=True)
     frame_dir = target.parent / f".{target.stem}_frames"
@@ -122,8 +123,8 @@ def render_video(
             total_frames = max(1, math.ceil(duration * draw_fps))
             elements = scene["elements"]
             for frame_index in range(total_frames):
-                image = Image.new("RGB", (width, height), PALETTE["white"])
-                draw = ImageDraw.Draw(image)
+                drawing = Image.new("RGB", (draw_width, draw_height), PALETTE["white"])
+                draw = ImageDraw.Draw(drawing)
                 elapsed = frame_index / draw_fps
                 for element_index, element in enumerate(elements):
                     # Reveal each drawing in sequence during the first 65% of its scene.
@@ -131,7 +132,12 @@ def render_video(
                     start = element_index * reveal_window
                     progress = min(1.0, max(0.0, (elapsed - start) / reveal_window))
                     if progress > 0:
-                        _draw_element(draw, element, progress, (width, height))
+                        _draw_element(draw, element, progress, (draw_width, draw_height))
+                if video_format == "short":
+                    image = Image.new("RGB", (width, height), PALETTE["white"])
+                    image.paste(drawing, (0, (height - draw_height) // 2))
+                else:
+                    image = drawing
                 image.save(frame_dir / f"frame_{frame_number:06d}.png", optimize=True)
                 frame_number += 1
 
