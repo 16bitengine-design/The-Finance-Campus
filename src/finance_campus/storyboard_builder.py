@@ -78,6 +78,10 @@ def _scene_elements(text: str, section: str, title: str, width: int, height: int
             "type": "arrow", "x1": round(width*.39), "y1": round(height*.35),
             "x2": round(width*.53), "y2": round(height*.35), "color": "gold",
             "start_seconds": 1.0, "draw_seconds": .45,
+        }, {
+            "type": "arrow", "x1": round(width*.53), "y1": round(height*.48),
+            "x2": round(width*.64), "y2": round(height*.55), "color": "green",
+            "start_seconds": 1.3, "draw_seconds": .4,
         }, wallet, coin]
     elif section == "escalating_real_world_stakes":
         person["x"], person["y"] = round(width*.06), round(height*.27)
@@ -144,6 +148,7 @@ def _scene_elements(text: str, section: str, title: str, width: int, height: int
         "type": "text", "x": round(width*.08), "y": round(height*.83),
         "text": title, "color": "navy", "start_seconds": 4.45, "draw_seconds": .2,
     })
+    elements.sort(key=lambda item: float(item.get("start_seconds", 0)))
     return elements
 
 
