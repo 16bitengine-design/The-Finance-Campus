@@ -1,0 +1,88 @@
+{
+  "pool_id": "inspiration-topic-pool-002",
+  "created_at": "2026-11-17",
+  "purpose": "Screen book-inspired money-mindset topics for genuinely distinct editorial angles. Ideas are paraphrased in original wording; no direct quotations are included.",
+  "status": "screened_candidates_only",
+  "auto_production": false,
+  "auto_publishing": false,
+  "screening_basis": "Compared against the 42 existing mindset blueprints before adding three distinct decision-quality topics. A book listing verifies bibliographic identity and broad subject only; it does not prove every script claim. Claim-level review remains mandatory.",
+  "accepted_candidates": [
+    {
+      "slug": "know-when-to-walk-away",
+      "title": "When you have already spent money, walking away can still be wise",
+      "inspiration": {
+        "author": "Daniel Kahneman",
+        "work": "Thinking, Fast and Slow",
+        "publisher_source": "https://us.macmillan.com/books/9780374533557/thinkingfastandslow/"
+      },
+      "decision": "accepted",
+      "reason": "Sunk-cost thinking and escalation of commitment are not directly covered by the current topic set. Keep the lesson focused on future costs and choices, not shame."
+    },
+    {
+      "slug": "judge-the-decision-not-only-the-result",
+      "title": "A good money decision can still have a bad outcome",
+      "inspiration": {
+        "author": "Annie Duke",
+        "work": "Thinking in Bets",
+        "publisher_source": "https://www.penguinrandomhouse.com/books/552885/thinking-in-bets-by-annie-duke/"
+      },
+      "decision": "accepted",
+      "reason": "Separates decision quality from outcome under uncertainty; distinct from general patience, risk awareness and setback recovery."
+    },
+    {
+      "slug": "luck-is-not-a-repeatable-money-plan",
+      "title": "Do not mistake a lucky result for a reliable money strategy",
+      "inspiration": {
+        "author": "Nassim Nicholas Taleb",
+        "work": "Fooled by Randomness",
+        "publisher_source": "https://www.penguinrandomhouse.com/books/176225/fooled-by-randomness-by-nassim-nicholas-taleb/"
+      },
+      "decision": "accepted",
+      "reason": "Focuses on luck versus skill and the danger of extrapolating from one success; distinct from avoiding get-rich-quick offers or financial trends."
+    }
+  ],
+  "screened_out": [
+    {
+      "title": "Why you keep spending because you already paid",
+      "decision": "duplicate",
+      "reason": "Same sunk-cost angle as accepted topic; retained only one clear title."
+    },
+    {
+      "title": "Why one lucky investment does not make you an expert",
+      "decision": "duplicate",
+      "reason": "Same luck-versus-skill lesson as accepted topic."
+    },
+    {
+      "title": "Why a bad result does not always mean a bad decision",
+      "decision": "duplicate",
+      "reason": "Same decision-quality-versus-outcome lesson as accepted topic."
+    },
+    {
+      "title": "Why following the crowd feels safer with money",
+      "decision": "overlap",
+      "reason": "Overlaps existing trend-following and comparison-trap blueprints."
+    },
+    {
+      "title": "Why a bonus feels easier to spend than a salary",
+      "decision": "overlap",
+      "reason": "Overlaps existing windfall and payday-spending topics."
+    },
+    {
+      "title": "Why we fear losses more than we value gains",
+      "decision": "overlap",
+      "reason": "Needs a more distinct practical angle; overlaps financial setbacks and fear-based decision avoidance."
+    },
+    {
+      "title": "Why confidence can become overconfidence",
+      "decision": "overlap",
+      "reason": "Overlaps money-confidence and trend-following topics; may be revisited with a sharply distinct investing-risk brief."
+    }
+  ],
+  "editorial_safeguards": [
+    "No direct quotations from copyrighted modern books or speeches.",
+    "Use the author's name and book title only when bibliographic identity is verified.",
+    "Write every explanation independently; do not imitate distinctive prose.",
+    "Do not present a book as scientific proof; source and verify factual claims separately.",
+    "Every generated script remains a candidate pending claim-level and editorial review."
+  ]
+}
