@@ -93,3 +93,14 @@ def test_storyboard_connects_cause_effect_and_outcome_with_ordered_draw_cues():
     outcome = scene["elements"][-2]
     assert outcome["type"] in {"person", "bank", "wallet", "house", "coin", "money_note", "savings_jar"}
     assert outcome["start_seconds"] > arrows[-1]["start_seconds"]
+
+def test_portrait_scene_titles_stay_above_the_caption_safe_zone():
+    storyboard = build_storyboard(
+        _script(),
+        video_format="short",
+        disclaimer_config=load_yaml("config/disclaimer.yaml"),
+    )
+    height = storyboard["canvas"]["height"]
+    for scene in storyboard["scenes"][:-1]:
+        title = next(item for item in scene["elements"] if item["type"] == "text")
+        assert title["y"] <= height * 0.85
