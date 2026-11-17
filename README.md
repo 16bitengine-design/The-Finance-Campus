@@ -58,3 +58,12 @@ The actual rendering engine, Kokoro integration, research automation, and platfo
 After one-time setup and platform authorization, the target system runs end to end without routine human intervention: research, topic selection, scriptwriting, illustration, Kokoro narration, rendering, quality control, scheduled publishing, and public-post verification. It retries recoverable failures safely, prevents duplicate uploads, resumes from recorded state, and reports blocking failures.
 
 Publishing remains disabled until end-to-end tests pass and platform authorization is configured. Initial account authorization and any platform-mandated app review cannot be skipped or guaranteed by code.
+## Editorial promise: urgency that leads to hope and action
+
+Our videos are designed to move viewers to act. We may directly address poverty, debt, inflation, unemployment, financial insecurity, fear, and other difficult money realities. We should not soften genuine problems until they lose their urgency. Use honest escalation to show how financial pressures can compound and why timely decisions matter.
+
+The required story arc is: relatable financial problem → escalating real-world stakes → clear explanation → hopeful and realistic possibility → practical action → empowering close.
+
+Urgency must be evidence-based, not manufactured. Never shame people facing hardship, present risks as certainties, exploit fear, or promise guaranteed wealth or investment returns. Every video should leave viewers with a realistic next step and a sense that improvement is possible.
+
+See `config/editorial-policy.md`. The policy describes the target editorial standard; automated script-level enforcement is still to be implemented and tested.
