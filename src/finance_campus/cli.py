@@ -7,12 +7,12 @@ import sys
 from pathlib import Path
 
 from finance_campus.config import load_yaml, validate_branding, validate_disclaimer
+from finance_campus.narration import synthesize_storyboard
+from finance_campus.production_pipeline import produce_video_from_script
 from finance_campus.script_pipeline import prepare_script
 from finance_campus.script_quality import validate_script
 from finance_campus.storyboard import render_storyboard, validate_storyboard
 from finance_campus.video_renderer import render_video
-from finance_campus.narration import synthesize_storyboard
-from finance_campus.production_pipeline import produce_video_from_script
 
 
 def _read_json(path: str) -> object:
