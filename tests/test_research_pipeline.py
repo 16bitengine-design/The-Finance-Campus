@@ -4,7 +4,7 @@ from finance_campus.research_pipeline import refresh_topics
 
 
 def fake_fetch(url):
-    return {"status": 200, "title": "Official financial education guide", "text": "emergency savings cash income bills debt loan interest credit digital financial safety investing risk retirement old age budget spending goals account financial products services"}
+    return {"status": 200, "title": "Official financial education guide", "text": "emergency savings cash income bills debt loan interest credit digital financial safety investing risk retirement old age budget spending goals account financial products services control freedom security values habits planning decisions familiarity performance trading panic manias momentum diversification fees research information questions progress choices"}
 
 
 def test_refresh_adds_unique_researched_topics(tmp_path):
@@ -34,13 +34,15 @@ def test_refresh_uses_new_topics_without_repeating_previous_batch(tmp_path):
     second = refresh_topics(path, target=20, fetcher=fake_fetch)
     third = refresh_topics(path, target=20, fetcher=fake_fetch)
     fourth = refresh_topics(path, target=20, fetcher=fake_fetch)
+    fifth = refresh_topics(path, target=20, fetcher=fake_fetch)
     assert first["added_count"] == 20
     assert second["added_count"] == 20
     assert {item["id"] for item in first["added"]}.isdisjoint(
         {item["id"] for item in second["added"]}
     )
-    assert third["added_count"] == 5
-    assert fourth["added_count"] == 0
+    assert third["added_count"] == 20
+    assert fourth["added_count"] == 6
+    assert fifth["added_count"] == 0
 
 
 
@@ -61,7 +63,7 @@ def test_refresh_adds_evergreen_mindset_topics_not_news_headlines(tmp_path):
 
 
 def test_inspiration_blueprints_are_carried_into_topic_records(tmp_path):
-    result = refresh_topics(tmp_path / "topics.json", target=45, fetcher=fake_fetch)
+    result = refresh_topics(tmp_path / "topics.json", target=66, fetcher=fake_fetch)
     inspired = {
         item["topic_slug"]: item["inspiration"]
         for item in result["added"]
@@ -86,3 +88,34 @@ def test_inspiration_blueprints_are_carried_into_topic_records(tmp_path):
         for item in result["added"]
         if item.get("inspiration")
     )
+
+
+
+def test_catalogue_has_enough_distinct_topics_for_three_full_weekly_batches():
+    from finance_campus.mindset_topics import MINDSET_TOPIC_BLUEPRINTS
+
+    slugs = [item["slug"] for item in MINDSET_TOPIC_BLUEPRINTS]
+    titles = [item["title"].casefold() for item in MINDSET_TOPIC_BLUEPRINTS]
+    assert len(slugs) == 66
+    assert len(slugs) == len(set(slugs))
+    assert len(titles) == len(set(titles))
+
+
+def test_new_topic_sources_are_mapped_to_authoritative_educational_sources(tmp_path):
+    result = refresh_topics(tmp_path / "topics.json", target=66, fetcher=fake_fetch)
+    added = {item["topic_slug"]: item for item in result["added"]}
+    expected_sources = {
+        "money-needs-a-regular-check-in": "cfpb_wellbeing",
+        "annual-expenses-are-not-surprises": "fdic_money_smart",
+        "familiar-investment-is-not-automatically-safe": "sec_behavior",
+        "routine-beats-waiting-for-motivation": "cfpb_habits",
+    }
+    for slug, source_key in expected_sources.items():
+        item = added[slug]
+        assert item["research_sources"][0]["publisher"] in {
+            "Consumer Financial Protection Bureau",
+            "Federal Deposit Insurance Corporation",
+            "U.S. Securities and Exchange Commission",
+        }
+        assert item["research_sources"][0]["url"].startswith("https://")
+        assert item["research_status"] == "source_checked_needs_claim_review"
