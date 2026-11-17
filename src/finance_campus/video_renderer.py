@@ -48,6 +48,63 @@ def _draw_arrow(draw: ImageDraw.ImageDraw, coords: tuple[int, int, int, int], fi
     draw.polygon(((x2, y2), left, right), fill=fill)
 
 
+def _ellipse_path(box: tuple[int, int, int, int], steps: int = 48) -> list[tuple[int, int]]:
+    left, top, right, bottom = box
+    cx, cy = (left + right) / 2, (top + bottom) / 2
+    rx, ry = (right - left) / 2, (bottom - top) / 2
+    return [
+        (round(cx + rx * math.cos(2 * math.pi * index / steps)),
+         round(cy + ry * math.sin(2 * math.pi * index / steps)))
+        for index in range(steps + 1)
+    ]
+
+
+def _draw_progressive_strokes(
+    draw: ImageDraw.ImageDraw,
+    strokes: list[list[tuple[int, int]]],
+    progress: float,
+    color: tuple[int, int, int],
+    width: int,
+) -> None:
+    """Reveal ordered pen strokes by travelled path length, not by wiping an image."""
+    if not strokes or progress <= 0:
+        return
+    lengths = [
+        sum(math.dist(a, b) for a, b in zip(path, path[1:]))
+        for path in strokes
+    ]
+    total = sum(lengths)
+    if total <= 0:
+        return
+    remaining = min(1.0, progress) * total
+    for path, length in zip(strokes, lengths):
+        if remaining <= 0:
+            break
+        if length <= 0:
+            continue
+        if remaining >= length:
+            draw.line(path, fill=color, width=width, joint="curve")
+            remaining -= length
+            continue
+        travelled = 0.0
+        partial = [path[0]]
+        for first, second in zip(path, path[1:]):
+            segment = math.dist(first, second)
+            if travelled + segment <= remaining:
+                partial.append(second)
+                travelled += segment
+                continue
+            fraction = (remaining - travelled) / segment if segment else 0
+            partial.append((
+                round(first[0] + (second[0] - first[0]) * fraction),
+                round(first[1] + (second[1] - first[1]) * fraction),
+            ))
+            break
+        if len(partial) > 1:
+            draw.line(partial, fill=color, width=width, joint="curve")
+        break
+
+
 def _draw_element(
     draw: ImageDraw.ImageDraw,
     element: dict[str, Any],
@@ -60,131 +117,139 @@ def _draw_element(
     width = max(2, round(4 * min(sx, sy)))
     kind = element["type"]
 
+    if progress <= 0:
+        return
     if kind == "text":
-        if progress < 1:
-            return
-        x, y = _point(element["x"], element["y"], sx, sy)
-        draw.text((x, y), element["text"], fill=color, font=_font(max(16, round(25 * sy))))
+        if progress >= 1:
+            x, y = _point(element["x"], element["y"], sx, sy)
+            draw.text((x, y), element["text"], fill=color, font=_font(max(16, round(25 * sy))))
         return
 
     if kind == "circle":
         cx, cy = _point(element["cx"], element["cy"], sx, sy)
-        radius = max(1, round(element["r"] * min(sx, sy) * progress))
-        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), outline=color, width=width)
+        radius = max(1, round(element["r"] * min(sx, sy)))
+        path = _ellipse_path((cx-radius, cy-radius, cx+radius, cy+radius))
+        _draw_progressive_strokes(draw, [path], progress, color, width)
         return
 
     if kind in ILLUSTRATION_TYPES:
         x, y = _point(element["x"], element["y"], sx, sy)
         w, h = round(element["width"] * sx), round(element["height"] * sy)
-        if w <= 0 or h <= 0 or progress <= 0:
+        if w <= 0 or h <= 0:
             return
         right, bottom = x + w, y + h
-        layer = Image.new("RGBA", draw._image.size, (255, 255, 255, 0))
-        art = ImageDraw.Draw(layer)
         cx, cy = x + w // 2, y + h // 2
+        strokes: list[list[tuple[int, int]]] = []
+
+        def path(*points: tuple[int, int]) -> None:
+            strokes.append(list(points))
+
+        def ellipse(box: tuple[int, int, int, int]) -> None:
+            strokes.append(_ellipse_path(box))
+
+        def rect(left: int, top: int, r: int, b: int) -> None:
+            path((left, top), (r, top), (r, b), (left, b), (left, top))
+
         if kind == "person":
             head = max(5, w // 7)
-            art.ellipse((cx-head, y, cx+head, y+2*head), outline=color, width=width)
-            eye_y = y + head
-            eye_r = max(2, width)
-            art.ellipse((cx-head//3-eye_r, eye_y-eye_r, cx-head//3+eye_r, eye_y+eye_r), fill=color)
-            art.ellipse((cx+head//3-eye_r, eye_y-eye_r, cx+head//3+eye_r, eye_y+eye_r), fill=color)
-            art.arc((cx-head//3, y+head, cx+head//3, y+int(head*1.65)), 10, 170, fill=color, width=width)
+            ellipse((cx-head, y, cx+head, y+2*head))
+            # Facial details are deliberately separate pen strokes.
+            eye_y, eye_r = y + head, max(2, width)
+            path((cx-head//3-eye_r, eye_y), (cx-head//3+eye_r, eye_y))
+            path((cx+head//3-eye_r, eye_y), (cx+head//3+eye_r, eye_y))
+            path((cx-head//3, y+int(head*1.45)), (cx, y+int(head*1.65)), (cx+head//3, y+int(head*1.45)))
             neck_y = y + 2*head
             shoulder = neck_y + max(8, h//24)
             waist = y + int(h*.66)
-            art.line((cx, neck_y, cx, shoulder), fill=color, width=width)
-            art.polygon(((cx-w//4, shoulder), (cx+w//4, shoulder), (cx+w//6, waist), (cx-w//6, waist)), outline=color)
-            art.line((cx-w//12, shoulder+width, cx, shoulder+width*4, cx+w//12, shoulder+width), fill=color, width=width)
-            art.line((cx, shoulder+width*4, cx, waist-h//14), fill=color, width=width)
-            art.rectangle((cx+w//12, shoulder+h//12, cx+w//4, shoulder+h//5), outline=color, width=max(1,width//2))
-            art.arc((cx-head, y-width, cx+head, y+head), 185, 355, fill=color, width=width)
-            art.ellipse((cx-head-width, y+head//2, cx-head+width, y+head), outline=color, width=width)
-            art.ellipse((cx+head-width, y+head//2, cx+head+width, y+head), outline=color, width=width)
+            path((cx, neck_y), (cx, shoulder))
+            path((cx-w//4, shoulder), (cx+w//4, shoulder), (cx+w//6, waist), (cx-w//6, waist), (cx-w//4, shoulder))
+            path((cx-w//12, shoulder+width), (cx, shoulder+width*4), (cx+w//12, shoulder+width))
+            path((cx, shoulder+width*4), (cx, waist-h//14))
+            rect(cx+w//12, shoulder+h//12, cx+w//4, shoulder+h//5)
+            path((cx-head, y+head//3), (cx-head//2, y-width), (cx+head//2, y-width), (cx+head, y+head//3))
+            ellipse((cx-head-width, y+head//2, cx-head+width, y+head))
+            ellipse((cx+head-width, y+head//2, cx+head+width, y+head))
             elbow_y = y + int(h*.43)
-            hand_r = max(4, width*2)
             left_hand = (x+w//10, y+int(h*.56))
             right_hand = (right-w//10, y+int(h*.56))
-            art.line((cx-w//4, shoulder+width, x+w//5, elbow_y, left_hand[0], left_hand[1]), fill=color, width=width)
-            art.line((cx+w//4, shoulder+width, right-w//5, elbow_y, right_hand[0], right_hand[1]), fill=color, width=width)
+            path((cx-w//4, shoulder+width), (x+w//5, elbow_y), left_hand)
+            path((cx+w//4, shoulder+width), (right-w//5, elbow_y), right_hand)
             for hx, hy in (left_hand, right_hand):
-                art.ellipse((hx-hand_r, hy-hand_r, hx+hand_r, hy+hand_r), outline=color, width=width)
-            art.line((cx-w//7, waist, x+w//4, bottom-h//12), fill=color, width=width)
-            art.line((cx+w//7, waist, right-w//4, bottom-h//12), fill=color, width=width)
-            art.line((x+w//4, bottom-h//12, x+w//8, bottom-h//20), fill=color, width=width)
-            art.line((right-w//4, bottom-h//12, right-w//8, bottom-h//20), fill=color, width=width)
+                ellipse((hx-width*2, hy-width*2, hx+width*2, hy+width*2))
+            path((cx-w//7, waist), (x+w//4, bottom-h//12), (x+w//8, bottom-h//20))
+            path((cx+w//7, waist), (right-w//4, bottom-h//12), (right-w//8, bottom-h//20))
         elif kind == "bank":
             roof_y = y + h//4
-            art.polygon(((x, roof_y), (cx, y), (right, roof_y)), outline=color)
-            art.line((x, roof_y, right, roof_y), fill=color, width=width)
+            path((x, roof_y), (cx, y), (right, roof_y), (x, roof_y))
+            path((x, roof_y), (right, roof_y))
             for col in range(4):
-                px = x + w*(col+0.5)/4
-                art.line((round(px), roof_y+width, round(px), bottom-h//6), fill=color, width=width)
-            art.line((x, bottom-h//6, right, bottom-h//6), fill=color, width=width)
-            art.line((x-w//20, bottom, right+w//20, bottom), fill=color, width=width)
-            sign_box = (cx-w//5, roof_y+h//14, cx+w//5, roof_y+h//5)
-            art.rounded_rectangle(sign_box, radius=max(2,width), outline=color, width=width)
-            art.text((cx-w//10, roof_y+h//13), "BANK", fill=color, font=_font(max(10,w//15)))
-            art.rectangle((cx-w//10, bottom-h//3, cx+w//10, bottom-h//6), outline=color, width=width)
+                px = round(x + w*(col+0.5)/4)
+                path((px, roof_y+width), (px, bottom-h//6))
+            path((x, bottom-h//6), (right, bottom-h//6))
+            path((x-w//20, bottom), (right+w//20, bottom))
+            rect(cx-w//5, roof_y+h//14, cx+w//5, roof_y+h//5)
+            rect(cx-w//10, bottom-h//3, cx+w//10, bottom-h//6)
+            if progress >= 1:
+                draw.text((cx-w//10, roof_y+h//13), "BANK", fill=color, font=_font(max(10,w//15)))
         elif kind == "wallet":
-            art.rounded_rectangle((x, y+h//4, right, bottom), radius=max(4,h//10), outline=color, width=width)
-            art.rounded_rectangle((cx, y+h//2, right+w//12, y+h*3//4), radius=max(3,h//16), outline=color, width=width)
-            art.ellipse((right-w//5, y+h*5//8, right-w//7, y+h*5//8+w//12), outline=color, width=width)
-            art.line((x+w//8, y+h//3, cx-w//12, y+h//3), fill=color, width=width)
-            art.line((x+w//8, y+h//2, cx-w//12, y+h//2), fill=color, width=width)
-            art.line((x+w//3, y+h//5, x+w//2, y+h//12, x+w*2//3, y+h//5), fill=color, width=width)
+            # Rounded wallet is represented by a hand-drawn multi-segment outline.
+            path((x+w//10, y+h//4), (right-w//10, y+h//4), (right, y+h//3),
+                 (right, bottom-h//10), (right-w//10, bottom), (x+w//10, bottom),
+                 (x, bottom-h//10), (x, y+h//3), (x+w//10, y+h//4))
+            path((cx, y+h//2), (right+w//12, y+h//2), (right+w//12, y+h*3//4),
+                 (cx, y+h*3//4), (cx, y+h//2))
+            ellipse((right-w//5, y+h*5//8, right-w//7, y+h*5//8+w//12))
+            path((x+w//8, y+h//3), (cx-w//12, y+h//3))
+            path((x+w//8, y+h//2), (cx-w//12, y+h//2))
+            path((x+w//3, y+h//5), (x+w//2, y+h//12), (x+w*2//3, y+h//5))
         elif kind == "house":
             roof_y = y+h//3
-            art.line((x, roof_y, cx, y), fill=color, width=width)
-            art.line((cx, y, right, roof_y), fill=color, width=width)
-            art.rectangle((x+w//8, roof_y, right-w//8, bottom), outline=color, width=width)
-            art.rectangle((cx-w//10, bottom-h//3, cx+w//10, bottom), outline=color, width=width)
+            path((x, roof_y), (cx, y), (right, roof_y))
+            rect(x+w//8, roof_y, right-w//8, bottom)
+            rect(cx-w//10, bottom-h//3, cx+w//10, bottom)
         elif kind == "coin":
-            art.ellipse((x, y, right, bottom), outline=color, width=width)
-            art.ellipse((x+w//5, y+h//5, right-w//5, bottom-h//5), outline=color, width=width)
-            art.text((cx-w//8, cy-h//4), "¤", fill=color, font=_font(max(12,w//2)))
+            ellipse((x, y, right, bottom))
+            ellipse((x+w//5, y+h//5, right-w//5, bottom-h//5))
+            if progress >= 1:
+                draw.text((cx-w//8, cy-h//4), "¤", fill=color, font=_font(max(12,w//2)))
         elif kind == "money_note":
-            art.rounded_rectangle((x, y+h//6, right, bottom-h//6), radius=max(3,h//12), outline=color, width=width)
-            art.ellipse((cx-w//9, cy-h//8, cx+w//9, cy+h//8), outline=color, width=width)
-            art.line((x+w//8, y+h//3, x+w//4, y+h//3), fill=color, width=width)
-            art.line((right-w//4, bottom-h//3, right-w//8, bottom-h//3), fill=color, width=width)
-            art.line((cx-w//12, y+h//4, cx+w//12, y+h//4), fill=color, width=width)
-            art.line((cx-w//12, bottom-h//4, cx+w//12, bottom-h//4), fill=color, width=width)
+            rect(x, y+h//6, right, bottom-h//6)
+            ellipse((cx-w//9, cy-h//8, cx+w//9, cy+h//8))
+            path((x+w//8, y+h//3), (x+w//4, y+h//3))
+            path((right-w//4, bottom-h//3), (right-w//8, bottom-h//3))
+            path((cx-w//12, y+h//4), (cx+w//12, y+h//4))
+            path((cx-w//12, bottom-h//4), (cx+w//12, bottom-h//4))
         elif kind == "savings_jar":
-            art.line((x+w//4, y+h//5, right-w//4, y+h//5), fill=color, width=width)
-            art.rounded_rectangle((x+w//5, y+h//4, right-w//5, bottom), radius=max(4,w//8), outline=color, width=width)
-            art.line((cx-w//8, y+h//5, cx+w//8, y+h//5), fill=color, width=width)
-            art.ellipse((cx-w//7, cy-h//8, cx+w//7, cy+h//8), outline=color, width=width)
+            path((x+w//4, y+h//5), (right-w//4, y+h//5))
+            path((x+w//5, y+h//4), (x+w//5, bottom-h//10),
+                 (x+w//4, bottom), (right-w//4, bottom),
+                 (right-w//5, bottom-h//10), (right-w//5, y+h//4),
+                 (x+w//5, y+h//4))
+            path((cx-w//8, y+h//5), (cx+w//8, y+h//5))
+            ellipse((cx-w//7, cy-h//8, cx+w//7, cy+h//8))
             coin_y = bottom-h//5
             for offset in (-w//12, 0, w//12):
-                art.ellipse((cx+offset-w//12, coin_y-h//12, cx+offset+w//12, coin_y+h//12), outline=color, width=width)
-            art.line((cx-w//5, y+h//3, cx+w//5, y+h//3), fill=color, width=width)
-        mask = Image.new("L", draw._image.size, 0)
-        mask_draw = ImageDraw.Draw(mask)
-        visible_right = x + max(1, round(w * progress))
-        slant = max(1, round(h * 0.12))
-        mask_draw.polygon(((x, y), (visible_right, y), (min(right, visible_right + slant), bottom), (x, bottom)), fill=255)
-        crop_box = (x, y, right, bottom)
-        art_layer = layer.crop(crop_box)
-        art_mask = mask.crop(crop_box)
-        draw._image.paste(art_layer.convert("RGB"), (x, y), art_mask)
+                ellipse((cx+offset-w//12, coin_y-h//12, cx+offset+w//12, coin_y+h//12))
+            path((cx-w//5, y+h//3), (cx+w//5, y+h//3))
+
+        _draw_progressive_strokes(draw, strokes, progress, color, width)
         return
 
     if kind == "rect":
         x, y = _point(element["x"], element["y"], sx, sy)
-        w = round(element["width"] * progress * sx)
-        h = round(element["height"] * progress * sy)
+        w = round(element["width"] * sx)
+        h = round(element["height"] * sy)
         if w > 0 and h > 0:
-            draw.rounded_rectangle((x, y, x + w, y + h), radius=max(2, width * 2), outline=color, width=width)
+            points = [(x,y), (x+w,y), (x+w,y+h), (x,y+h), (x,y)]
+            _draw_progressive_strokes(draw, [points], progress, color, width)
         return
 
     x1, y1 = _point(element["x1"], element["y1"], sx, sy)
     x2, y2 = _point(element["x2"], element["y2"], sx, sy)
     end = (round(x1 + (x2 - x1) * progress), round(y1 + (y2 - y1) * progress))
+    draw.line((x1, y1, end[0], end[1]), fill=color, width=width)
     if kind == "arrow" and progress >= 1:
         _draw_arrow(draw, (x1, y1, end[0], end[1]), color, width)
-    else:
-        draw.line((x1, y1, end[0], end[1]), fill=color, width=width)
 
 
 def render_video(
