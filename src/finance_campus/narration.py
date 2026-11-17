@@ -20,7 +20,7 @@ SUPPORTED_VOICES = {
 }
 
 
-def _sentence_groups(text: str, *, min_words: int = 12, max_words: int = 38) -> list[str]:
+def _sentence_groups(text: str, *, min_words: int = 12, max_words: int = 24) -> list[str]:
     """Group complete sentences into natural Kokoro chunks, avoiding tiny utterances."""
     sentences = [part.strip() for part in re.split(r"(?<=[.!?])\s+", text.strip()) if part.strip()]
     if not sentences:
@@ -84,7 +84,7 @@ def _timestamp(seconds: float) -> str:
     return f"{hours:02d}:{minutes:02d}:{whole_seconds:02d},{millis:03d}"
 
 
-def _caption_lines(text: str, width: int = 42) -> str:
+def _caption_lines(text: str, width: int = 48) -> str:
     words = text.split()
     lines: list[str] = []
     current = ""
@@ -97,7 +97,7 @@ def _caption_lines(text: str, width: int = 42) -> str:
             current = candidate
     if current:
         lines.append(current)
-    return "\n".join(lines[:3])
+    return "\n".join(lines)
 
 
 def synthesize_storyboard(
