@@ -56,6 +56,10 @@ def _element(kind: str, x: float, y: float, width: float, height: float, color: 
 
 def _scene_elements(text: str, section: str, title: str, width: int, height: int) -> list[dict[str, Any]]:
     first, second, third = _visual_types(text, section)
+    # The connecting arrow is drawn explicitly between the two main objects.
+    # Keep the lower supporting illustration a drawable object, not a second arrow.
+    if third == "arrow":
+        third = "coin"
     left_x, right_x = width * 0.08, width * 0.64
     top_y = height * 0.22
     obj_w, obj_h = width * 0.27, height * 0.35
