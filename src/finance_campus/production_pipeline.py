@@ -12,6 +12,7 @@ from finance_campus.config import load_yaml, validate_branding, validate_disclai
 from finance_campus.disclaimers import append_description_disclaimer, disclaimer_texts
 from finance_campus.final_video_qc import validate_final_video
 from finance_campus.narration import synthesize_storyboard
+from finance_campus.post_metadata import generate_post_metadata
 from finance_campus.quality_gates import validate_video_package
 from finance_campus.research_pipeline import is_approved_research_url
 from finance_campus.script_pipeline import prepare_script
@@ -206,12 +207,38 @@ def produce_video_from_script(
             "Consult a qualified professional",
         )
     )
-    description = append_description_disclaimer(
-        str(script.get("description", "")).strip(), disclaimer_config,
-    )
+    post_metadata = generate_post_metadata(script, disclaimer_config)
+    youtube_metadata = post_metadata["platforms"]["youtube"]
+    description = youtube_metadata["description"]
     description_path = destination / "description.txt"
+    youtube_description_path = destination / "youtube-description.txt"
     description_path.write_text(description + "\n", encoding="utf-8")
-    description_ok = disclaimer["description"].casefold() in description.casefold()
+    youtube_description_path.write_text(description + "\n", encoding="utf-8")
+    metadata_path = destination / "post-metadata.json"
+    metadata_path.write_text(
+        json.dumps(post_metadata, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    artifacts = {
+        "youtube_description": str(youtube_description_path),
+        "post_metadata": str(metadata_path),
+    }
+    if video_format == "short":
+        tiktok_caption_path = destination / "tiktok-caption.txt"
+        tiktok_caption_path.write_text(
+            post_metadata["platforms"]["tiktok"]["caption"] + "\n",
+            encoding="utf-8",
+        )
+        artifacts["tiktok_caption"] = str(tiktok_caption_path)
+    description_ok = (
+        post_metadata["validation"]["youtube_disclaimer_present"]
+        and (
+            video_format != "short"
+            or post_metadata["validation"]["tiktok_disclaimer_present"]
+        )
+        and post_metadata["validation"]["platform_copy_is_distinct"]
+        and post_metadata["validation"]["hashtags_are_unique"]
+    )
 
     quality = validate_video_package(
         sources=sources,
@@ -268,6 +295,7 @@ def produce_video_from_script(
             "captions": narration["captions_path"],
             "video": str(video_path),
             "description": str(description_path),
+            **artifacts,
             "visual_review_contact_sheet": visual_review_report["path"],
         },
     }
