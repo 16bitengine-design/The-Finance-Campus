@@ -6,16 +6,17 @@ verification. Curated topic blueprints fill any remaining weekly target.
 """
 from __future__ import annotations
 
-import hashlib
-import json
-import re
-import urllib.error
-import urllib.request
 from collections.abc import Callable
 from datetime import UTC, datetime
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
+
+import hashlib
+import json
+import re
+import urllib.error
+import urllib.request
 
 from finance_campus.mindset_topics import MINDSET_TOPIC_BLUEPRINTS
 from finance_campus.topics import add_topic, load_topics, save_topics
