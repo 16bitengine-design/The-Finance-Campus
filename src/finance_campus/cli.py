@@ -27,6 +27,7 @@ def main() -> int:
     parser.add_argument("--fps", type=int, default=30)
     parser.add_argument("--audio", help="Optional narration audio file to mux into the MP4")
     parser.add_argument("--captions", help="Optional SRT captions file to burn into the video")
+    parser.add_argument("--transition-seconds", type=float, default=0.25)
     args = parser.parse_args()
     if args.command == "validate-config":
         checks = {"branding": validate_branding(load_yaml("config/branding.yaml")), "disclaimer": validate_disclaimer(load_yaml("config/disclaimer.yaml"))}
@@ -88,7 +89,7 @@ def main() -> int:
                 for output in render_storyboard(storyboard, args.output_path):
                     print(f"RENDERED SVG: {output}")
             else:
-                output = render_video(storyboard, args.output_path, video_format=args.video_format, fps=args.fps, audio_path=args.audio, captions_path=args.captions)
+                output = render_video(storyboard, args.output_path, video_format=args.video_format, fps=args.fps, audio_path=args.audio, captions_path=args.captions, transition_seconds=args.transition_seconds)
                 print(f"RENDERED MP4: {output} ({args.video_format}, {args.fps} fps)")
             return 0
         except (OSError, RuntimeError, ValueError) as exc:
