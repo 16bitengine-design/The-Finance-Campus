@@ -47,3 +47,9 @@ The complete system is designed for zero monetary cost from ideation through pub
 Zero monetary cost does not mean unlimited free cloud compute or guaranteed platform API access. GitHub Actions and social-platform APIs have quotas, eligibility/review requirements, and terms that can change. The system must use quota guards and stop rather than silently incur charges if a zero-cost route is unavailable. Local/self-hosted execution is the fallback where practical.
 
 The actual rendering engine, Kokoro integration, research automation, and platform publishing are still under development; publishing remains disabled until end-to-end tests pass.
+
+## Publishing cadence target
+- Two distinct short videos are produced each day.
+- Each of the two videos is cross-published to YouTube Shorts and TikTok, resulting in two posts per day on each platform (four platform posts total).
+- The configured target slots remain 09:00 and 18:00 Africa/Kampala time.
+- Publishing is still disabled until the full pipeline, account access, quality gates, and public-verification checks are tested.
