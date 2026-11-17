@@ -1,6 +1,7 @@
 import pytest
 
 from finance_campus.script_generator import generate_script
+from finance_campus.mindset_topics import MINDSET_TOPIC_BLUEPRINTS
 from finance_campus.script_quality import validate_script
 
 
@@ -104,3 +105,30 @@ def test_direct_quote_rejects_more_than_fifteen_words():
     }
     with pytest.raises(ValueError, match="15-word"):
         generate_script(item)
+
+
+def test_all_book_inspiration_blueprints_are_compatible_with_script_generator():
+    inspired = [item for item in MINDSET_TOPIC_BLUEPRINTS if item.get("inspiration")]
+    assert len(inspired) == 5
+    for blueprint in inspired:
+        candidate = {
+            "id": "TFC-INSPIRATION",
+            "title": blueprint["title"],
+            "category": blueprint["category"],
+            "editorial_brief": {
+                "problem": blueprint["problem"],
+                "stakes": blueprint["stakes"],
+                "explanation": blueprint["explanation"],
+                "action": blueprint["action"],
+            },
+            "research_sources": [{
+                "url": "https://www.consumerfinance.gov/educator-tools/",
+                "verification": "reachable_and_keyword_checked",
+            }],
+            "inspiration": blueprint["inspiration"],
+        }
+        script = generate_script(candidate)
+        explanation = script["sections"]["clear_explanation_of_why_it_matters"]
+        assert blueprint["inspiration"]["author"] in explanation
+        assert blueprint["inspiration"]["work"] in explanation
+        assert "“" not in explanation
