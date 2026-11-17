@@ -26,7 +26,7 @@ Every video must include a spoken disclaimer, a readable on-screen disclaimer, a
 - Structured script validator and atomic fail-closed approval handoff.
 - GitHub Actions test/lint workflow.
 
-The progressive whiteboard video renderer and Kokoro narration synthesis are implemented. Real-model CPU synthesis and end-to-end narrated video rendering still require the dedicated smoke test and artifact review. Rendered-image computer-vision checks, research automation, and platform publishing are not implemented yet.
+The progressive whiteboard video renderer and Kokoro narration synthesis are implemented. Real-model CPU synthesis and end-to-end narrated video rendering still require the dedicated smoke test and artifact review. Rendered-image computer-vision checks and platform publishing are not implemented yet. First-generation source-checked topic refresh and script-candidate automation have been added; their live scheduled workflow still requires an end-to-end run.
 
 
 ## Kokoro narration integration
@@ -131,7 +131,7 @@ The complete system is designed for zero monetary cost from ideation through pub
 
 Zero monetary cost does not mean unlimited free cloud compute or guaranteed platform API access. GitHub Actions and social-platform APIs have quotas, eligibility/review requirements, and terms that can change. The system must use quota guards and stop rather than silently incur charges if a zero-cost route is unavailable. Local/self-hosted execution is the fallback where practical.
 
-The actual rendering engine, Kokoro integration, research automation, and platform publishing are still under development; publishing remains disabled until end-to-end tests pass.
+The actual rendering engine and Kokoro integration are still under end-to-end verification. First-generation topic research and script-candidate workflows are implemented but require a live run. Platform publishing remains disabled until all production and publication gates pass.
 
 ## Publishing cadence target
 - Two distinct short videos are produced each day.
