@@ -6,9 +6,9 @@ It is a draft for review, not a claim about trending hashtags or guaranteed reac
 from __future__ import annotations
 
 import re
-from typing import Any
 
 from finance_campus.disclaimers import append_description_disclaimer
+from typing import Any
 
 
 CATEGORY_TAGS = {
