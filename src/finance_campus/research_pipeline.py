@@ -5,20 +5,19 @@ sources are checked for relevance; candidates remain unapproved pending claim re
 """
 from __future__ import annotations
 
-from collections.abc import Callable
-from datetime import UTC, datetime
-from html.parser import HTMLParser
-from pathlib import Path
-from typing import Any
 import hashlib
 import json
 import re
 import urllib.error
 import urllib.request
+from collections.abc import Callable
+from datetime import UTC, datetime
+from html.parser import HTMLParser
+from pathlib import Path
+from typing import Any
 
 from finance_campus.mindset_topics import MINDSET_TOPIC_BLUEPRINTS
 from finance_campus.topics import add_topic, load_topics, save_topics
-
 
 USER_AGENT = "TheFinanceCampusResearchBot/1.0 (educational research; contact via GitHub repository)"
 SOURCE_CATALOG: dict[str, dict[str, str]] = {
