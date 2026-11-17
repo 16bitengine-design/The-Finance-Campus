@@ -2,7 +2,7 @@ import shutil
 import subprocess
 
 import pytest
-from PIL import Image, ImageChops
+from PIL import Image, ImageChops, ImageDraw
 
 from finance_campus.storyboard import render_scene_svg, validate_storyboard
 from finance_campus.video_renderer import _draw_progressive_strokes, _point, render_video
