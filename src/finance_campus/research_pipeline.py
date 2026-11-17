@@ -166,6 +166,7 @@ def refresh_topics(
             "topic_slug": blueprint["slug"],
             "content_focus": "money_mindset_and_behaviour",
             "research_role": "verify_educational_principles_not_report_financial_news",
+            **({"inspiration": blueprint["inspiration"]} if blueprint.get("inspiration") else {}),
             "discovery_metadata": {"method": "evergreen_money_mindset_blueprint", "candidate_only": True},
         }
         if add_topic(topics, topic):
