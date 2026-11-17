@@ -48,14 +48,14 @@ def _has_text(value: typing.Any) -> bool:
     return isinstance(value, str) and bool(value.strip())
 
 
-def _is_http_url(value: Any) -> bool:
+def _is_http_url(value: typing.Any) -> bool:
     if not isinstance(value, str):
         return False
     parsed = urllib.parse.urlparse(value.strip())
     return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
 
 
-def validate_script(script: Any) -> ScriptQualityReport:
+def validate_script(script: typing.Any) -> ScriptQualityReport:
     """Validate a structured script package against the editorial policy.
 
     Expected shape:
