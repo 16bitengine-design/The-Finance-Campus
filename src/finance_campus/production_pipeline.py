@@ -19,6 +19,7 @@ from finance_campus.script_quality import validate_script
 from finance_campus.storyboard import validate_storyboard
 from finance_campus.storyboard_builder import build_storyboard
 from finance_campus.video_renderer import render_video
+from finance_campus.visual_review import create_visual_review_sheet
 
 
 def _source_urls(script: dict[str, Any]) -> list[str]:
@@ -149,6 +150,9 @@ def produce_video_from_script(
     final_video_report = validate_final_video(
         video_path, video_format=video_format, expected_fps=fps,
     )
+    visual_review_report = create_visual_review_sheet(
+        video_path, destination / "visual-review-contact-sheet.jpg",
+    )
     narration_duration = float(narration["duration_seconds"])
     timed_scenes = timed_storyboard["scenes"]
     expected_speech_seconds = sum(
@@ -207,7 +211,9 @@ def produce_video_from_script(
     )
     manifest = {
         "title": script["title"],
-        "status": "quality_approved" if quality.passed else "rejected",
+        "status": "awaiting_visual_review" if quality.passed else "rejected",
+        "technical_quality_approved": quality.passed,
+        "human_visual_review_required": True,
         "stages": {
             "script_validated": True,
             "script_approved": True,
@@ -220,6 +226,9 @@ def produce_video_from_script(
             "video_rendered": True,
             "media_streams_verified": True,
             "final_video_qc_passed": final_video_report["passed"],
+            "visual_review_sheet_generated": True,
+            "human_visual_review_required": True,
+            "human_visual_review_passed": False,
             "audio_video_duration_aligned": duration_alignment_passed,
             "quality_gate_passed": quality.passed,
             "uploaded": False,
@@ -232,6 +241,7 @@ def produce_video_from_script(
         "captions": caption_report,
         "media": media,
         "final_video_qc": final_video_report,
+        "visual_review": visual_review_report,
         "quality_errors": quality.errors,
         "artifacts": {
             "approved_script": str(approved_script_path),
@@ -241,6 +251,7 @@ def produce_video_from_script(
             "captions": narration["captions_path"],
             "video": str(video_path),
             "description": str(description_path),
+            "visual_review_contact_sheet": visual_review_report["path"],
         },
     }
     manifest_path = destination / "production-manifest.json"
