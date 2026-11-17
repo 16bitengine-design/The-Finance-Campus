@@ -136,3 +136,19 @@ def test_pay_yourself_first_storyboard_uses_distinct_story_scenes_and_moving_mon
     assert moving
     assert moving[0]["type"] == "coin"
     assert validate_storyboard(storyboard) == []
+
+
+
+def test_video_specific_visual_signature_changes_with_script_content():
+    script = _script()
+    first = build_storyboard(
+        script, video_format="short",
+        disclaimer_config=load_yaml("config/disclaimer.yaml"),
+    )
+    changed = json.loads(json.dumps(script))
+    changed["title"] = "A Different Money Lesson"
+    second = build_storyboard(
+        changed, video_format="short",
+        disclaimer_config=load_yaml("config/disclaimer.yaml"),
+    )
+    assert first["scenes"][0]["visual_signature"] != second["scenes"][0]["visual_signature"]
