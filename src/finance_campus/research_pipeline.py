@@ -46,6 +46,26 @@ SOURCE_CATALOG: dict[str, dict[str, str]] = {
         "publisher": "U.S. Securities and Exchange Commission",
         "domain": "investor.gov",
     },
+    "cfpb_wellbeing": {
+        "url": "https://www.consumerfinance.gov/consumer-tools/financial-well-being/about/",
+        "publisher": "Consumer Financial Protection Bureau",
+        "domain": "consumerfinance.gov",
+    },
+    "fdic_money_smart": {
+        "url": "https://www.fdic.gov/consumer-resource-center/money-smart-adults",
+        "publisher": "Federal Deposit Insurance Corporation",
+        "domain": "fdic.gov",
+    },
+    "cfpb_habits": {
+        "url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/youth-financial-education/learn/financial-habits-norms/",
+        "publisher": "Consumer Financial Protection Bureau",
+        "domain": "consumerfinance.gov",
+    },
+    "sec_behavior": {
+        "url": "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins-72",
+        "publisher": "U.S. Securities and Exchange Commission",
+        "domain": "investor.gov",
+    },
 }
 
 # Topic definitions are deliberately explicit: each one has a real learning outcome,
