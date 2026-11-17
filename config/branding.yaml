@@ -10,8 +10,10 @@ brand:
     white: "#FFFFFF"
   visual_identity:
     primary_style: "premium whiteboard illustration combined with modern motion graphics"
-    illustration: "clean hand-drawn financial diagrams, charts, objects, and recurring presenters"
-    recurring_characters: true
+    illustration: "off-screen narration with interactive hand-drawn financial diagrams, charts, money flows, objects, and illustrative scenario characters; never show a presenter or narrator avatar"
+    recurring_characters: false
+    visible_presenter: false
+    narration_mode: off-screen voice only
     consistent_character_design: true
     typography: "professional, highly readable, consistent"
     transitions: "smooth and restrained"
