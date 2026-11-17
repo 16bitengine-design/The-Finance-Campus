@@ -85,13 +85,28 @@ def _draw_element(
         if kind == "person":
             head = max(5, w // 7)
             art.ellipse((cx-head, y, cx+head, y+2*head), outline=color, width=width)
-            shoulder = y + 2*head + 5
+            eye_y = y + head
+            eye_r = max(2, width)
+            art.ellipse((cx-head//3-eye_r, eye_y-eye_r, cx-head//3+eye_r, eye_y+eye_r), fill=color)
+            art.ellipse((cx+head//3-eye_r, eye_y-eye_r, cx+head//3+eye_r, eye_y+eye_r), fill=color)
+            art.arc((cx-head//3, y+head, cx+head//3, y+int(head*1.65)), 10, 170, fill=color, width=width)
+            neck_y = y + 2*head
+            shoulder = neck_y + max(8, h//24)
             waist = y + int(h*.66)
-            art.line((cx, shoulder, cx, waist), fill=color, width=width)
-            art.line((cx, shoulder+8, x+w//8, y+int(h*.55)), fill=color, width=width)
-            art.line((cx, shoulder+8, right-w//8, y+int(h*.55)), fill=color, width=width)
-            art.line((cx, waist, x+w//4, bottom), fill=color, width=width)
-            art.line((cx, waist, right-w//4, bottom), fill=color, width=width)
+            art.line((cx, neck_y, cx, shoulder), fill=color, width=width)
+            art.polygon(((cx-w//4, shoulder), (cx+w//4, shoulder), (cx+w//6, waist), (cx-w//6, waist)), outline=color)
+            elbow_y = y + int(h*.43)
+            hand_r = max(4, width*2)
+            left_hand = (x+w//10, y+int(h*.56))
+            right_hand = (right-w//10, y+int(h*.56))
+            art.line((cx-w//4, shoulder+width, x+w//5, elbow_y, left_hand[0], left_hand[1]), fill=color, width=width)
+            art.line((cx+w//4, shoulder+width, right-w//5, elbow_y, right_hand[0], right_hand[1]), fill=color, width=width)
+            for hx, hy in (left_hand, right_hand):
+                art.ellipse((hx-hand_r, hy-hand_r, hx+hand_r, hy+hand_r), outline=color, width=width)
+            art.line((cx-w//7, waist, x+w//4, bottom-h//12), fill=color, width=width)
+            art.line((cx+w//7, waist, right-w//4, bottom-h//12), fill=color, width=width)
+            art.line((x+w//4, bottom-h//12, x+w//8, bottom-h//20), fill=color, width=width)
+            art.line((right-w//4, bottom-h//12, right-w//8, bottom-h//20), fill=color, width=width)
         elif kind == "bank":
             roof_y = y + h//4
             art.polygon(((x, roof_y), (cx, y), (right, roof_y)), outline=color)
