@@ -105,6 +105,41 @@ def validate_storyboard(data: Any) -> list[str]:
                         and (motion["start_seconds"] < 0 or motion["end_seconds"] <= motion["start_seconds"])
                     ):
                         errors.append(f"{item_prefix}.motion timing must be non-negative and end after start")
+            interaction_target = element.get("interaction_target")
+            if interaction_target is not None:
+                if not isinstance(interaction_target, dict):
+                    errors.append(f"{item_prefix}.interaction_target must be an object")
+                else:
+                    for coordinate in ("x", "y"):
+                        value = interaction_target.get(coordinate)
+                        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+                            errors.append(f"{item_prefix}.interaction_target.{coordinate} must be a finite number")
+            interaction_animation = element.get("interaction_animation")
+            if interaction_animation is not None:
+                if not isinstance(interaction_animation, dict):
+                    errors.append(f"{item_prefix}.interaction_animation must be an object")
+                else:
+                    for field in ("from_x", "from_y", "start_seconds", "end_seconds"):
+                        value = interaction_animation.get(field)
+                        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+                            errors.append(f"{item_prefix}.interaction_animation.{field} must be a finite number")
+                    if (
+                        all(
+                            isinstance(interaction_animation.get(field), (int, float))
+                            and not isinstance(interaction_animation.get(field), bool)
+                            and math.isfinite(interaction_animation[field])
+                            for field in ("start_seconds", "end_seconds")
+                        )
+                        and (
+                            interaction_animation["start_seconds"] < 0
+                            or interaction_animation["end_seconds"] <= interaction_animation["start_seconds"]
+                        )
+                    ):
+                        errors.append(f"{item_prefix}.interaction_animation timing must be non-negative and end after start")
+                    if interaction_animation.get("easing", "linear") not in {"linear", "ease_out"}:
+                        errors.append(f"{item_prefix}.interaction_animation.easing must be linear or ease_out")
+                    if interaction_target is None:
+                        errors.append(f"{item_prefix}.interaction_animation requires interaction_target")
             for timing_field in ("start_seconds", "draw_seconds"):
                 if timing_field in element:
                     timing_value = element[timing_field]
