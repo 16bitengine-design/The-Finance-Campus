@@ -129,9 +129,10 @@ def generate_post_metadata(
             "youtube_disclaimer_present": disclaimer_config["disclaimer"]["description"].casefold()
                 in youtube_description.casefold(),
             "tiktok_disclaimer_present": (
-                video_format != "short"
-                or disclaimer_config["disclaimer"]["description"].casefold()
+                disclaimer_config["disclaimer"]["description"].casefold()
                 in tiktok_caption.casefold()
+                if video_format == "short"
+                else None
             ),
             "hashtags_are_unique": (
                 len({tag.casefold() for tag in youtube_hashtags}) == len(youtube_hashtags)
