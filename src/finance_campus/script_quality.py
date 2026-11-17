@@ -76,6 +76,10 @@ def validate_script(script: typing.Any) -> ScriptQualityReport:
     if not _has_text(script.get("title")):
         errors.append("A non-empty script title is required")
 
+    generation = script.get("script_generation")
+    if isinstance(generation, dict) and generation.get("approved_for_production") is not True:
+        errors.append("Generated script is still a candidate; claim-level source verification and editorial approval are required")
+
     sections = script.get("sections")
     if not isinstance(sections, dict):
         errors.append("Script sections must be an object")
