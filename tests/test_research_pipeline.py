@@ -49,6 +49,7 @@ def test_refresh_adds_evergreen_mindset_topics_not_news_headlines(tmp_path):
     assert result["discovery_method"] == "evergreen_money_mindset_blueprints"
     assert result["news_feed_topics_added"] == 0
     assert result["mindset_topics_added"] == 20
+    assert all(item["content_focus"] == "money_mindset_and_behaviour" for item in result["added"])
     assert all(
         item["discovery_metadata"]["method"] == "evergreen_money_mindset_blueprint"
         for item in result["added"]
