@@ -1,8 +1,7 @@
 import pytest
 
-from finance_campus.script_quality import validate_script
-
 from finance_campus.script_generator import generate_script
+from finance_campus.script_quality import validate_script
 
 
 def topic():
