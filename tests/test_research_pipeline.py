@@ -146,3 +146,15 @@ def test_research_source_record_preserves_verified_final_url(tmp_path):
     result = refresh_topics(tmp_path / "topics.json", target=1, fetcher=fake_fetch)
     source = result["added"][0]["research_sources"][0]
     assert source["final_url"] == source["url"]
+
+
+def test_only_approved_https_publisher_domains_are_accepted():
+    from finance_campus.research_pipeline import is_approved_research_url
+
+    assert is_approved_research_url("https://www.consumerfinance.gov/guide")
+    assert is_approved_research_url("https://www.bou.or.ug/financial_literacy")
+    assert not is_approved_research_url("http://www.consumerfinance.gov/guide")
+    assert not is_approved_research_url("https://consumerfinance.gov.attacker.example/guide")
+    assert not is_approved_research_url("https://example.org/guide")
+    assert not is_approved_research_url("https://user:pass@consumerfinance.gov/guide")
+    assert not is_approved_research_url("https://consumerfinance.gov:8443/guide")
