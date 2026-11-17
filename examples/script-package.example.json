@@ -8,7 +8,10 @@
     "practical_action_viewers_can_take": "Write down one realistic amount you could set aside this week and choose a safe place to keep it separate from everyday spending.",
     "empowering_close": "Your first deposit may be small, but it is a practical step toward more financial breathing room."
   },
-  "sources": [\n    "https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/"\n  ],\n  "claims": [],
+  "sources": [
+    "https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/"
+  ],
+  "claims": [],
   "hypothetical_examples": [
     {
       "label": "Hypothetical example",
