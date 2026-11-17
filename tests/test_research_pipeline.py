@@ -33,12 +33,14 @@ def test_refresh_uses_new_topics_without_repeating_previous_batch(tmp_path):
     first = refresh_topics(path, target=20, fetcher=fake_fetch)
     second = refresh_topics(path, target=20, fetcher=fake_fetch)
     third = refresh_topics(path, target=20, fetcher=fake_fetch)
+    fourth = refresh_topics(path, target=20, fetcher=fake_fetch)
     assert first["added_count"] == 20
     assert second["added_count"] == 20
     assert {item["id"] for item in first["added"]}.isdisjoint(
         {item["id"] for item in second["added"]}
     )
-    assert third["added_count"] == 0
+    assert third["added_count"] == 2
+    assert fourth["added_count"] == 0
 
 
 
