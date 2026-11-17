@@ -26,17 +26,15 @@ Every video must include a spoken disclaimer, a readable on-screen disclaimer, a
 - Structured script validator and atomic fail-closed approval handoff.
 - GitHub Actions test/lint workflow.
 
-The progressive whiteboard video renderer and Kokoro narration synthesis are implemented. Real-model CPU synthesis and end-to-end narrated video rendering still require the dedicated smoke test and artifact review. Rendered-image computer-vision checks and platform publishing are not implemented yet. Autonomous topic discovery now scans official publisher RSS/Atom feeds from Uganda's Capital Markets Authority and Insurance Regulatory Authority, alongside the CFPB, FTC consumer protection, and SEC investor alerts. It follows finance-relevant headlines to allow-listed publisher articles, checks article readability and redirect domains, and creates unapproved topic candidates. A curated authoritative-source catalogue fills any shortfall. Feed discovery, article checks, and topic generation are repository-native; the weekly workflow still requires a successful live run to verify publisher availability and real topic yield.
+The progressive whiteboard video renderer and Kokoro narration synthesis are implemented. Real-model CPU synthesis and end-to-end narrated video rendering still require the dedicated smoke test and artifact review. Rendered-image computer-vision checks and platform publishing are not implemented yet. Topic discovery is mindset-first and evergreen: it selects recurring money beliefs, habits, emotional triggers and everyday decisions rather than chasing financial headlines. Official financial education sources are used to check relevance and principles, not to turn press releases into videos. All topic candidates remain unapproved until editorial and claim-level review.
 
 
 
-## Autonomous topic discovery
+## Mindset-first topic discovery
 
-The weekly GitHub Actions workflow scans official RSS/Atom feeds from Uganda's Capital Markets Authority and Insurance Regulatory Authority, plus the Consumer Financial Protection Bureau, the Federal Trade Commission's consumer-protection programme, and the U.S. Securities and Exchange Commission's investor-alert feed. Uganda feeds are tagged as country-specific so their regulatory content is not mistaken for global rules. It filters finance-relevant headlines, checks that article links remain on the approved publisher domain, retrieves readable article text, and creates topic candidates with source metadata. The existing curated source catalogue is used only to fill any remaining weekly target.
+The weekly repository workflow selects evergreen topics about money beliefs, everyday habits, emotional spending, comparison, avoidance, patience, debt behaviour, financial boundaries and resilience. The editorial agenda is not driven by news volume, market movements or the latest institutional press release.
 
-Discovered topics are marked `discovered_needs_claim_review`; curated fallback topics are marked for source/claim review. Both remain `not_started` and `not_published`. Headline discovery and article readability do not establish that a proposed script claim is true. Every claim must still be mapped to supporting evidence and reviewed before production approval. The workflow never produces or publishes a video.
-
-The feed list is intentionally restricted to authoritative publisher domains. Feed failures, off-domain links, unreadable pages, duplicates, and irrelevant headlines are rejected and recorded. A target of 20 is an attempt, not permission to invent topics: if authoritative sources do not yield enough suitable material, the report must show that the target was not met.
+Authoritative sources are used as research checks for the underlying educational principles and relevant local rules. Statistics and technical details are included only when essential to the lesson. A source being reachable or containing mapped keywords does not prove every proposed claim; each candidate remains subject to editorial review and claim-level verification. Topic refresh does not generate, render or publish videos.
 
 ## Kokoro narration integration
 
