@@ -148,14 +148,17 @@ def _render_element(element: dict[str, Any], index: int) -> str:
     return f'<text x="{x}" y="{y}" fill="{color}" font-family="Arial,sans-serif" font-size="25" font-weight="600" opacity="0" style="animation:appear .35s ease-out {delay:.2f}s forwards">{label}</text>'
 
 
-def render_scene_svg(scene: dict[str, Any]) -> str:
-    """Render one already-validated scene as a 16:9 SVG whiteboard frame."""
-    errors = validate_storyboard({"scenes": [scene]})
+def render_scene_svg(scene: dict[str, Any], canvas: dict[str, Any] | None = None) -> str:
+    """Render one validated scene as an SVG matching its storyboard canvas."""
+    errors = validate_storyboard({"canvas": canvas or {"width": WIDTH, "height": HEIGHT}, "scenes": [scene]})
     if errors:
         raise ValueError("Invalid storyboard scene: " + "; ".join(errors))
     elements = "\n".join(_render_element(item, index) for index, item in enumerate(scene["elements"]))
     title = html.escape(scene["id"])
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 {WIDTH} {HEIGHT}">
+    canvas_width = float((canvas or {}).get("width", WIDTH))
+    canvas_height = float((canvas or {}).get("height", HEIGHT))
+    output_width, output_height = (1920, 1080) if canvas_width >= canvas_height else (1080, 1920)
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{output_width}" height="{output_height}" viewBox="0 0 {_number(canvas_width)} {_number(canvas_height)}">
 <title>{title}</title>
 <defs>
   <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8" fill="#102B55"/></marker>
@@ -177,6 +180,6 @@ def render_storyboard(data: dict[str, Any], output_dir: str | Path) -> list[Path
     outputs: list[Path] = []
     for scene in data["scenes"]:
         path = destination / f'{scene["id"]}.svg'
-        path.write_text(render_scene_svg(scene), encoding="utf-8")
+        path.write_text(render_scene_svg(scene, data.get("canvas")), encoding="utf-8")
         outputs.append(path)
     return outputs
