@@ -197,3 +197,44 @@ def test_progressive_strokes_reveal_pen_path_in_order():
     # At 50% the first stroke is complete and the second has not started.
     assert image.getpixel((45, 15)) != (255, 255, 255)
     assert image.getpixel((75, 15)) == (255, 255, 255)
+
+
+
+@pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="FFmpeg is not installed")
+def test_scene_transition_inserts_smooth_crossfade_frames(tmp_path):
+    storyboard = {
+        "canvas": {"width": 1000, "height": 562},
+        "scenes": [
+            {
+                "id": "outgoing",
+                "narration": "The first illustration.",
+                "duration_seconds": 1,
+                "elements": [
+                    {"type": "circle", "cx": 500, "cy": 281, "r": 90, "color": "navy",
+                     "start_seconds": 0, "draw_seconds": 0.1},
+                ],
+            },
+            {
+                "id": "incoming",
+                "narration": "The next illustration.",
+                "duration_seconds": 1,
+                "elements": [
+                    {"type": "circle", "cx": 500, "cy": 281, "r": 90, "color": "gold",
+                     "start_seconds": 0, "draw_seconds": 0.1},
+                ],
+            },
+        ],
+    }
+    render_video(
+        storyboard, tmp_path / "crossfade.mp4",
+        fps=4, draw_fps=4, transition_seconds=0.5, keep_frames=True,
+    )
+    frames = sorted((tmp_path / ".crossfade_frames").glob("frame_*.png"))
+    # Four frames per scene plus two cross-dissolve frames.
+    assert len(frames) == 10
+    outgoing = Image.open(frames[3]).convert("RGB").getpixel((540, 960))
+    halfway = Image.open(frames[5]).convert("RGB").getpixel((540, 960))
+    incoming = Image.open(frames[7]).convert("RGB").getpixel((540, 960))
+    assert outgoing != incoming
+    assert halfway != outgoing
+    assert halfway != incoming
