@@ -318,7 +318,15 @@ def render_video(
                     reveal_window = float(element.get("draw_seconds", fallback_window))
                     progress = min(1.0, max(0.0, (elapsed - start) / reveal_window))
                     if progress > 0:
-                        _draw_element(draw, element, progress, (draw_width, draw_height), coordinate_size)
+                        animated = dict(element)
+                        motion = element.get("motion")
+                        if isinstance(motion, dict):
+                            motion_start = float(motion["start_seconds"])
+                            motion_end = float(motion["end_seconds"])
+                            travel = min(1.0, max(0.0, (elapsed-motion_start)/(motion_end-motion_start)))
+                            animated["x"] = round(float(motion["from_x"]) + (float(motion["to_x"])-float(motion["from_x"]))*travel)
+                            animated["y"] = round(float(motion["from_y"]) + (float(motion["to_y"])-float(motion["from_y"]))*travel)
+                        _draw_element(draw, animated, progress, (draw_width, draw_height), coordinate_size)
                 image = Image.new("RGB", (width, height), PALETTE["white"])
                 image.paste(drawing, ((width - draw_width) // 2, (height - draw_height) // 2))
                 scene_path = frame_dir / f"scene_{scene_index:03d}_frame_{frame_index:06d}.png"
