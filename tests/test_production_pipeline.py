@@ -45,6 +45,10 @@ def test_production_pipeline_runs_all_stages_and_fails_closed(monkeypatch, tmp_p
     monkeypatch.setattr(production_pipeline, "synthesize_storyboard", fake_synthesis)
     monkeypatch.setattr(production_pipeline, "render_video", fake_render)
     monkeypatch.setattr(
+        production_pipeline, "validate_final_video",
+        lambda *args, **kwargs: {"passed": True, "video_codec": "h264"},
+    )
+    monkeypatch.setattr(
         production_pipeline,
         "_probe_video",
         lambda path, video_format: {
@@ -61,6 +65,7 @@ def test_production_pipeline_runs_all_stages_and_fails_closed(monkeypatch, tmp_p
     assert manifest["stages"]["storyboard_generated"]
     assert manifest["stages"]["kokoro_narration_generated"]
     assert manifest["stages"]["video_rendered"]
+    assert manifest["stages"]["final_video_qc_passed"]
     assert manifest["stages"]["quality_gate_passed"]
     assert manifest["stages"]["audio_video_duration_aligned"]
     assert manifest["stages"]["uploaded"] is False
