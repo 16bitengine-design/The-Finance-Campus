@@ -91,6 +91,15 @@ def generate_script(topic: dict[str, Any], *, duration: str = "short") -> dict[s
         }
         target_seconds = [300, 600]
 
+    spoken_text = " ".join(sections.values())
+    spoken_word_count = len(re.findall(r"\\b[\\w’'-]+\\b", spoken_text))
+    estimated_duration_seconds = round(spoken_word_count / 145 * 60)
+    duration_fit = (
+        "under_target" if estimated_duration_seconds < target_seconds[0]
+        else "over_target" if estimated_duration_seconds > target_seconds[1]
+        else "within_target"
+    )
+
     return {
         "id": f"{topic.get('id', 'TFC-UNASSIGNED')}-{duration.upper()}",
         "title": topic["title"],
@@ -120,6 +129,10 @@ def generate_script(topic: dict[str, Any], *, duration: str = "short") -> dict[s
             "method": "deterministic_editorial_template",
             "human_or_claim_level_review_required": True,
             "approved_for_production": False,
+            "spoken_word_count": spoken_word_count,
+            "estimated_duration_seconds": estimated_duration_seconds,
+            "duration_fit": duration_fit,
+            "words_per_minute_assumption": 145,
         },
     }
 
