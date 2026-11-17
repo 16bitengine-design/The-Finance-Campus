@@ -26,7 +26,7 @@ Every video must include a spoken disclaimer, a readable on-screen disclaimer, a
 - Structured script validator and atomic fail-closed approval handoff.
 - GitHub Actions test/lint workflow.
 
-The progressive whiteboard video renderer and Kokoro narration synthesis are implemented. Real-model CPU synthesis and end-to-end narrated video rendering still require the dedicated smoke test and artifact review. Rendered-image computer-vision checks and platform publishing are not implemented yet. Topic discovery is mindset-first and evergreen: it selects recurring money beliefs, habits, emotional triggers and everyday decisions rather than chasing financial headlines. Official financial education sources are used to check relevance and principles, not to turn press releases into videos. All topic candidates remain unapproved until editorial and claim-level review.
+The progressive whiteboard video renderer and Kokoro narration integration are implemented. The quality workflow has passed its illustrated sample render and artifact upload. The dedicated real-model Kokoro CPU smoke test still needs a successful run and artifact review before the full narration path is production-validated. Claim-level automated fact-checking, semantic visual QC, daily production scheduling, YouTube/TikTok upload adapters, publication verification, persistent publishing ledger, and operational notifications are not yet operational. Topic discovery is mindset-first and evergreen: it selects recurring money beliefs, habits, emotional triggers and everyday decisions rather than chasing financial headlines. Official financial education sources are used to check relevance and principles, not to turn press releases into videos. All topic candidates remain unapproved until editorial and claim-level review.
 
 
 
@@ -256,3 +256,10 @@ The current generator is a deterministic editorial-template engine, not an LLM. 
 - Source checks verify HTTP reachability and keyword presence, not semantic claim support.
 - Script drafts are structured and ready for editorial refinement, but are not yet fully original long-form narrative writing.
 - No generated script is automatically sent to Kokoro or video production. Topic refresh and script drafting do not publish or produce videos.
+
+
+## Implementation and release status
+
+See [docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md) for the verified capability matrix, current limitations, release controls and engineering sequence. Configuration validation now rejects early publishing activation, non-Kokoro narration, paid-service settings and removal of the required human visual review gate.
+
+Generated scripts now report their spoken word count and estimated narration duration using a 145 words/minute planning assumption. This helps identify drafts that cannot realistically fill their declared format; it does not replace pacing review.
