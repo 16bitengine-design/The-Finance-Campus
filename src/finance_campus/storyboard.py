@@ -85,6 +85,13 @@ def validate_storyboard(data: Any) -> list[str]:
                         errors.append(f"{item_prefix}.text must be a non-empty string")
                 elif isinstance(element[field], bool) or not isinstance(element[field], (int, float)) or not math.isfinite(element[field]):
                     errors.append(f"{item_prefix}.{field} must be a finite number")
+            for timing_field in ("start_seconds", "draw_seconds"):
+                if timing_field in element:
+                    timing_value = element[timing_field]
+                    if isinstance(timing_value, bool) or not isinstance(timing_value, (int, float)) or not math.isfinite(timing_value):
+                        errors.append(f"{item_prefix}.{timing_field} must be a finite number")
+                    elif timing_value < 0 or (timing_field == "draw_seconds" and timing_value == 0):
+                        errors.append(f"{item_prefix}.{timing_field} is outside its valid range")
             if kind in ILLUSTRATION_TYPES and any(
                 isinstance(element.get(k), (int, float)) and element[k] <= 0
                 for k in ("width", "height")
