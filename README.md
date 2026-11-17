@@ -79,6 +79,39 @@ The synthesis step checks for empty/non-finite audio, silence, peak level and ou
 
 The manually triggered GitHub Actions workflow `Kokoro CPU narration smoke test` installs Kokoro and `espeak-ng`, downloads the actual model, synthesizes the sample storyboard on CPU, renders the MP4 with narration and captions, and uploads the resulting files for review. The normal lightweight test suite uses a mocked Kokoro pipeline so it does not download model weights on every commit.
 
+
+## End-to-end narrated video production
+
+The automated production entry point starts from an approved structured script and creates the complete illustrated video package:
+
+1. Validate the six required editorial sections, prohibited claims and source links.
+2. Build six illustrated whiteboard scenes using a deterministic financial-visual mapping (people, wallets, bank buildings, money notes, coins, savings jars and connecting arrows).
+3. Add the spoken disclaimer and a visible disclaimer scene held for at least six seconds.
+4. Synthesize every scene with Kokoro, using the selected voice and actual generated speech duration.
+5. Generate synchronized SRT captions and insert silent holds for scene transitions.
+6. Render the progressive whiteboard animation with smooth cross-dissolves, narration and burned-in captions.
+7. Verify the MP4 dimensions and audio/video streams, append the description disclaimer, and run the fail-closed quality gate.
+8. Save a production manifest. The pipeline does not upload or publish videos.
+
+The storyboard mapper is deliberately deterministic: it selects suitable financial illustrations from the approved narration. It is not yet a generative visual-understanding system, so the storyboard should still be reviewed during production-quality development.
+
+### One-command production
+
+Use an approved script package with at least one reputable source URL (see examples/script-package.example.json):
+
+\`\`\`bash
+python -m finance_campus.cli produce-video \\
+  examples/script-package.example.json production/emergency-fund-short \\
+  --format short --voice af_heart --device cpu \\
+  --fps 30 --draw-fps 24 --transition-seconds 0.25
+\`\`\`
+
+For a YouTube long-form video, use --format long. Available voice IDs are af_heart, am_michael, bf_emma, and bm_george.
+
+A successful run writes approved_script.json, storyboard.json, storyboard_with_audio_timing.json, narration.wav, captions.srt, finance-campus-video.mp4, description.txt, and production-manifest.json. The manifest records generated, rendered, and quality-approved states separately from upload and public availability. Publishing remains disabled.
+
+The real-model Kokoro smoke test remains a separate manual GitHub Actions workflow. It downloads the model and performs actual CPU synthesis; mocked unit tests do not count as proof of real voice quality.
+
 ## Development status
 Publishing remains disabled until the production pipeline and platform integrations pass end-to-end quality checks.
 
@@ -165,7 +198,7 @@ Render each scene to a standalone animated SVG whiteboard frame:
 
 `python -m finance_campus.cli render-storyboard examples/storyboard.example.json production/storyboards/debt-example`
 
-The SVG renderer produces scene assets at the storyboard canvas aspect ratio. The MP4 renderer in `src/finance_campus/video_renderer.py` progressively reveals the line-art illustrations into raster frames with Pillow, then encodes and validates a playable H.264 MP4 with FFmpeg. It supports vertical 1080×1920 Shorts and horizontal 1920×1080 long-form layouts, preserving the composition rather than stretching it. The built-in person and financial-object drawings are intentionally simple reusable line-art assets; richer custom character artwork and scene transitions remain visual-quality upgrades.
+The SVG renderer produces scene assets at the storyboard canvas aspect ratio. The MP4 renderer in `src/finance_campus/video_renderer.py` progressively reveals the line-art illustrations into raster frames with Pillow, then encodes and validates a playable H.264 MP4 with FFmpeg. It supports vertical 1080×1920 Shorts and horizontal 1920×1080 long-form layouts, preserving the composition rather than stretching it. The built-in person and financial-object drawings are intentionally simple reusable line-art assets; richer custom character artwork remains a visual-quality upgrade.
 
 Render an MP4:
 
@@ -175,4 +208,4 @@ Use `--format long` for 16:9. FFmpeg and Pillow are required. Narration audio an
 
 `python -m finance_campus.cli render-video storyboard.json output.mp4 --format short --audio narration.wav --captions captions.srt`
 
-The renderer validates the requested audio stream and the final MP4 playback. Drawing defaults to 24 progressive frames per second, with 30 fps output; tune it using `--draw-fps` and `--fps`. Tune scene fades using `--transition-seconds`. Kokoro narration generation remains a separate stage that will provide the audio file; caption timing must be generated and quality-checked upstream. A gentle whiteboard fade transition is applied at scene boundaries and can be tuned with `--transition-seconds`. More advanced hand-drawn character animation and broader audiovisual quality checks remain outstanding. CI renders and stores a sample illustrated portrait video as a workflow artifact.
+The renderer validates the requested audio stream and the final MP4 playback. Drawing defaults to 24 progressive frames per second, with 30 fps output; tune it using `--draw-fps` and `--fps`. Tune scene fades using `--transition-seconds`. Kokoro narration generation is available as a separate command and is also integrated into the end-to-end `produce-video` command. Captions are generated from the synthesized narration and burned into the rendered video. A gentle whiteboard cross-dissolve is applied at scene boundaries and can be tuned with `--transition-seconds`. More advanced hand-drawn character animation and broader audiovisual quality checks remain outstanding. CI renders and stores a sample illustrated portrait video as a workflow artifact.
