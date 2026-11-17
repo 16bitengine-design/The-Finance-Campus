@@ -5,7 +5,7 @@ import pytest
 from PIL import Image, ImageChops
 
 from finance_campus.storyboard import render_scene_svg, validate_storyboard
-from finance_campus.video_renderer import render_video
+from finance_campus.video_renderer import _point, render_video
 
 
 def _storyboard():
@@ -122,3 +122,8 @@ def test_render_video_supports_landscape_long_form(tmp_path):
 def test_video_renderer_rejects_negative_transition_duration(tmp_path):
     with pytest.raises(ValueError, match="transition_seconds"):
         render_video(_storyboard(), tmp_path / "bad-transition.mp4", transition_seconds=-0.1)
+
+
+
+def test_coordinate_mapping_uses_distinct_x_and_y_values():
+    assert _point(120, 1450, 1.08, 1.08) == (130, 1566)
