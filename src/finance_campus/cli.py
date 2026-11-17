@@ -7,21 +7,24 @@ import sys
 from pathlib import Path
 
 from finance_campus.config import load_yaml, validate_branding, validate_disclaimer
+from finance_campus.script_pipeline import prepare_script
 from finance_campus.script_quality import validate_script
+
+
+def _read_json(path: str) -> object:
+    with Path(path).open("r", encoding="utf-8") as handle:
+        return json.load(handle)
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="The Finance Campus project tools")
     parser.add_argument(
         "command",
-        choices=("validate-config", "validate-script"),
-        help="The validation task to run",
+        choices=("validate-config", "validate-script", "prepare-script"),
+        help="The validation or preparation task to run",
     )
-    parser.add_argument(
-        "script_path",
-        nargs="?",
-        help="JSON script package path (required for validate-script)",
-    )
+    parser.add_argument("script_path", nargs="?", help="Input JSON script package")
+    parser.add_argument("output_path", nargs="?", help="Approved output path for prepare-script")
     args = parser.parse_args()
 
     if args.command == "validate-config":
@@ -39,21 +42,33 @@ def main() -> int:
                 print(f"PASS {name}")
         return 1 if failures else 0
 
-    if args.command == "validate-script":
+    if args.command in {"validate-script", "prepare-script"}:
         if not args.script_path:
-            parser.error("validate-script requires a JSON script package path")
+            parser.error(f"{args.command} requires an input JSON script package")
+        if args.command == "prepare-script" and not args.output_path:
+            parser.error("prepare-script requires an approved output path")
         try:
-            with Path(args.script_path).open("r", encoding="utf-8") as handle:
-                script = json.load(handle)
+            script = _read_json(args.script_path)
         except (OSError, json.JSONDecodeError) as exc:
             print(f"FAIL script: unable to read valid JSON ({exc})")
             return 1
-        report = validate_script(script)
-        if report.passed:
-            print("PASS script: editorial quality requirements met")
+
+        if args.command == "validate-script":
+            report = validate_script(script)
+            if report.passed:
+                print("PASS script: editorial quality requirements met")
+                return 0
+            for error in report.errors:
+                print(f"FAIL script: {error}")
+            return 1
+
+        result = prepare_script(script, args.output_path)
+        if result.approved:
+            print(f"PASS script: approved package written to {result.output_path}")
             return 0
-        for error in report.errors:
+        for error in result.errors:
             print(f"FAIL script: {error}")
+        print("REJECTED: no approved package was written")
         return 1
 
     return 0
