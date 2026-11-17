@@ -144,6 +144,14 @@ def produce_video_from_script(
         transition_seconds=transition_seconds,
     )
     media = _probe_video(video_path, video_format=video_format)
+    narration_duration = float(narration["duration_seconds"])
+    duration_tolerance = max(0.15, 2 / fps)
+    duration_alignment_passed = abs(media["duration_seconds"] - narration_duration) <= duration_tolerance
+    if not duration_alignment_passed:
+        raise RuntimeError(
+            "Rendered video duration does not align with Kokoro narration: "
+            f"video={media['duration_seconds']}s, audio={narration_duration}s"
+        )
 
     disclaimer = disclaimer_texts(disclaimer_config)
     all_spoken = " ".join(scene["narration"] for scene in storyboard["scenes"]).casefold()
@@ -191,6 +199,7 @@ def produce_video_from_script(
             "captions_generated": True,
             "video_rendered": True,
             "media_streams_verified": True,
+            "audio_video_duration_aligned": duration_alignment_passed,
             "quality_gate_passed": quality.passed,
             "uploaded": False,
             "publicly_accessible": False,
