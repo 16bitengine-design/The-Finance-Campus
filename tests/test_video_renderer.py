@@ -314,3 +314,24 @@ def test_character_interaction_target_changes_reaching_arm_geometry():
         1.0, second.size,
     )
     assert ImageChops.difference(first, second).getbbox() is not None
+
+
+def test_character_reach_interpolates_over_time_without_object_motion():
+    from finance_campus.video_renderer import _motion_position
+
+    character = {
+        "type": "person",
+        "interaction_target": {"x": 700, "y": 500},
+        "interaction_animation": {
+            "from_x": 300, "from_y": 250,
+            "start_seconds": 1, "end_seconds": 3,
+            "easing": "ease_out",
+        },
+    }
+    before = _motion_position(character, 0)["interaction_target"]
+    halfway = _motion_position(character, 2)["interaction_target"]
+    after = _motion_position(character, 3)["interaction_target"]
+    assert before == {"x": 300, "y": 250}
+    assert halfway["x"] > 500 and halfway["x"] < 700
+    assert halfway["y"] > 250 and halfway["y"] < 500
+    assert after == {"x": 700, "y": 500}
