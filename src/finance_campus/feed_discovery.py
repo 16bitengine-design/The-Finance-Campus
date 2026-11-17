@@ -16,7 +16,13 @@ from html import unescape
 from typing import Any
 from urllib.parse import urlparse
 
-from finance_campus.research_pipeline import USER_AGENT, fetch_source
+USER_AGENT = "TheFinanceCampusResearchBot/1.0 (educational research; contact via GitHub repository)"
+
+
+def _fetch_article(url: str) -> dict[str, Any]:
+    from finance_campus.research_pipeline import fetch_source
+
+    return fetch_source(url)
 
 
 OFFICIAL_FEEDS: tuple[dict[str, str], ...] = (
@@ -121,7 +127,7 @@ def discover_from_official_feeds(
     target: int,
     timestamp: str | None = None,
     feed_fetcher=fetch_feed,
-    article_fetcher=fetch_source,
+    article_fetcher=_fetch_article,
 ) -> tuple[list[dict[str, Any]], list[dict[str, str]], dict[str, int]]:
     """Discover original topic candidates from fresh official RSS/Atom articles."""
     checked_at = timestamp or datetime.now(UTC).isoformat()
