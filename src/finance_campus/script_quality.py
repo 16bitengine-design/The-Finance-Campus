@@ -124,9 +124,7 @@ def validate_script(script: Any) -> ScriptQualityReport:
                     f"Hypothetical example {index} must be explicitly labelled hypothetical"
                 )
 
-    if not isinstance(script.get("claims", []), list):
-        pass
-    elif "claims" not in script:
+    if "claims" not in script:
         errors.append("A claims list is required, even when it is empty")
 
     return ScriptQualityReport(passed=not errors, errors=errors)
