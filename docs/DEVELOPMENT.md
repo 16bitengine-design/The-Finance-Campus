@@ -29,3 +29,12 @@
 
 ## Workflow policy
 Prefer GitHub Actions for tasks that can run reliably inside this repository. Do not create duplicate external schedules for repository-native workflows. Topic refresh must never trigger video production or publishing.
+## Zero-cost development gate
+- No paid APIs, subscriptions, media assets, hosting, compute, or publishing intermediaries.
+- Prefer free/open-source and locally runnable tools; guard free-tier quotas and stop rather than incur charges.
+- Kokoro TTS remains the only approved narration engine.
+- Produce original whiteboard illustrations and animations in code; do not substitute text-only motion.
+- Use direct YouTube/TikTok APIs only where access is granted; do not assume quotas or eligibility are unlimited.
+- If a required step has no viable zero-cost path, stop and explain the constraint rather than activating a paid service.
+
+See config/cost-policy.md.
