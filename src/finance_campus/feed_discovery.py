@@ -27,6 +27,18 @@ def _fetch_article(url: str) -> dict[str, Any]:
 
 OFFICIAL_FEEDS: tuple[dict[str, str], ...] = (
     {
+        "name": "Capital Markets Authority Uganda",
+        "url": "https://cmauganda.co.ug/feed/",
+        "domain": "cmauganda.co.ug",
+        "geography": "Uganda; country-specific regulatory information",
+    },
+    {
+        "name": "Insurance Regulatory Authority Uganda",
+        "url": "https://ira.go.ug/feed/",
+        "domain": "ira.go.ug",
+        "geography": "Uganda; country-specific insurance information",
+    },
+    {
         "name": "CFPB newsroom",
         "url": "https://www.consumerfinance.gov/about-us/newsroom/feed/",
         "domain": "consumerfinance.gov",
