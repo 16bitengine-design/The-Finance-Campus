@@ -50,7 +50,8 @@ def test_financial_illustration_types_are_valid_and_render_to_svg():
         ],
     }
     assert validate_storyboard({"scenes": [scene]}) == []
-    svg = render_scene_svg(scene)
+    svg = render_scene_svg(scene, {"width": 1000, "height": 1778})
+    assert 'width="1080" height="1920"' in svg
     assert "<circle" in svg
     assert "Save consistently" in svg
 
