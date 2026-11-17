@@ -30,6 +30,10 @@ The progressive whiteboard video renderer and Kokoro narration synthesis are imp
 
 
 
+## Books, quotations and public-speaker inspiration
+
+Scripts may include carefully verified ideas from classical financial books and respected speakers. Modern copyrighted material is normally paraphrased in original language with attribution; direct quotations require documented permission, a compatible licence or verified public-domain status. Attribution alone does not make a quote free to use. The script generator enforces rights metadata and a conservative 15-word internal limit for direct quotes, but human rights review remains necessary. See `docs/BOOKS_QUOTES_AND_SPEAKER_INSPIRATION.md`.
+
 ## Mindset-first topic discovery
 
 The weekly repository workflow selects evergreen topics about money beliefs, everyday habits, emotional spending, comparison, avoidance, patience, debt behaviour, financial boundaries and resilience. The editorial agenda is not driven by news volume, market movements or the latest institutional press release.
