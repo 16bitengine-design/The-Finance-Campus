@@ -1,0 +1,48 @@
+{
+  "scenes": [
+    {
+      "id": "debt-growth",
+      "narration": "When interest builds up, the amount owed can grow even when you are not borrowing more.",
+      "duration_seconds": 8,
+      "elements": [
+        {
+          "type": "rect",
+          "x": 120,
+          "y": 150,
+          "width": 220,
+          "height": 160,
+          "color": "navy"
+        },
+        {
+          "type": "arrow",
+          "x1": 390,
+          "y1": 230,
+          "x2": 560,
+          "y2": 230,
+          "color": "gold"
+        },
+        {
+          "type": "circle",
+          "cx": 650,
+          "cy": 230,
+          "r": 80,
+          "color": "green"
+        },
+        {
+          "type": "text",
+          "x": 125,
+          "y": 355,
+          "text": "Starting debt",
+          "color": "navy"
+        },
+        {
+          "type": "text",
+          "x": 590,
+          "y": 355,
+          "text": "Growing balance",
+          "color": "green"
+        }
+      ]
+    }
+  ]
+}
