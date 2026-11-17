@@ -14,6 +14,7 @@ from finance_campus.disclaimers import append_description_disclaimer, disclaimer
 from finance_campus.final_video_qc import validate_final_video
 from finance_campus.narration import synthesize_storyboard
 from finance_campus.quality_gates import validate_video_package
+from finance_campus.research_pipeline import is_approved_research_url
 from finance_campus.script_pipeline import prepare_script
 from finance_campus.script_quality import validate_script
 from finance_campus.storyboard import validate_storyboard
@@ -23,19 +24,36 @@ from finance_campus.visual_review import create_visual_review_sheet
 
 
 def _source_urls(script: dict[str, Any]) -> list[str]:
-    values = list(script.get("sources", [])) if isinstance(script.get("sources", []), list) else []
-    for claim in script.get("claims", []):
-        if isinstance(claim, dict) and isinstance(claim.get("sources"), list):
-            values.extend(claim["sources"])
-    unique: list[str] = []
-    for value in values:
-        if not isinstance(value, str):
-            continue
-        parsed = urlparse(value.strip())
-        if parsed.scheme in {"http", "https"} and parsed.netloc and value not in unique:
-            unique.append(value)
-    return unique
+    """Collect only HTTPS sources from the approved research publisher allowlist."""
+    values = script.get("sources", [])
+    if not isinstance(values, list):
+        raise ValueError("Script sources must be a list")
+    collected = list(values)
+    claims = script.get("claims", [])
+    if not isinstance(claims, list):
+        raise ValueError("Script claims must be a list")
+    for claim in claims:
+        if not isinstance(claim, dict):
+            raise ValueError("Every claim must be a structured object")
+        claim_sources = claim.get("sources", [])
+        if not isinstance(claim_sources, list):
+            raise ValueError("Claim sources must be a list")
+        collected.extend(claim_sources)
 
+    unique: list[str] = []
+    for value in collected:
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError("Research source entries must be non-empty URLs")
+        normalized = value.strip()
+        if not is_approved_research_url(normalized):
+            raise ValueError(
+                "Production rejected an unapproved research source. "
+                "Use HTTPS on an approved publisher domain and register new publishers "
+                "only after editorial review: " + normalized
+            )
+        if normalized not in unique:
+            unique.append(normalized)
+    return unique
 
 def _probe_video(path: Path, *, video_format: str) -> dict[str, Any]:
     ffprobe = shutil.which("ffprobe")
