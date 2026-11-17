@@ -77,3 +77,19 @@ def test_debt_visual_mapping_shows_repayment_obligation():
     assert scene["visual_objects"] == ["wallet", "money_note", "house"]
     assert "repayment" in scene["matched_visual_terms"]
     assert any(item["type"] == "arrow" for item in scene["elements"])
+
+
+def test_storyboard_connects_cause_effect_and_outcome_with_ordered_draw_cues():
+    storyboard = build_storyboard(
+        _script(),
+        video_format="short",
+        disclaimer_config=load_yaml("config/disclaimer.yaml"),
+    )
+    scene = storyboard["scenes"][0]
+    arrows = [item for item in scene["elements"] if item["type"] == "arrow"]
+    assert len(arrows) == 2
+    starts = [item["start_seconds"] for item in scene["elements"]]
+    assert starts == sorted(starts)
+    outcome = scene["elements"][-2]
+    assert outcome["type"] in {"person", "bank", "wallet", "house", "coin", "money_note", "savings_jar"}
+    assert outcome["start_seconds"] > arrows[-1]["start_seconds"]
