@@ -1,10 +1,11 @@
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
 import soundfile as sf
 
-from finance_campus.narration import SUPPORTED_VOICES, _sentence_groups, synthesize_storyboard
+from finance_campus.narration import (SUPPORTED_VOICES, _sentence_groups, _synthesize_chunk, synthesize_storyboard)
 
 
 class FakeKokoroPipeline:
@@ -49,6 +50,28 @@ def _storyboard():
         ],
     }
 
+
+def test_synthesis_accepts_current_kokoro_result_objects():
+    samples = np.sin(np.linspace(0, 2 * np.pi * 220 * 0.25, 6000, endpoint=False))
+    audio = samples.astype(np.float32) * 0.15
+
+    class ResultObjectPipeline:
+        def __call__(self, text, *, voice, speed):
+            yield SimpleNamespace(graphemes=text, phonemes="fake phonemes", audio=audio)
+
+    result = _synthesize_chunk(ResultObjectPipeline(), "A complete test sentence.", "af_heart", 1.0)
+    assert result.size == audio.size
+    assert np.isfinite(result).all()
+    assert float(np.max(np.abs(result))) > 0.1
+
+
+def test_synthesis_skips_kokoro_results_without_audio():
+    class EmptyResultPipeline:
+        def __call__(self, text, *, voice, speed):
+            yield SimpleNamespace(graphemes=text, phonemes="", audio=None)
+
+    with pytest.raises(RuntimeError, match="no audio chunks"):
+        _synthesize_chunk(EmptyResultPipeline(), "A test sentence.", "af_heart", 1.0)
 
 def test_sentence_groups_keep_complete_sentences_and_avoid_tiny_chunks():
     groups = _sentence_groups(
