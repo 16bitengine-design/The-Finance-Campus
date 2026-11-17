@@ -103,3 +103,22 @@ def test_render_video_muxes_narration_and_burns_captions(tmp_path):
     )
     assert "Video:" in probe.stderr
     assert "Audio:" in probe.stderr
+
+
+
+@pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="FFmpeg is not installed")
+def test_render_video_supports_landscape_long_form(tmp_path):
+    output = render_video(
+        _storyboard(), tmp_path / "long-form.mp4",
+        video_format="long", fps=12, draw_fps=6,
+    )
+    probe = subprocess.run(
+        ["ffmpeg", "-hide_banner", "-i", str(output), "-f", "null", "-"],
+        capture_output=True, text=True, check=False,
+    )
+    assert "1920x1080" in probe.stderr
+
+
+def test_video_renderer_rejects_negative_transition_duration(tmp_path):
+    with pytest.raises(ValueError, match="transition_seconds"):
+        render_video(_storyboard(), tmp_path / "bad-transition.mp4", transition_seconds=-0.1)
