@@ -52,5 +52,5 @@ def test_generator_rejects_unchecked_source():
 def test_generator_rejects_missing_editorial_brief():
     item = topic()
     del item["editorial_brief"]
-    with pytest.raises(ValueError, match="editorial_brief"):
+    with pytest.raises(TypeError, match="editorial_brief"):
         generate_script(item)
