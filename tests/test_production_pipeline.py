@@ -92,3 +92,19 @@ def test_production_pipeline_rejects_scripts_without_research_sources(tmp_path):
     with pytest.raises(ValueError, match="research source"):
         production_pipeline.produce_video_from_script(script, tmp_path)
     assert not (tmp_path / "finance-campus-video.mp4").exists()
+
+
+
+def test_production_rejects_unapproved_or_insecure_research_sources(tmp_path):
+    script = _script()
+    script["sources"] = ["https://consumerfinance.gov.attacker.example/fake"]
+    with pytest.raises(ValueError, match="unapproved research source"):
+        production_pipeline.produce_video_from_script(script, tmp_path)
+    assert not (tmp_path / "finance-campus-video.mp4").exists()
+
+
+def test_production_rejects_plain_http_sources(tmp_path):
+    script = _script()
+    script["sources"] = ["http://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/"]
+    with pytest.raises(ValueError, match="unapproved research source"):
+        production_pipeline.produce_video_from_script(script, tmp_path)
