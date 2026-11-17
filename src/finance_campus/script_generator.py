@@ -39,22 +39,22 @@ def generate_script(topic: dict[str, Any], *, duration: str = "short") -> dict[s
     action = brief["action"]
     if duration == "short":
         sections = {
-            "relatable_financial_problem": problem,
-            "escalating_real_world_stakes": stakes,
-            "clear_explanation_of_why_it_matters": explanation,
-            "hopeful_and_realistic_possibility": "You do not need to solve the whole problem today. A clear first step, repeated consistently and adjusted to your circumstances, can improve the decisions available to you.",
-            "practical_action_viewers_can_take": action,
-            "empowering_close": "Your circumstances may be difficult, but understanding the next decision gives you a place to begin. Learn, apply, and grow.",
+            "relatable_financial_problem": f"Have you ever found yourself in this situation? {problem}",
+            "escalating_real_world_stakes": f"Here is the part people often miss: {stakes}",
+            "clear_explanation_of_why_it_matters": f"Here is the money lesson: {explanation}",
+            "hopeful_and_realistic_possibility": "This pattern does not have to define your future. You may not control every circumstance, but you can learn to recognise the pattern and make a more deliberate next decision.",
+            "practical_action_viewers_can_take": f"Try this: {action}",
+            "empowering_close": "Do not measure your progress by appearances or someone else's timeline. Make the next decision with intention. Learn, apply, and grow.",
         }
         target_seconds = [45, 90]
     else:
         sections = {
-            "relatable_financial_problem": problem + " Many people face this challenge while balancing essential costs, family responsibilities and uncertain income.",
-            "escalating_real_world_stakes": stakes + " If the pattern continues, it can affect other goals and reduce the room available to handle the next setback.",
-            "clear_explanation_of_why_it_matters": explanation + " The important distinction is between what is known, what depends on personal circumstances and what needs to be checked before acting.",
-            "hopeful_and_realistic_possibility": "There may be practical ways to improve the situation gradually. Progress does not require a perfect income or a dramatic overnight change; it starts with an honest picture of the numbers and a manageable decision.",
-            "practical_action_viewers_can_take": action + " Review the result, adjust it to your actual income and obligations, and seek qualified help where the decision is complex.",
-            "empowering_close": "The goal is not to judge where you are today. It is to make the next money decision with better information and a realistic plan. Learn, apply, and grow.",
+            "relatable_financial_problem": f"Start with an honest question: have you ever recognised this pattern in your own life? {problem} This can happen to people with different incomes and responsibilities.",
+            "escalating_real_world_stakes": f"The problem is not always obvious at first. {stakes} Over time, the pattern can influence confidence, choices and the options available when life changes.",
+            "clear_explanation_of_why_it_matters": f"The key idea is simple: {explanation} The point is not to judge anyone. It is to understand the behaviour and see where a different choice may help.",
+            "hopeful_and_realistic_possibility": "Change does not require a perfect income, perfect discipline or an overnight transformation. It can begin with noticing one trigger, setting one boundary or repeating one manageable habit. Progress should fit real circumstances.",
+            "practical_action_viewers_can_take": f"Here is a practical place to begin: {action} Review what happens, adjust the approach to your circumstances and seek qualified help when a decision is complex.",
+            "empowering_close": "Your current financial situation is not your identity. You can learn, question old habits and make the next decision more deliberately. Learn, apply, and grow.",
         }
         target_seconds = [300, 600]
 
