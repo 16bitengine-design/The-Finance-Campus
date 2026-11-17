@@ -292,3 +292,25 @@ def test_character_poses_render_different_body_language():
         1.0, determined.size,
     )
     assert ImageChops.difference(worried, determined).getbbox() is not None
+
+
+def test_character_interaction_target_changes_reaching_arm_geometry():
+    from finance_campus.video_renderer import _draw_element
+
+    base = {
+        "type": "person", "x": 40, "y": 30, "width": 180, "height": 340,
+        "color": "navy", "pose": "reaching", "expression": "calm",
+    }
+    first = Image.new("RGB", (300, 420), (255, 255, 255))
+    second = Image.new("RGB", (300, 420), (255, 255, 255))
+    _draw_element(
+        ImageDraw.Draw(first),
+        {**base, "interaction_target": {"x": 500, "y": 250}},
+        1.0, first.size,
+    )
+    _draw_element(
+        ImageDraw.Draw(second),
+        {**base, "interaction_target": {"x": 850, "y": 650}},
+        1.0, second.size,
+    )
+    assert ImageChops.difference(first, second).getbbox() is not None
