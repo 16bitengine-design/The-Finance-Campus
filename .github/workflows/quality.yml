@@ -31,14 +31,21 @@ jobs:
 
       - name: Render illustrated portrait sample and review frames
         run: |
+          ffmpeg -hide_banner -loglevel error -y -f lavfi -i "sine=frequency=440:sample_rate=24000:duration=1" -af volume=12dB -c:a pcm_s16le /tmp/finance-campus-qc-tone.wav
           python - <<'PY'
           from pathlib import Path
-          from PIL import Image, ImageOps, ImageDraw
+          from PIL import Image, ImageDraw
           from finance_campus.video_renderer import render_video
+          from finance_campus.final_video_qc import validate_final_video
           import json
           storyboard = json.loads(Path("examples/illustrated-savings-short.json").read_text(encoding="utf-8"))
           output = Path("/tmp/finance-campus-sample.mp4")
-          render_video(storyboard, output, video_format="short", fps=30, draw_fps=24, keep_frames=True)
+          render_video(
+              storyboard, output, video_format="short", fps=30, draw_fps=24,
+              audio_path="/tmp/finance-campus-qc-tone.wav", keep_frames=True,
+          )
+          qc = validate_final_video(output, video_format="short", expected_fps=30)
+          print("Final encoded MP4 QC:", json.dumps(qc, indent=2))
           frames = sorted(Path("/tmp").glob(".finance-campus-sample_frames/frame_*.png"))
           if not frames:
               raise SystemExit("No rendered preview frames were produced")
