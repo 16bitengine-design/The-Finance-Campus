@@ -299,6 +299,19 @@ def _draw_element(
             else:
                 path(left_shoulder, (x+w//5, elbow_y), left_hand)
                 path(right_shoulder, (right-w//5, elbow_y), right_hand)
+
+            # When a scene specifies an interaction, the protagonist's hand
+            # reaches the actual prop instead of stopping at a generic pose.
+            target = element.get("interaction_target")
+            if isinstance(target, dict) and pose not in {"worried", "overwhelmed", "celebrating"}:
+                target_x = round(float(target["x"]) * sx)
+                target_y = round(float(target["y"]) * sy)
+                elbow = (
+                    round((right_shoulder[0] + target_x) * .52),
+                    round((right_shoulder[1] + target_y) * .48),
+                )
+                right_hand = (target_x, target_y)
+                path(right_shoulder, elbow, right_hand)
             for hx, hy in (left_hand, right_hand):
                 ellipse((hx-width*2, hy-width*2, hx+width*2, hy+width*2))
             path((cx-w//7, waist), (x+w//4, bottom-h//12), (x+w//8, bottom-h//20))
