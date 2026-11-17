@@ -43,3 +43,16 @@ Use a relatable story, escalating but truthful consequences, a plain-language ex
 - Not a statistics-heavy personal finance lecture.
 - Not product promotion or personalised investment recommendations.
 - Not fear-based motivation or promises of quick wealth.
+
+## Topic-source verification and limits
+
+The repository topic refresher uses a fixed catalogue of official educational sources. It checks that each source:
+- Is configured with HTTPS on its approved publisher domain.
+- Returns a successful response and does not redirect outside that publisher domain.
+- Contains the mapped topic keywords when readable page text is available.
+- Is recorded with its original URL, final URL, publisher, checked time and matched keywords.
+
+These checks establish source reachability and topical relevance only. They do **not** establish that every claim in a future script is supported by the source. PDF sources without extracted text require separate human review. Each candidate must remain unapproved until an editor verifies the specific claims, context, geography and wording against the underlying source. U.S. SEC material must not be presented as Ugandan regulation or as a personal investment recommendation.
+
+The weekly refresh may add fewer than 20 topics when the unused catalogue is exhausted or source checks fail. It must report the shortfall honestly rather than invent topics or weaken verification. Refreshing the topic library does not start video production or publishing.
+
