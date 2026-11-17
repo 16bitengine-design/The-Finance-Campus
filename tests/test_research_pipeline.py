@@ -61,7 +61,7 @@ def test_refresh_adds_evergreen_mindset_topics_not_news_headlines(tmp_path):
 
 
 def test_inspiration_blueprints_are_carried_into_topic_records(tmp_path):
-    result = refresh_topics(tmp_path / "topics.json", target=40, fetcher=fake_fetch)
+    result = refresh_topics(tmp_path / "topics.json", target=42, fetcher=fake_fetch)
     inspired = {
         item["topic_slug"]: item["inspiration"]
         for item in result["added"]
