@@ -56,6 +56,7 @@ def _sentence_groups(text: str, *, min_words: int = 12, max_words: int = 24) -> 
             flush()
     return groups
 
+
 def _audio_array(value: Any) -> np.ndarray:
     if hasattr(value, "detach"):
         value = value.detach().cpu().numpy()
@@ -66,8 +67,8 @@ def _audio_array(value: Any) -> np.ndarray:
     rms = float(np.sqrt(np.mean(np.square(audio))))
     if peak < 1e-5 or rms < 1e-6:
         raise ValueError("Kokoro returned silent narration")
-    if peak > 1.0:
-        audio = audio / peak * 0.98
+    gain = min(0.1 / rms, 0.89 / peak)
+    audio = audio * gain
     return audio
 
 
