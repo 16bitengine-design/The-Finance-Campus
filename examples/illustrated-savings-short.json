@@ -4,27 +4,31 @@
     {
       "id": "income-and-choice",
       "narration": "When income arrives, every dollar has a job. If you spend without a plan, your future goals can be left with nothing.",
-      "duration_seconds": 4,
+      "duration_seconds": 5,
       "elements": [
-        {"type": "person", "x": 110, "y": 260, "width": 210, "height": 390, "color": "navy"},
-        {"type": "money_note", "x": 430, "y": 300, "width": 230, "height": 130, "color": "green"},
-        {"type": "arrow", "x1": 350, "y1": 450, "x2": 420, "y2": 390, "color": "gold"},
-        {"type": "wallet", "x": 350, "y": 720, "width": 300, "height": 210, "color": "navy"},
-        {"type": "text", "x": 260, "y": 1050, "text": "Give your money a plan", "color": "green"}
+        {"type": "person", "x": 90, "y": 130, "width": 250, "height": 520, "color": "navy"},
+        {"type": "money_note", "x": 570, "y": 220, "width": 280, "height": 170, "color": "green"},
+        {"type": "arrow", "x1": 370, "y1": 420, "x2": 550, "y2": 340, "color": "gold"},
+        {"type": "wallet", "x": 330, "y": 700, "width": 360, "height": 250, "color": "navy"},
+        {"type": "coin", "x": 170, "y": 1080, "width": 130, "height": 130, "color": "gold"},
+        {"type": "coin", "x": 435, "y": 1040, "width": 130, "height": 130, "color": "gold"},
+        {"type": "coin", "x": 700, "y": 1080, "width": 130, "height": 130, "color": "gold"},
+        {"type": "house", "x": 350, "y": 1280, "width": 300, "height": 270, "color": "green"},
+        {"type": "text", "x": 245, "y": 1690, "text": "Give your money a plan", "color": "green"}
       ]
     },
     {
       "id": "build-the-buffer",
       "narration": "Start with a small emergency buffer. Consistent saving can help you handle an unexpected bill without immediately turning to expensive debt.",
-      "duration_seconds": 4,
+      "duration_seconds": 5,
       "elements": [
-        {"type": "bank", "x": 150, "y": 180, "width": 700, "height": 420, "color": "navy"},
-        {"type": "coin", "x": 200, "y": 780, "width": 150, "height": 150, "color": "gold"},
-        {"type": "coin", "x": 425, "y": 720, "width": 150, "height": 150, "color": "gold"},
-        {"type": "coin", "x": 650, "y": 780, "width": 150, "height": 150, "color": "gold"},
-        {"type": "arrow", "x1": 500, "y1": 900, "x2": 500, "y2": 1120, "color": "green"},
-        {"type": "savings_jar", "x": 360, "y": 1130, "width": 280, "height": 360, "color": "green"},
-        {"type": "text", "x": 255, "y": 1600, "text": "Small steps. More security.", "color": "navy"}
+        {"type": "bank", "x": 160, "y": 150, "width": 680, "height": 420, "color": "navy"},
+        {"type": "coin", "x": 170, "y": 690, "width": 150, "height": 150, "color": "gold"},
+        {"type": "coin", "x": 425, "y": 650, "width": 150, "height": 150, "color": "gold"},
+        {"type": "coin", "x": 680, "y": 690, "width": 150, "height": 150, "color": "gold"},
+        {"type": "arrow", "x1": 500, "y1": 850, "x2": 500, "y2": 1030, "color": "green"},
+        {"type": "savings_jar", "x": 350, "y": 1040, "width": 300, "height": 430, "color": "green"},
+        {"type": "text", "x": 245, "y": 1660, "text": "Small steps. More security.", "color": "navy"}
       ]
     }
   ]
