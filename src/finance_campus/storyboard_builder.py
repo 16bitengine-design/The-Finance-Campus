@@ -16,29 +16,37 @@ SECTION_ORDER = (
 )
 
 
-def _visual_types(text: str, section: str) -> tuple[str, str, str]:
-    words = set(re.findall(r"[a-z]+", text.casefold()))
-    if words & {"debt", "borrow", "borrowing", "loan", "repayment", "credit"}:
-        return "wallet", "money_note", "arrow"
-    if words & {"save", "savings", "buffer", "emergency", "fund"}:
-        return "person", "savings_jar", "coin"
-    if words & {"inflation", "prices", "price", "cost", "costs", "expensive"}:
-        return "money_note", "coin", "arrow"
-    if words & {"income", "payday", "salary", "earn", "earning", "wages"}:
-        return "person", "money_note", "wallet"
-    if words & {"invest", "investment", "compound", "interest", "returns"}:
-        return "coin", "bank", "arrow"
-    if section == "relatable_financial_problem":
-        return "person", "wallet", "coin"
-    if section == "escalating_real_world_stakes":
-        return "house", "money_note", "arrow"
-    if section == "clear_explanation_of_why_it_matters":
-        return "bank", "money_note", "arrow"
-    if section == "hopeful_and_realistic_possibility":
-        return "person", "savings_jar", "coin"
-    if section == "practical_action_viewers_can_take":
-        return "wallet", "savings_jar", "arrow"
-    return "person", "savings_jar", "coin"
+VISUAL_PATTERNS = (
+    (("compound", "compounding", "interest on interest"), ("coin", "bank", "savings_jar"), "Repeated growth can build on earlier growth"),
+    (("inflation", "purchasing power", "prices rise", "price increases"), ("money_note", "coin", "wallet"), "Rising prices reduce what the same money can buy"),
+    (("repayment", "debt", "borrow", "borrowing", "loan", "credit"), ("wallet", "money_note", "house"), "Borrowed money creates a repayment obligation"),
+    (("emergency fund", "emergency savings", "unexpected bill", "unexpected expense", "rainy day"), ("house", "wallet", "savings_jar"), "A reserve can absorb an unexpected cost"),
+    (("budget", "spending plan", "allocate", "expenses"), ("wallet", "money_note", "savings_jar"), "Income is divided between needs and goals"),
+    (("income", "payday", "salary", "wages", "earnings"), ("person", "money_note", "wallet"), "Earnings flow into the household budget"),
+    (("invest", "investment", "stocks", "bonds", "etf", "portfolio"), ("person", "bank", "coin"), "Investing puts money into assets that carry risk"),
+    (("insurance", "cover", "premium", "claim", "risk"), ("house", "bank", "wallet"), "Protection helps manage specified financial risks"),
+    (("scam", "fraud", "phishing", "fake investment"), ("person", "wallet", "bank"), "A deceptive request can put money at risk"),
+    (("save", "savings", "buffer", "fund", "deposit"), ("person", "savings_jar", "coin"), "Regular deposits build a financial buffer"),
+)
+
+
+def _visual_types(text: str, section: str) -> tuple[tuple[str, str, str], str, list[str]]:
+    normalized = re.sub(r"[^a-z0-9 ]+", " ", text.casefold())
+    normalized = re.sub(r"\s+", " ", normalized).strip()
+    for phrases, objects, relationship in VISUAL_PATTERNS:
+        matched = [phrase for phrase in phrases if phrase in normalized]
+        if matched:
+            return objects, relationship, matched
+    defaults = {
+        "relatable_financial_problem": (("person", "wallet", "coin"), "A household faces a money decision"),
+        "escalating_real_world_stakes": (("house", "wallet", "money_note"), "Financial pressure affects everyday needs"),
+        "clear_explanation_of_why_it_matters": (("bank", "money_note", "wallet"), "A financial mechanism links choices to outcomes"),
+        "hopeful_and_realistic_possibility": (("person", "savings_jar", "coin"), "A manageable action can improve resilience"),
+        "practical_action_viewers_can_take": (("wallet", "savings_jar", "coin"), "A practical step moves money toward a goal"),
+        "empowering_close": (("person", "savings_jar", "coin"), "Consistent small actions can build progress"),
+    }
+    objects, relationship = defaults.get(section, (("person", "wallet", "coin"), "A financial choice has consequences"))
+    return objects, relationship, []
 
 
 def _element(kind: str, x: float, y: float, width: float, height: float, color: str, start: float) -> dict[str, Any]:
@@ -55,11 +63,7 @@ def _element(kind: str, x: float, y: float, width: float, height: float, color: 
 
 
 def _scene_elements(text: str, section: str, title: str, width: int, height: int) -> list[dict[str, Any]]:
-    first, second, third = _visual_types(text, section)
-    # The connecting arrow is drawn explicitly between the two main objects.
-    # Keep the lower supporting illustration a drawable object, not a second arrow.
-    if third == "arrow":
-        third = "coin"
+    (first, second, third), _, _ = _visual_types(text, section)
     left_x, right_x = width * 0.08, width * 0.64
     top_y = height * 0.22
     obj_w, obj_h = width * 0.27, height * 0.35
@@ -108,10 +112,14 @@ def build_storyboard(
 
     for index, (section, title) in enumerate(SECTION_ORDER):
         narration = str(script["sections"][section]).strip()
+        (visual_objects, visual_relationship, matched_terms) = _visual_types(narration, section)
         scenes.append({
             "id": section.replace("_", "-"),
             "narration": narration,
             "duration_seconds": 5.0,
+            "visual_intent": visual_relationship,
+            "visual_objects": list(visual_objects),
+            "matched_visual_terms": matched_terms,
             "elements": _scene_elements(narration, section, title, width, height),
         })
 
