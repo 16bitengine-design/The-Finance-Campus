@@ -9,6 +9,7 @@ from pathlib import Path
 from finance_campus.config import load_yaml, validate_branding, validate_disclaimer
 from finance_campus.script_pipeline import prepare_script
 from finance_campus.script_quality import validate_script
+from finance_campus.storyboard import render_storyboard, validate_storyboard
 
 
 def _read_json(path: str) -> object:
@@ -20,11 +21,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="The Finance Campus project tools")
     parser.add_argument(
         "command",
-        choices=("validate-config", "validate-script", "prepare-script"),
-        help="The validation or preparation task to run",
+        choices=("validate-config", "validate-script", "prepare-script", "validate-storyboard", "render-storyboard"),
+        help="The validation, preparation, or rendering task to run",
     )
     parser.add_argument("script_path", nargs="?", help="Input JSON script package")
-    parser.add_argument("output_path", nargs="?", help="Approved output path for prepare-script")
+    parser.add_argument("output_path", nargs="?", help="Approved output path or storyboard SVG output directory")
     args = parser.parse_args()
 
     if args.command == "validate-config":
