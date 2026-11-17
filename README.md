@@ -26,7 +26,54 @@ Every video must include a spoken disclaimer, a readable on-screen disclaimer, a
 - Structured script validator and atomic fail-closed approval handoff.
 - GitHub Actions test/lint workflow.
 
-Rendered-image computer-vision checks, media rendering, Kokoro integration, research automation, and platform publishing are not implemented yet.
+The progressive whiteboard video renderer and Kokoro narration synthesis are implemented. Real-model CPU synthesis and end-to-end narrated video rendering still require the dedicated smoke test and artifact review. Rendered-image computer-vision checks, research automation, and platform publishing are not implemented yet.
+
+
+## Kokoro narration integration
+
+Kokoro is the project's only approved narration engine. The integration supports four English voice profiles: female voices `af_heart` and `bf_emma`, and male voices `am_michael` and `bm_george`. Synthesis runs locally on CPU by default when explicitly selected; CUDA is optional. No paid speech API or API key is used.
+
+### Install
+
+1. Install FFmpeg and `espeak-ng` (the latter provides pronunciation fallback for unfamiliar English words).
+2. Install the project with the Kokoro extra:
+
+   `python -m pip install -e ".[dev,tts]"`
+
+3. The first synthesis downloads the open-weight Kokoro model and selected voice pack from Hugging Face. The model is cached for later runs. The first run therefore needs an internet connection and enough disk space; inference can then run locally.
+
+### Generate scene-aligned narration
+
+```bash
+python -m finance_campus.cli synthesize-narration \
+  examples/illustrated-savings-short.json production/kokoro \
+  --voice af_heart --device cpu --speed 1.0 \
+  --transition-seconds 0.25 --draw-fps 24
+```
+
+The command creates:
+- `narration.wav`: assembled mono PCM narration at 24 kHz.
+- `captions.srt`: caption cues aligned to synthesized narration chunks.
+- `storyboard_with_audio_timing.json`: storyboard with scene durations recalculated from the generated speech, plus a short drawing hold and transition silence.
+
+Then render the video using those exact generated assets and the same transition/drawing frame settings:
+
+```bash
+python -m finance_campus.cli render-video \
+  production/kokoro/storyboard_with_audio_timing.json production/kokoro/finance-campus.mp4 \
+  --format short --fps 30 --draw-fps 24 \
+  --audio production/kokoro/narration.wav \
+  --captions production/kokoro/captions.srt \
+  --transition-seconds 0.25
+```
+
+Available voice choices: `af_heart`, `am_michael`, `bf_emma`, `bm_george`. Use `--device cpu` on machines without a supported GPU. Keep `--draw-fps` and `--transition-seconds` identical in both commands so the speech, scene holds and cross-dissolves stay aligned.
+
+The synthesis step checks for empty/non-finite audio, silence, peak level and output WAV integrity, and applies consistent loudness normalization with a peak ceiling. It fails rather than silently substituting another TTS provider.
+
+### Real-model verification
+
+The manually triggered GitHub Actions workflow `Kokoro CPU narration smoke test` installs Kokoro and `espeak-ng`, downloads the actual model, synthesizes the sample storyboard on CPU, renders the MP4 with narration and captions, and uploads the resulting files for review. The normal lightweight test suite uses a mocked Kokoro pipeline so it does not download model weights on every commit.
 
 ## Development status
 Publishing remains disabled until the production pipeline and platform integrations pass end-to-end quality checks.
