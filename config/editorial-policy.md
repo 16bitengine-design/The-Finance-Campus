@@ -45,6 +45,21 @@ Research exists to keep the lesson honest, not to turn the channel into a data b
 
 Urgency must come from understandable consequences, not fear tactics. Never manufacture panic, shame people for hardship or suggest that mindset alone can overcome structural barriers.
 
+## Classical books, financial thinkers and public speakers
+
+Books and talks may enrich a lesson when they clarify a useful money belief, behaviour or decision. They are supporting material, not authority by celebrity status.
+
+- Use classical financial and personal-development books, biographies, academic works and reputable talks when the relevant idea is useful and accurately represented.
+- Verify the author's identity, the original work, the exact passage or underlying idea, and a reliable source location. Do not repeat quote graphics or unattributed quote websites as evidence.
+- Prefer an independently written paraphrase for modern copyrighted works. Attribute the idea to the author and name the book, speech or other original work where possible. Do not imitate distinctive wording or reconstruct a passage by swapping synonyms.
+- Direct quotations from copyrighted material require documented permission or a compatible licence, or verified public-domain status for the relevant territory and use. A short quotation is not automatically lawful; attribution alone is not permission, and legal exceptions vary by jurisdiction.
+- For direct quotations that pass rights review, apply a conservative 15-word internal limit per quote, preserve exact wording and punctuation, and identify the author and work. This internal limit is not a legal safe harbour.
+- Public-domain status must be checked for the relevant country. A book's age, online availability or presence in a quote collection does not by itself establish that every edition, translation, recording or adaptation is public domain.
+- Never invent, misattribute, or silently alter a quotation. If the original wording or source cannot be verified, omit the quote and express the general lesson without attribution.
+- Use no more than one short literary or speaker reference in a short video unless the story genuinely needs more. The audience's practical lesson must remain central.
+
+For modern speakers such as Zig Ziglar, default to a verified, independently worded summary of the idea and cite the original book or talk in the research record. Do not reproduce memorable lines from books or speeches merely because they are widely shared online.
+
 ## Emotional destination
 
 A viewer should leave thinking:
