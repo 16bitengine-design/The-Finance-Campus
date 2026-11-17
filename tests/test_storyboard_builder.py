@@ -152,3 +152,25 @@ def test_video_specific_visual_signature_changes_with_script_content():
         disclaimer_config=load_yaml("config/disclaimer.yaml"),
     )
     assert first["scenes"][0]["visual_signature"] != second["scenes"][0]["visual_signature"]
+
+
+def test_character_performance_changes_with_the_emotional_story_arc():
+    storyboard = build_storyboard(
+        _script(),
+        video_format="short",
+        disclaimer_config=load_yaml("config/disclaimer.yaml"),
+    )
+    scenes = storyboard["scenes"][:-1]
+    expected = [
+        ("worried", "worried"),
+        ("overwhelmed", "overwhelmed"),
+        ("thinking", "calm"),
+        ("reaching", "calm"),
+        ("determined", "determined"),
+        ("celebrating", "calm"),
+    ]
+    actual = []
+    for scene in scenes:
+        character = next(item for item in scene["elements"] if item["type"] == "person")
+        actual.append((character["pose"], character["expression"]))
+    assert actual == expected
