@@ -43,8 +43,8 @@ def validate_final_video(
     probe = subprocess.run(
         [
             ffprobe_path, "-v", "error", "-show_entries",
-            "stream=codec_type,codec_name,width,height,pix_fmt,avg_frame_rate,nb_frames,"
-            "sample_rate,channels:format=duration,size",
+            ("stream=codec_type,codec_name,width,height,pix_fmt,avg_frame_rate,nb_frames,"
+             "sample_rate,channels:format=duration,size"),
             "-of", "json", str(path),
         ],
         capture_output=True, text=True, check=False,
