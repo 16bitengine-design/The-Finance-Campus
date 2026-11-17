@@ -1,0 +1,127 @@
+{
+  "pool_id": "TFC-INSPIRATION-001",
+  "title": "Classical Books and Influential Thinkers — First Topic Pool",
+  "created_at": "2026-11-17",
+  "editorial_status": "duplicate_checked_candidates",
+  "purpose": "Generate original mindset-first lessons inspired by books and speakers. This file is an editorial pool, not an instruction to produce or publish videos.",
+  "copyright_rules": {
+    "modern_books_and_speeches": "Paraphrase ideas in original wording; do not reproduce distinctive passages.",
+    "direct_quotes": "Do not use unless public-domain status, permission, or a suitable licence is documented. Attribution alone is not permission.",
+    "attribution": "Verify the author and originating work. Describe an idea as inspiration rather than presenting an unverified paraphrase as a direct quotation.",
+    "claim_review": "Verify factual claims independently; a book reference is not evidence that every claim in a script is accurate."
+  },
+  "topics": [
+    {
+      "pool_id": "TFC-INS-001",
+      "title": "Why You Should Pay Yourself First",
+      "category": "Saving and Emergency Funds",
+      "inspiration": {"work": "The Richest Man in Babylon", "author": "George S. Clason", "type": "classical_financial_book"},
+      "original_lesson": "Build a saving habit by deliberately setting aside a realistic amount when income arrives, rather than relying only on whatever remains.",
+      "duplicate_check": "distinct_angle",
+      "related_existing_topics": ["pay-yourself-later-myth", "small-steps-beat-perfect-plans"],
+      "decision": "retain_as_new_candidate",
+      "notes": "Existing topics discuss postponing saving and small repeatable habits; this candidate focuses specifically on prioritising saving at the point income arrives."
+    },
+    {
+      "pool_id": "TFC-INS-002",
+      "title": "Looking Rich Is Not the Same as Being Wealthy",
+      "category": "Financial Psychology",
+      "inspiration": {"work": "The Psychology of Money", "author": "Morgan Housel", "type": "modern_financial_book"},
+      "original_lesson": "Visible spending does not reveal a person's financial security or full circumstances.",
+      "duplicate_check": "duplicate",
+      "related_existing_topics": ["looking-rich-vs-being-secure", "comparison-trap", "wealth-is-built-not-performed"],
+      "decision": "do_not_add_duplicate"
+    },
+    {
+      "pool_id": "TFC-INS-003",
+      "title": "Your Financial Future Begins With What You Believe Is Possible",
+      "category": "Financial Psychology",
+      "inspiration": {"work": "Think and Grow Rich", "author": "Napoleon Hill", "type": "modern_motivational_book"},
+      "original_lesson": "Beliefs can influence which financial goals people consider and whether they seek knowledge or take constructive steps.",
+      "duplicate_check": "overlapping_angle",
+      "related_existing_topics": ["money-confidence-through-knowledge", "money-goals-need-identity", "do-not-confuse-income-with-worth"],
+      "decision": "merge_into_existing_theme",
+      "notes": "Avoid presenting positive thinking as a guarantee of wealth or as a substitute for structural realities and practical action."
+    },
+    {
+      "pool_id": "TFC-INS-004",
+      "title": "Small Money Habits Can Shape Your Financial Future",
+      "category": "Financial Psychology",
+      "inspiration": {"work": "The Richest Man in Babylon", "author": "George S. Clason", "type": "classical_financial_book"},
+      "original_lesson": "Repeated everyday choices can reinforce a financial habit over time.",
+      "duplicate_check": "duplicate",
+      "related_existing_topics": ["small-leaks-big-pressure", "small-steps-beat-perfect-plans", "future-self-is-real"],
+      "decision": "do_not_add_duplicate"
+    },
+    {
+      "pool_id": "TFC-INS-005",
+      "title": "Stop Competing With Other People's Money",
+      "category": "Financial Psychology",
+      "inspiration": {"work": "The Millionaire Next Door", "authors": ["Thomas J. Stanley", "William D. Danko"], "type": "modern_financial_book"},
+      "original_lesson": "Do not use another person's visible lifestyle as the measure of your own financial progress.",
+      "duplicate_check": "duplicate",
+      "related_existing_topics": ["comparison-trap", "do-not-let-status-set-your-goals", "looking-rich-vs-being-secure"],
+      "decision": "do_not_add_duplicate"
+    },
+    {
+      "pool_id": "TFC-INS-006",
+      "title": "Motivation Won't Save You Without Discipline",
+      "category": "Financial Psychology",
+      "inspiration": {"speaker": "Zig Ziglar", "type": "speaker_inspiration"},
+      "original_lesson": "A financial goal needs repeatable actions and routines; motivation alone is unreliable.",
+      "duplicate_check": "overlapping_angle",
+      "related_existing_topics": ["money-goals-need-identity", "small-steps-beat-perfect-plans"],
+      "decision": "merge_into_existing_theme",
+      "notes": "Use an independently verified Zig Ziglar source if his ideas are referenced. Do not attribute a circulating quote without locating its original source."
+    },
+    {
+      "pool_id": "TFC-INS-007",
+      "title": "Every Purchase Costs More Than Money",
+      "category": "Financial Psychology",
+      "inspiration": {"work": "Your Money or Your Life", "authors": ["Vicki Robin", "Joe Dominguez"], "type": "modern_personal_finance_book"},
+      "original_lesson": "Consider the time, energy and trade-offs involved in earning the money used for a purchase.",
+      "duplicate_check": "distinct_angle",
+      "related_existing_topics": ["emotional-spending", "small-leaks-big-pressure"],
+      "decision": "retain_as_new_candidate",
+      "notes": "This introduces the specific time-and-life-energy lens rather than repeating general spending awareness."
+    },
+    {
+      "pool_id": "TFC-INS-008",
+      "title": "The Danger of Wanting to Get Rich Quickly",
+      "category": "Financial Scams and Fraud Prevention",
+      "inspiration": {"work": "The Intelligent Investor", "author": "Benjamin Graham", "type": "modern_investing_book"},
+      "original_lesson": "Impatience and unrealistic expectations can weaken judgement and increase vulnerability to reckless offers and scams.",
+      "duplicate_check": "duplicate",
+      "related_existing_topics": ["financial-success-is-not-speed", "get-rich-quick-appeal", "do-not-chase-every-trend"],
+      "decision": "do_not_add_duplicate"
+    },
+    {
+      "pool_id": "TFC-INS-009",
+      "title": "Stop Living Only for Today",
+      "category": "Wealth Creation",
+      "inspiration": {"work": "The 7 Habits of Highly Effective People", "author": "Stephen R. Covey", "type": "modern_personal_development_book"},
+      "original_lesson": "Bring future priorities into today's choices without ignoring present needs.",
+      "duplicate_check": "duplicate",
+      "related_existing_topics": ["instant-gratification", "future-self-is-real"],
+      "decision": "do_not_add_duplicate"
+    },
+    {
+      "pool_id": "TFC-INS-010",
+      "title": "Never Underestimate the Power of Consistency",
+      "category": "Saving and Emergency Funds",
+      "inspiration": {"work": "The Compound Effect", "author": "Darren Hardy", "type": "modern_personal_development_book"},
+      "original_lesson": "Small repeatable actions can be more sustainable than waiting for perfect conditions or relying on bursts of motivation.",
+      "duplicate_check": "duplicate",
+      "related_existing_topics": ["small-steps-beat-perfect-plans", "money-goals-need-identity", "future-self-is-real"],
+      "decision": "do_not_add_duplicate"
+    }
+  ],
+  "summary": {
+    "reviewed": 10,
+    "distinct_new_candidates": 2,
+    "duplicates": 6,
+    "overlapping_angles_to_merge": 2,
+    "automatically_added_to_production_topic_library": 0,
+    "reason_not_auto_added": "Candidates require editorial approval and source/claim review before entering the production topic library."
+  }
+}
