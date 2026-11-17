@@ -1,0 +1,61 @@
+name: Kokoro CPU narration smoke test
+
+on:
+  workflow_dispatch:
+    inputs:
+      voice:
+        description: Kokoro English voice
+        required: true
+        type: choice
+        default: af_heart
+        options:
+          - af_heart
+          - am_michael
+          - bf_emma
+          - bm_george
+
+permissions:
+  contents: read
+
+jobs:
+  synthesize-and-render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install FFmpeg and Kokoro phonemizer
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg espeak-ng
+      - name: Install project and Kokoro
+        run: python -m pip install -e ".[dev,tts]"
+      - name: Generate narration with real Kokoro model on CPU
+        run: |
+          python -m finance_campus.cli synthesize-narration \
+            examples/illustrated-savings-short.json artifacts/kokoro \
+            --voice "${{ inputs.voice }}" --device cpu \
+            --transition-seconds 0.25 --draw-fps 24
+      - name: Render illustrated video with synchronized narration and captions
+        run: |
+          python -m finance_campus.cli render-video \
+            artifacts/kokoro/storyboard_with_audio_timing.json artifacts/kokoro/finance-campus-kokoro.mp4 \
+            --format short --fps 30 --draw-fps 24 \
+            --audio artifacts/kokoro/narration.wav \
+            --captions artifacts/kokoro/captions.srt \
+            --transition-seconds 0.25
+      - name: Verify rendered media streams
+        run: |
+          ffprobe -v error -show_entries stream=codec_type,sample_rate,channels,width,height -of json artifacts/kokoro/finance-campus-kokoro.mp4
+          ffmpeg -hide_banner -v error -i artifacts/kokoro/finance-campus-kokoro.mp4 -f null -
+      - name: Upload Kokoro narration and rendered sample
+        uses: actions/upload-artifact@v4
+        with:
+          name: finance-campus-kokoro-smoke-test
+          path: artifacts/kokoro/
+          if-no-files-found: error
