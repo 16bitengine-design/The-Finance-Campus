@@ -1,9 +1,8 @@
-"""Zero-cost, source-checked topic generation from a curated authoritative source map.
+"""Zero-cost topic discovery from official feeds with a curated source fallback.
 
-This first version uses editorially curated topic blueprints rather than an LLM.
-It verifies that source pages are reachable and relevant keywords appear before
-a topic enters the library. Reachability is not proof that every claim is supported;
-new topics remain marked for editorial/source-support review.
+Official RSS/Atom headlines are filtered, linked articles are checked for trusted
+publisher domains and readable text, and candidates remain unapproved pending claim
+verification. Curated topic blueprints fill any remaining weekly target.
 """
 from __future__ import annotations
 
@@ -156,8 +155,6 @@ def refresh_topics(
             known.add(str(discovered_topic["id"]))
 
     for blueprint in TOPIC_BLUEPRINTS:
-        if len(added) >= target:
-            break
         if len(added) >= target:
             break
         topic_id = "TFC-" + hashlib.sha1(blueprint["slug"].encode()).hexdigest()[:10].upper()
