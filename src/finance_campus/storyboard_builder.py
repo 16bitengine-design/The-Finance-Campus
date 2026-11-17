@@ -74,6 +74,17 @@ def _scene_elements(text: str, section: str, title: str, width: int, height: int
     shift_y = (((variation >> 4) % 5) - 2) * height * .009
     accent = ("navy", "green", "gold")[variation % 3]
     person = _element("person", width * .08 + shift_x, height * .19 + shift_y, width * .30, height * .43, accent, .15)
+    character_direction = {
+        "relatable_financial_problem": ("worried", "worried"),
+        "escalating_real_world_stakes": ("overwhelmed", "overwhelmed"),
+        "clear_explanation_of_why_it_matters": ("thinking", "calm"),
+        "hopeful_and_realistic_possibility": ("reaching", "calm"),
+        "practical_action_viewers_can_take": ("determined", "determined"),
+        "empowering_close": ("celebrating", "calm"),
+    }
+    person["pose"], person["expression"] = character_direction.get(
+        section, ("neutral", "calm"),
+    )
     paycheck = _element("money_note", width * .48, height * .20, width * .30, height * .17, "green", .75)
     wallet = _element("wallet", width * .58, height * .49, width * .29, height * .19, "navy", 1.55)
     jar = _element("savings_jar", width * .60, height * .38, width * .27, height * .31, "green", 1.75)
