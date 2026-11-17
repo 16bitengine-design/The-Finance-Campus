@@ -28,3 +28,12 @@ jobs:
         run: python -m pytest -q
       - name: Check formatting and lint
         run: ruff check src tests
+
+      - name: Render illustrated portrait sample
+        run: python -m finance_campus.cli render-video examples/illustrated-savings-short.json /tmp/finance-campus-sample.mp4 --format short --fps 30
+      - name: Upload rendered sample for visual review
+        uses: actions/upload-artifact@v4
+        with:
+          name: finance-campus-illustrated-sample
+          path: /tmp/finance-campus-sample.mp4
+          if-no-files-found: error
