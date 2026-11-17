@@ -39,9 +39,9 @@ Prefer GitHub Actions for tasks that can run reliably inside this repository. Do
 
 See config/cost-policy.md.
 ## Unattended operating requirement
-The intended production mode is fully unattended after one-time setup and platform authorization. No routine human approval is required for topic selection, research, scripting, storyboarding, illustration, Kokoro narration, rendering, quality checks, scheduled publishing, or publication verification.
+The intended production mode is fully unattended after one-time setup and platform authorization. This is a target architecture, not the current operating state. Human visual review remains mandatory, and publishing integrations are not implemented. Do not describe the system as fully unattended or activate publishing until the release gates in IMPLEMENTATION_STATUS.md have passed.
 
-Automation must:
+When the required integrations are implemented and validated, the automation must:
 - Run the complete scheduled pipeline without waiting for a person between stages.
 - Enforce every financial accuracy, source, disclaimer, originality, audio, visual, and media-integrity gate automatically.
 - Publish automatically only when every required gate passes and platform authorization is valid.
@@ -63,3 +63,8 @@ The expected JSON structure is illustrated in `examples/script-package.example.j
 The approval handoff writes atomically and leaves an existing approved file untouched when a candidate fails. Future script generators must submit their output to this handoff and downstream storyboard/audio/rendering stages must read only approved files.
 
 This does not yet implement AI script generation, source retrieval, claim-to-source verification, or robust semantic review. The URL check confirms syntax only; it does not prove source authority or claim support. Do not treat this gate alone as financial fact-checking.
+
+
+## Current release status
+
+The current repository can refresh topic candidates, draft deterministic script candidates, render illustrated videos through the CLI, and run technical quality checks. It cannot yet automatically fact-check every claim, semantically approve visual storytelling, upload to YouTube or TikTok, verify public availability, or recover duplicate-safe publishing after interruption. These are tracked explicitly in [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md). Do not activate the publishing switches in config/settings.yaml until those controls are implemented and tested.
