@@ -36,7 +36,15 @@ jobs:
           TOPIC_TARGET: ${{ github.event.inputs.target || '20' }}
         run: |
           mkdir -p data
-          python -m finance_campus.cli refresh-topics data/topics.json --target "$TOPIC_TARGET" | tee topic-refresh-report.json
+          set +e
+          python -m finance_campus.cli refresh-topics data/topics.json --target "$TOPIC_TARGET" > topic-refresh-report.json 2>&1
+          status=$?
+          set -e
+          cat topic-refresh-report.json
+          if [ "$status" -eq 1 ]; then exit 1; fi
+          if [ "$status" -eq 2 ]; then
+            echo "::warning::The target was not fully met. Any valid researched topics will still be committed."
+          fi
       - name: Commit topic library and research report
         run: |
           git config user.name "github-actions[bot]"
