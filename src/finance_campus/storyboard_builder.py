@@ -102,6 +102,19 @@ def _scene_elements(text: str, section: str, title: str, width: int, height: int
             "x2": round(width*.64), "y2": round(height*.55), "color": "green",
             "start_seconds": 1.3, "draw_seconds": .4,
         }, wallet, coin]
+        wallet["open_animation"] = {
+            "start_seconds": 2.0,
+            "end_seconds": 3.0,
+            "easing": "ease_out",
+        }
+        cash = _element("money_note", width * .64, height * .445, width * .16, height * .09, "green", 2.55)
+        cash["motion"] = {
+            "from_x": round(width * .64), "from_y": round(height * .445),
+            "to_x": round(width * .68), "to_y": round(height * .34),
+            "start_seconds": 2.55, "end_seconds": 3.45,
+            "easing": "ease_out",
+        }
+        elements.append(cash)
     elif section == "escalating_real_world_stakes":
         person["x"], person["y"] = round(width*.06), round(height*.27)
         person["width"], person["height"] = round(width*.24), round(height*.38)
