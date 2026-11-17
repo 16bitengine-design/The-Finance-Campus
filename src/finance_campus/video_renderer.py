@@ -5,6 +5,7 @@ then encodes a playable MP4. Narration generation is upstream; supplied audio an
 """
 from __future__ import annotations
 
+import itertools
 import json
 import math
 import shutil
@@ -70,7 +71,7 @@ def _draw_progressive_strokes(
     if not strokes or progress <= 0:
         return
     lengths = [
-        sum(math.dist(a, b) for a, b in zip(path, path[1:]))
+        sum(math.dist(a, b) for a, b in itertools.pairwise(path))
         for path in strokes
     ]
     total = sum(lengths)
@@ -88,7 +89,7 @@ def _draw_progressive_strokes(
             continue
         travelled = 0.0
         partial = [path[0]]
-        for first, second in zip(path, path[1:]):
+        for first, second in itertools.pairwise(path):
             segment = math.dist(first, second)
             if travelled + segment <= remaining:
                 partial.append(second)
