@@ -45,3 +45,35 @@ def test_storyboard_builder_rejects_unknown_format():
         assert "video_format" in str(exc)
     else:
         raise AssertionError("Unknown video format should be rejected")
+
+
+def test_visual_mapping_records_concept_and_relationship_for_review():
+    script = _script()
+    script["sections"]["relatable_financial_problem"] = (
+        "Prices rise and purchasing power falls: the same money buys less food."
+    )
+    storyboard = build_storyboard(
+        script,
+        video_format="short",
+        disclaimer_config=load_yaml("config/disclaimer.yaml"),
+    )
+    scene = storyboard["scenes"][0]
+    assert scene["visual_objects"] == ["money_note", "coin", "wallet"]
+    assert "purchasing power" in scene["matched_visual_terms"]
+    assert "same money" in scene["visual_intent"]
+
+
+def test_debt_visual_mapping_shows_repayment_obligation():
+    script = _script()
+    script["sections"]["relatable_financial_problem"] = (
+        "A household borrows money through a loan and must make repayments."
+    )
+    storyboard = build_storyboard(
+        script,
+        video_format="short",
+        disclaimer_config=load_yaml("config/disclaimer.yaml"),
+    )
+    scene = storyboard["scenes"][0]
+    assert scene["visual_objects"] == ["wallet", "money_note", "house"]
+    assert "repayment" in scene["matched_visual_terms"]
+    assert any(item["type"] == "arrow" for item in scene["elements"])
