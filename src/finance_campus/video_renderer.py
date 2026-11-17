@@ -347,7 +347,7 @@ def render_video(
         filter_chain = f"fps={fps},format=yuv420p"
         if captions is not None:
             caption_name = str(captions).replace("\\", "\\\\").replace(":", "\\:").replace("'", "\\'").replace(",", "\\,")
-            style = "FontName=DejaVu Sans,FontSize=24,PrimaryColour=&H00FFFFFF,OutlineColour=&H00102B55,BorderStyle=1,Outline=2,Alignment=2,MarginV=90"
+            style = "FontName=DejaVu Sans,FontSize=18,PrimaryColour=&H00FFFFFF,BackColour=&HCC102B55,BorderStyle=3,Outline=0,Shadow=0,Alignment=2,MarginV=105,MarginL=90,MarginR=90"
             filter_chain += f",subtitles='{caption_name}':force_style='{style}'"
         command = [
             executable, "-hide_banner", "-loglevel", "error", "-y",
