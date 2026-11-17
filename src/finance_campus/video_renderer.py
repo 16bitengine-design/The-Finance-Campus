@@ -34,8 +34,8 @@ def _font(size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
     return ImageFont.load_default()
 
 
-def _point(value: float, scale_x: float, scale_y: float) -> tuple[int, int]:
-    return round(value * scale_x), round(value * scale_y)
+def _point(x: float, y: float, scale_x: float, scale_y: float) -> tuple[int, int]:
+    return round(x * scale_x), round(y * scale_y)
 
 
 def _draw_arrow(draw: ImageDraw.ImageDraw, coords: tuple[int, int, int, int], fill: tuple[int, int, int], width: int) -> None:
@@ -63,12 +63,12 @@ def _draw_element(
     if kind == "text":
         if progress < 1:
             return
-        x, y = _point(element["x"], sx, sy)
+        x, y = _point(element["x"], element["y"], sx, sy)
         draw.text((x, y), element["text"], fill=color, font=_font(max(16, round(25 * sy))))
         return
 
     if kind == "circle":
-        cx, cy = _point(element["cx"], sx, sy)
+        cx, cy = _point(element["cx"], element["cy"], sx, sy)
         radius = max(1, round(element["r"] * min(sx, sy) * progress))
         draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), outline=color, width=width)
         return
@@ -152,8 +152,8 @@ def _draw_element(
             draw.rounded_rectangle((x, y, x + w, y + h), radius=max(2, width * 2), outline=color, width=width)
         return
 
-    x1, y1 = _point(element["x1"], sx, sy)
-    x2, y2 = _point(element["x2"], sx, sy)
+    x1, y1 = _point(element["x1"], element["y1"], sx, sy)
+    x2, y2 = _point(element["x2"], element["y2"], sx, sy)
     end = (round(x1 + (x2 - x1) * progress), round(y1 + (y2 - y1) * progress))
     if kind == "arrow" and progress >= 1:
         _draw_arrow(draw, (x1, y1, end[0], end[1]), color, width)
