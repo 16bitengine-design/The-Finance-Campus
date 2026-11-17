@@ -127,3 +127,27 @@ def test_video_renderer_rejects_negative_transition_duration(tmp_path):
 
 def test_coordinate_mapping_uses_distinct_x_and_y_values():
     assert _point(120, 1450, 1.08, 1.08) == (130, 1566)
+
+
+
+@pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="FFmpeg is not installed")
+def test_portrait_render_places_illustration_at_lower_canvas_coordinates(tmp_path):
+    storyboard = {
+        "canvas": {"width": 1000, "height": 1778},
+        "scenes": [{
+            "id": "lower-canvas-coin",
+            "narration": "A coin appears near the bottom of the portrait canvas.",
+            "duration_seconds": 1,
+            "elements": [
+                {"type": "coin", "x": 430, "y": 1450, "width": 120, "height": 120, "color": "gold"},
+            ],
+        }],
+    }
+    render_video(
+        storyboard, tmp_path / "portrait-position.mp4",
+        fps=12, draw_fps=6, keep_frames=True,
+    )
+    frame = Image.open(tmp_path / ".portrait-position_frames" / "frame_000005.png").convert("RGB")
+    lower_region = frame.crop((0, 1400, 1080, 1920))
+    white = Image.new("RGB", lower_region.size, (255, 255, 255))
+    assert ImageChops.difference(lower_region, white).getbbox() is not None
