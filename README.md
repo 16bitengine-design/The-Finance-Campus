@@ -22,7 +22,8 @@ Every video must include a spoken disclaimer, a readable on-screen disclaimer, a
 - Shared brand-token and asset-metadata validation helpers.
 - Canonical disclaimer helpers.
 - JSON topic-library utilities with duplicate protection.
-- Fail-closed video-package quality gate.
+- Fail-closed video-package quality gate, including mandatory script editorial validation.
+- Structured script validator and atomic fail-closed approval handoff.
 - GitHub Actions test/lint workflow.
 
 Rendered-image computer-vision checks, media rendering, Kokoro integration, research automation, and platform publishing are not implemented yet.
@@ -66,7 +67,7 @@ The required story arc is: relatable financial problem → escalating real-world
 
 Urgency must be evidence-based, not manufactured. Never shame people facing hardship, present risks as certainties, exploit fear, or promise guaranteed wealth or investment returns. Every video should leave viewers with a realistic next step and a sense that improvement is possible.
 
-See `config/editorial-policy.md`. The policy describes the target editorial standard; automated script-level enforcement is still to be implemented and tested.
+See `config/editorial-policy.md`. The policy describes the target editorial standard; automated script-level enforcement is implemented as a deterministic first-line gate; deeper semantic and source-support verification remains outstanding.
 
 ## Script editorial quality gate
 
@@ -77,3 +78,15 @@ Structured scripts are checked before production with:
 The JSON package must include all six editorial story sections, a claims list (which may be empty), and explicit labels for hypothetical examples. Every listed factual claim must have at least one valid HTTP(S) source URL. The gate rejects a defined set of guaranteed-wealth promises and shaming phrases. It intentionally permits honest discussion of poverty, fear, debt, inflation, unemployment, and financial insecurity.
 
 This is a deterministic first-line gate. It checks required structure, source metadata, and known prohibited phrases; it does not prove that a source supports a claim or reliably understand every possible manipulative statement. Independent research verification and deeper semantic review remain necessary before publishing.
+
+### Prepare a script for production
+
+A script generator or researcher must first produce a JSON package following `examples/script-package.example.json`. The production handoff validates the complete package and writes it to the approved location only if every deterministic editorial check passes:
+
+`python -m finance_campus.cli prepare-script candidate.json production/approved/script.json`
+
+An invalid candidate exits with an error and does not create or overwrite the approved output. To run the checks without writing an approved copy:
+
+`python -m finance_campus.cli validate-script candidate.json`
+
+The handoff is ready for a future generator to call. It does not itself generate scripts or call an AI service; no script-generation provider has been integrated. All production stages must consume only approved script packages.
