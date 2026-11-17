@@ -11,7 +11,8 @@ from finance_campus.script_pipeline import prepare_script
 from finance_campus.script_quality import validate_script
 from finance_campus.storyboard import render_storyboard, validate_storyboard
 from finance_campus.video_renderer import render_video
-from finance_campus.narration import synthesize_storyboard\nfrom finance_campus.production_pipeline import produce_video_from_script
+from finance_campus.narration import synthesize_storyboard
+from finance_campus.production_pipeline import produce_video_from_script
 
 
 def _read_json(path: str) -> object:
@@ -34,7 +35,24 @@ def main() -> int:
     parser.add_argument("--speed", type=float, default=1.0)
     parser.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
     parser.add_argument("--scene-tail-seconds", type=float, default=0.35)
-    args = parser.parse_args()\n    if args.command == "produce-video":\n        if not args.script_path or not args.output_path:\n            parser.error("produce-video requires an approved script JSON and an output directory")\n        try:\n            script = _read_json(args.script_path)\n            result = produce_video_from_script(\n                script, args.output_path, video_format=args.video_format,\n                voice=args.voice, speed=args.speed, device=args.device,\n                fps=args.fps, draw_fps=args.draw_fps,\n                transition_seconds=args.transition_seconds,\n                scene_tail_seconds=args.scene_tail_seconds,\n            )\n            print(json.dumps(result, indent=2))\n            return 0\n        except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as exc:\n            print(f"FAIL production: {exc}")\n            return 1
+    args = parser.parse_args()
+    if args.command == "produce-video":
+        if not args.script_path or not args.output_path:
+            parser.error("produce-video requires an approved script JSON and an output directory")
+        try:
+            script = _read_json(args.script_path)
+            result = produce_video_from_script(
+                script, args.output_path, video_format=args.video_format,
+                voice=args.voice, speed=args.speed, device=args.device,
+                fps=args.fps, draw_fps=args.draw_fps,
+                transition_seconds=args.transition_seconds,
+                scene_tail_seconds=args.scene_tail_seconds,
+            )
+            print(json.dumps(result, indent=2))
+            return 0
+        except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as exc:
+            print(f"FAIL production: {exc}")
+            return 1
     if args.command == "validate-config":
         checks = {"branding": validate_branding(load_yaml("config/branding.yaml")), "disclaimer": validate_disclaimer(load_yaml("config/disclaimer.yaml"))}
         failed = False
