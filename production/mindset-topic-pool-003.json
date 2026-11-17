@@ -1,0 +1,186 @@
+{
+  "pool_id": "mindset-topic-pool-003",
+  "created_at": "2026-11-17",
+  "status": "screened_blueprints_added_to_code_pending_claim_level_review",
+  "purpose": "Expand the evergreen topic reserve with distinct money-management habits and investor decision behaviours, while keeping the editorial focus on mindset rather than financial headlines.",
+  "comparison_basis": "Screened against the 45 existing topic blueprints and the previous inspiration pools. Similar angles were rejected or narrowed; the accepted list below focuses on distinct behaviours or decision errors.",
+  "auto_production": false,
+  "auto_publishing": false,
+  "candidates": [
+    {
+      "slug": "money-needs-a-regular-check-in",
+      "title": "Your money needs a regular check-in, not an annual resolution",
+      "publisher": "Consumer Financial Protection Bureau",
+      "source": "https://www.consumerfinance.gov/consumer-tools/financial-well-being/about/",
+      "distinct_angle": "A recurring review habit, distinct from making a one-time budget.",
+      "decision": "accepted_for_blueprint_library"
+    },
+    {
+      "slug": "define-enough-before-comparison",
+      "title": "Decide what enough means before comparison moves the goalposts",
+      "publisher": "Consumer Financial Protection Bureau",
+      "source": "https://www.consumerfinance.gov/consumer-tools/financial-well-being/about/",
+      "distinct_angle": "Defines personal sufficiency and values, rather than comparing visible lifestyles.",
+      "decision": "accepted_for_blueprint_library"
+    },
+    {
+      "slug": "annual-expenses-are-not-surprises",
+      "title": "Annual expenses are not surprises if you plan for them",
+      "publisher": "Federal Deposit Insurance Corporation",
+      "source": "https://www.fdic.gov/consumer-resource-center/money-smart-adults",
+      "distinct_angle": "Focuses on predictable but non-monthly costs, distinct from unexpected emergencies.",
+      "decision": "accepted_for_blueprint_library"
+    },
+    {
+      "slug": "records-create-clarity-not-guilt",
+      "title": "Keeping money records creates clarity, not a reason for guilt",
+      "publisher": "Federal Deposit Insurance Corporation",
+      "source": "https://www.fdic.gov/consumer-resource-center/money-smart-adults",
+      "distinct_angle": "Focuses on financial record-keeping as information, not shame or avoidance.",
+      "decision": "accepted_for_blueprint_library"
+    },
+    {
+      "slug": "agree-on-money-before-shared-commitments",
+      "title": "Agree on money expectations before making shared commitments",
+      "publisher": "Consumer Financial Protection Bureau",
+      "source": "https://www.consumerfinance.gov/consumer-tools/educator-tools/youth-financial-education/learn/financial-habits-norms/",
+      "distinct_angle": "Focuses on clear roles and expectations before shared obligations.",
+      "decision": "accepted_for_blueprint_library"
+    },
+    {
+      "slug": "routine-beats-waiting-for-motivation",
+      "title": "A simple money routine works when motivation disappears",
+      "publisher": "Consumer Financial Protection Bureau",
+      "source": "https://www.consumerfinance.gov/consumer-tools/educator-tools/youth-financial-education/learn/financial-habits-norms/",
+      "distinct_angle": "Focuses on routine design rather than general discipline slogans.",
+      "decision": "accepted_for_blueprint_library"
+    },
+    {
+      "slug": "spending-should-reflect-values-not-mood",
+      "title": "Let your values guide spending more than the mood of the moment",
+      "publisher": "Federal Deposit Insurance Corporation",
+      "source": "https://www.fdic.gov/consumer-resource-center/money-smart-adults",
+      "distinct_angle": "Focuses on values-based choices when emotions influence optional spending.",
+      "decision": "accepted_for_blueprint_library"
+    },
+    {
+      "slug": "plans-can-adapt-without-being-abandoned",
+      "title": "Changing your money plan is not the same as giving up",
+      "publisher": "Consumer Financial Protection Bureau",
+      "source": "https://www.consumerfinance.gov/consumer-tools/financial-well-being/about/",
+      "distinct_angle": "Focuses on flexible plan revision, distinct from simply starting small.",
+      "decision": "accepted_for_blueprint_library"
+    },
+    {
+      "slug": "one-hard-month-is-not-your-whole-story",
+      "title": "One difficult month does not define your financial future",
+      "publisher": "Consumer Financial Protection Bureau",
+      "source": "https://www.consumerfinance.gov/consumer-tools/financial-well-being/about/",
+      "distinct_angle": "Focuses on preventing one setback from becoming an identity or permanent conclusion.",
+      "decision": "accepted_for_blueprint_library"
+    },
+    {
+      "slug": "pause-before-emotional-money-decisions",
+      "title": "Pause before making important money decisions in a strong emotion",
+      "publisher": "Consumer Financial Protection Bureau",
+      "source": "https://www.consumerfinance.gov/consumer-tools/educator-tools/youth-financial-education/learn/financial-habits-norms/",
+      "distinct_angle": "A cooling-off decision habit for high-emotion commitments, not only impulse purchases.",
+      "decision": "accepted_for_blueprint_library"
+    },
+    {
+      "slug": "make-progress-visible-not-perfection",
+      "title": "Make your financial progress visible instead of demanding perfection",
+      "publisher": "Consumer Financial Protection Bureau",
+      "source": "https://www.consumerfinance.gov/consumer-tools/financial-well-being/about/",
+      "distinct_angle": "Uses visible progress and realistic baselines rather than perfect streaks.",
+      "decision": "accepted_for_blueprint_library"
+    },
+    {
+      "slug": "familiar-investment-is-not-automatically-safe",
+      "title": "A familiar investment is not automatically a safe investment",
+      "publisher": "U.S. Securities and Exchange Commission / Investor.gov",
+      "source": "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins-72",
+      "distinct_angle": "Explains familiarity bias; recognition is not risk analysis.",
+      "decision": "accepted_for_blueprint_library"
+    },
+    {
+      "slug": "past-investment-performance-is-not-a-promise",
+      "title": "Past investment performance is a record, not a promise",
+      "publisher": "U.S. Securities and Exchange Commission / Investor.gov",
+      "source": "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins-72",
+      "distinct_angle": "Focuses on extrapolating past performance, not generic get-rich-quick promises.",
+      "decision": "accepted_for_blueprint_library"
+    },
+    {
+      "slug": "more-investment-activity-is-not-always-progress",
+      "title": "More investment activity does not automatically mean better decisions",
+      "publisher": "U.S. Securities and Exchange Commission / Investor.gov",
+      "source": "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins-72",
+      "distinct_angle": "Focuses on active-trading behaviour and confusing activity with decision quality.",
+      "decision": "accepted_for_blueprint_library"
+    },
+    {
+      "slug": "panic-is-not-an-investment-strategy",
+      "title": "Panic is not an investment strategy",
+      "publisher": "U.S. Securities and Exchange Commission / Investor.gov",
+      "source": "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins-72",
+      "distinct_angle": "Focuses on crowd panic and emotional reactions to market movements.",
+      "decision": "accepted_for_blueprint_library"
+    },
+    {
+      "slug": "popularity-is-not-due-diligence",
+      "title": "A popular investment still deserves independent research",
+      "publisher": "U.S. Securities and Exchange Commission / Investor.gov",
+      "source": "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins-72",
+      "distinct_angle": "Focuses on momentum and social proof, with an explicit research action.",
+      "decision": "accepted_for_blueprint_library"
+    },
+    {
+      "slug": "many-investments-do-not-guarantee-diversification",
+      "title": "Owning many investments does not automatically mean you are diversified",
+      "publisher": "U.S. Securities and Exchange Commission / Investor.gov",
+      "source": "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins-72",
+      "distinct_angle": "Clarifies naïve diversification without recommending a specific portfolio.",
+      "decision": "accepted_for_blueprint_library"
+    },
+    {
+      "slug": "fees-deserve-attention-before-performance",
+      "title": "Do not overlook fees while focusing on investment performance",
+      "publisher": "U.S. Securities and Exchange Commission / Investor.gov",
+      "source": "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins-72",
+      "distinct_angle": "Focuses on neglecting fees when judging performance.",
+      "decision": "accepted_for_blueprint_library"
+    },
+    {
+      "slug": "write-down-why-before-changing-an-investment-plan",
+      "title": "Write down your reasons before changing an investment plan",
+      "publisher": "U.S. Securities and Exchange Commission / Investor.gov",
+      "source": "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins-72",
+      "distinct_angle": "A decision-journal habit to reduce reactive changes; not a recommendation to hold or sell.",
+      "decision": "accepted_for_blueprint_library"
+    },
+    {
+      "slug": "check-the-source-before-sharing-money-claims",
+      "title": "Check the source before sharing a money claim with others",
+      "publisher": "Consumer Financial Protection Bureau",
+      "source": "https://www.consumerfinance.gov/consumer-tools/educator-tools/youth-financial-education/learn/financial-habits-norms/",
+      "distinct_angle": "Focuses on information verification and responsible sharing, not scam detection alone.",
+      "decision": "accepted_for_blueprint_library"
+    },
+    {
+      "slug": "ask-for-clarity-without-feeling-embarrassed",
+      "title": "Asking for clarity is a strength, not a sign of weakness",
+      "publisher": "Federal Deposit Insurance Corporation",
+      "source": "https://www.fdic.gov/consumer-resource-center/money-smart-adults",
+      "distinct_angle": "Focuses on confidence to ask plain-language questions before agreeing to financial terms.",
+      "decision": "accepted_for_blueprint_library"
+    }
+  ],
+  "evidence_limitations": [
+    "Source-page reachability and keyword matching do not establish that every sentence in a future script is supported.",
+    "The SEC Investor Bulletin describes U.S. investor behaviour research; use it for general behavioural education, not as a statement of Ugandan regulation.",
+    "Investment topics must remain educational and must not become personalized investment recommendations.",
+    "All topics remain candidates until claim-level evidence, geography and script quality are reviewed."
+  ],
+  "next_step": "Run the repository research refresh to create candidate records; manually review claims before production."
+}
