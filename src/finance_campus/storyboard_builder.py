@@ -1,6 +1,7 @@
 """Turn an approved financial script into a visual whiteboard storyboard."""
 from __future__ import annotations
 
+import hashlib
 import re
 from typing import Any
 
@@ -65,7 +66,14 @@ def _element(kind: str, x: float, y: float, width: float, height: float, color: 
 def _scene_elements(text: str, section: str, title: str, width: int, height: int) -> list[dict[str, Any]]:
     """Compose a distinct illustrated story beat for each part of the lesson."""
     (first, second, third), _, _ = _visual_types(text, section)
-    person = _element("person", width * .08, height * .19, width * .30, height * .43, "navy", .15)
+    # A stable per-video signature varies composition and accent choices without
+    # introducing randomness between retries of the same production.
+    signature = hashlib.sha256(f"{title}|{section}|{text}".encode("utf-8")).hexdigest()
+    variation = int(signature[:8], 16)
+    shift_x = ((variation % 7) - 3) * width * .012
+    shift_y = (((variation >> 4) % 5) - 2) * height * .009
+    accent = ("navy", "green", "gold")[variation % 3]
+    person = _element("person", width * .08 + shift_x, height * .19 + shift_y, width * .30, height * .43, accent, .15)
     paycheck = _element("money_note", width * .48, height * .20, width * .30, height * .17, "green", .75)
     wallet = _element("wallet", width * .58, height * .49, width * .29, height * .19, "navy", 1.55)
     jar = _element("savings_jar", width * .60, height * .38, width * .27, height * .31, "green", 1.75)
@@ -149,6 +157,15 @@ def _scene_elements(text: str, section: str, title: str, width: int, height: int
         "text": title, "color": "navy", "start_seconds": 4.45, "draw_seconds": .2,
     })
     elements.sort(key=lambda item: float(item.get("start_seconds", 0)))
+    # Apply the script-specific composition offset to the full illustration group.
+    for item in elements:
+        if "x" in item and item["type"] != "text":
+            item["x"] = round(item["x"] + shift_x)
+        if "y" in item and item["type"] != "text":
+            item["y"] = round(item["y"] + shift_y)
+        if item["type"] in {"coin", "money_note", "savings_jar"}:
+            item["color"] = accent
+    elements.sort(key=lambda item: float(item.get("start_seconds", 0)))
     return elements
 
 
@@ -178,6 +195,7 @@ def build_storyboard(
             "visual_intent": visual_relationship,
             "visual_objects": list(visual_objects),
             "matched_visual_terms": matched_terms,
+            "visual_signature": hashlib.sha256(f"{script['title']}|{section}|{narration}".encode("utf-8")).hexdigest()[:16],
             "elements": _scene_elements(narration, section, title, width, height),
         })
 
