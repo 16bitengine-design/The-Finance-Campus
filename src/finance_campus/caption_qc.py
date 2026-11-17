@@ -68,18 +68,16 @@ def validate_srt(
     if expected_speech_seconds is not None:
         if expected_speech_seconds <= 0:
             raise ValueError("Expected speech duration must be positive")
-        # Word-level Kokoro timestamps intentionally leave small gaps between
-        # spoken words and phrases. Summing cue lengths therefore understates
-        # the duration of the speech timeline. Compare the first-to-last cue
-        # span instead; still report the actual on-screen captioned seconds.
-        timeline_span = max(0.0, last_end - (first_start or 0.0))
-        coverage = timeline_span / expected_speech_seconds
-        if abs(timeline_span - expected_speech_seconds) > max(
-            tolerance_seconds * len(blocks), expected_speech_seconds * 0.02
-        ):
+        # Genuine word-level timestamps leave natural pauses between caption
+        # phrases. Allow a bounded 8% timing gap while still rejecting materially
+        # incomplete caption tracks; never stretch cues to cover silent audio.
+        coverage = covered_seconds / expected_speech_seconds
+        minimum_coverage = 0.92
+        if coverage < minimum_coverage:
             raise ValueError(
-                "Caption timeline does not match synthesized speech duration: "
-                f"timeline={timeline_span:.3f}s, speech={expected_speech_seconds:.3f}s"
+                "Caption coverage is incomplete for synthesized speech: "
+                f"captions={covered_seconds:.3f}s, speech={expected_speech_seconds:.3f}s, "
+                f"coverage={coverage:.1%}, required={minimum_coverage:.0%}"
             )
 
     return {
@@ -88,10 +86,6 @@ def validate_srt(
         "first_caption_seconds": round(first_start or 0.0, 3),
         "last_caption_seconds": round(last_end, 3),
         "caption_covered_seconds": round(covered_seconds, 3),
-        "caption_timeline_span_seconds": (
-            round(last_end - (first_start or 0.0), 3)
-            if expected_speech_seconds is not None else None
-        ),
         "speech_coverage_ratio": round(coverage, 4) if coverage is not None else None,
         "audio_duration_seconds": round(audio_duration_seconds, 3),
     }
