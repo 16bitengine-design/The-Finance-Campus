@@ -36,7 +36,7 @@ def test_both_platform_descriptions_include_required_disclaimer():
     assert required in result["platforms"]["youtube"]["description"]
     assert required in result["platforms"]["tiktok"]["caption"]
     assert result["validation"]["youtube_disclaimer_present"]
-    assert result["validation"]["tiktok_disclaimer_present"] is None
+    assert result["validation"]["tiktok_disclaimer_present"] is True
 
 
 def test_metadata_rejects_missing_title():
@@ -48,4 +48,4 @@ def test_long_form_metadata_targets_youtube_only():
     config = load_yaml("config/disclaimer.yaml")
     result = generate_post_metadata(sample_script(), config, video_format="long")
     assert set(result["platforms"]) == {"youtube"}
-    assert result["validation"]["tiktok_disclaimer_present"]
+    assert result["validation"]["tiktok_disclaimer_present"] is None
