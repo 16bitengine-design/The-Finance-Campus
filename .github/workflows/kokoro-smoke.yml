@@ -6,7 +6,7 @@ on:
       script_path:
         description: Approved structured script JSON in the repository
         required: true
-        default: examples/script-package.example.json
+        default: examples/sample-video-pay-yourself-first.json
         type: string
       voice:
         description: Kokoro English voice
@@ -73,6 +73,10 @@ jobs:
           assert manifest["technical_quality_approved"] is True
           assert manifest["human_visual_review_required"] is True
           stages = manifest["stages"]
+          metadata = json.loads((root / "post-metadata.json").read_text(encoding="utf-8"))
+          assert metadata["validation"]["youtube_disclaimer_present"] is True
+          assert metadata["validation"]["tiktok_disclaimer_present"] is True
+          assert metadata["validation"]["platform_copy_is_distinct"] is True
           required = (
               "script_validated",
               "script_approved",
@@ -92,7 +96,7 @@ jobs:
           assert stages["publicly_accessible"] is False
           for name in ("approved_script.json", "storyboard.json", "narration.wav",
                        "captions.srt", "finance-campus-video.mp4", "description.txt",
-                       "visual-review-contact-sheet.jpg"):
+                       "visual-review-contact-sheet.jpg", "post-metadata.json", "tiktok-caption.txt"):
               path = root / name
               assert path.is_file() and path.stat().st_size > 0, f"Missing artifact: {path}"
           print(json.dumps({"status": manifest["status"], "voice": manifest["voice"],
