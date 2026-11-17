@@ -1,0 +1,29 @@
+brand:
+  name: "The Finance Campus"
+  tagline: "Your classroom for smarter money decisions."
+  slogan: "Learn. Apply. Grow."
+  language: "en"
+  palette:
+    navy: "#102B55"
+    green: "#168C43"
+    gold: "#F5B817"
+    white: "#FFFFFF"
+  visual_identity:
+    primary_style: "premium whiteboard illustration combined with modern motion graphics"
+    illustration: "clean hand-drawn financial diagrams, charts, objects, and recurring presenters"
+    recurring_characters: true
+    consistent_character_design: true
+    typography: "professional, highly readable, consistent"
+    transitions: "smooth and restrained"
+  prohibited_visuals:
+    - "graduation caps"
+    - "graduation gowns"
+    - "diplomas"
+    - "certificates"
+    - "graduation ceremonies"
+    - "university graduation imagery"
+  enforcement:
+    required_for_every_asset: true
+    validate_before_render: true
+    validate_before_publish: true
+    reject_on_failure: true
