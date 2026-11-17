@@ -90,3 +90,14 @@ An invalid candidate exits with an error and does not create or overwrite the ap
 `python -m finance_campus.cli validate-script candidate.json`
 
 The handoff is ready for a future generator to call. It does not itself generate scripts or call an AI service; no script-generation provider has been integrated. All production stages must consume only approved script packages.
+
+
+## Financial calculation library
+
+The first calculation layer is implemented in `src/finance_campus/calculations.py`:
+- Compound growth with configurable periodic compounding.
+- Fixed-payment amortizing loan estimates.
+- Inflation-adjusted purchasing-power estimates.
+- Monthly savings deposits for a target under an explicitly assumed return.
+
+Run its automated checks with `python -m pytest -q`. Inputs are validated and invalid or non-finite values are rejected. Loan estimates use nominal APR divided by 12; savings deposits are assumed to occur at month-end and the annual return is converted to an equivalent monthly rate. These are educational mathematical models, not quotes or forecasts. Actual fees, taxes, variable rates, deposit timing, and product terms may change outcomes. Any assumed return must be clearly labelled hypothetical and never presented as guaranteed.
