@@ -78,9 +78,20 @@ def _synthesize_chunk(pipeline: Any, text: str, voice: str, speed: float) -> np.
     try:
         generated = pipeline(text, voice=voice, speed=speed)
         for item in generated:
-            if not isinstance(item, (tuple, list)) or len(item) < 3:
-                raise RuntimeError("Unexpected Kokoro output; expected (graphemes, phonemes, audio)")
-            pieces.append(_audio_array(item[2]))
+            # Kokoro 0.9.x yields a Result dataclass with .audio, while
+            # older releases/fakes may yield the legacy 3-item tuple.
+            if hasattr(item, "audio"):
+                chunk_audio = item.audio
+            elif isinstance(item, (tuple, list)) and len(item) >= 3:
+                chunk_audio = item[2]
+            else:
+                raise RuntimeError(
+                    "Unexpected Kokoro output; expected a Result with .audio "
+                    "or (graphemes, phonemes, audio)"
+                )
+            if chunk_audio is None:
+                continue
+            pieces.append(_audio_array(chunk_audio))
     except Exception as exc:
         raise RuntimeError(f"Kokoro synthesis failed for narration chunk: {exc}") from exc
     if not pieces:
