@@ -72,6 +72,55 @@ jobs:
               sheet.paste(tile, ((index%3)*290, (index//3)*520))
           sheet.save("/tmp/finance-campus-contact-sheet.jpg", quality=92)
           PY
+      - name: Install Kokoro runtime and speech dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y espeak-ng
+          python -m pip install -e ".[dev,tts]"
+
+      - name: Produce complete Kokoro-narrated review candidate
+        run: |
+          python -m finance_campus.cli produce-video examples/script-package.example.json /tmp/finance-campus-kokoro-candidate --format short --voice af_heart --device cpu
+          test -s /tmp/finance-campus-kokoro-candidate/finance-campus-video.mp4
+          test -s /tmp/finance-campus-kokoro-candidate/visual-review-contact-sheet.jpg
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          manifest = json.loads(Path("/tmp/finance-campus-kokoro-candidate/production-manifest.json").read_text())
+          assert manifest["stages"]["kokoro_narration_generated"] is True
+          assert manifest["stages"]["captions_validated"] is True
+          assert manifest["stages"]["human_visual_review_required"] is True
+          assert manifest["stages"]["human_visual_review_passed"] is False
+          assert manifest["stages"]["uploaded"] is False
+          assert manifest["stages"]["publicly_accessible"] is False
+          assert manifest["status"] == "awaiting_visual_review"
+          print(json.dumps({
+              "status": manifest["status"],
+              "duration_seconds": manifest["media"]["duration_seconds"],
+              "voice": manifest["voice"],
+              "video": manifest["artifacts"]["video"],
+              "contact_sheet": manifest["artifacts"]["visual_review_contact_sheet"],
+              "uploaded": manifest["stages"]["uploaded"],
+              "publicly_accessible": manifest["stages"]["publicly_accessible"],
+          }, indent=2))
+          PY
+
+      - name: Upload complete narrated review candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: finance-campus-kokoro-review-candidate
+          path: |
+            /tmp/finance-campus-kokoro-candidate/finance-campus-video.mp4
+            /tmp/finance-campus-kokoro-candidate/visual-review-contact-sheet.jpg
+            /tmp/finance-campus-kokoro-candidate/production-manifest.json
+            /tmp/finance-campus-kokoro-candidate/storyboard.json
+            /tmp/finance-campus-kokoro-candidate/timed-storyboard.json
+            /tmp/finance-campus-kokoro-candidate/narration.wav
+            /tmp/finance-campus-kokoro-candidate/captions.srt
+            /tmp/finance-campus-kokoro-candidate/youtube-description.txt
+            /tmp/finance-campus-kokoro-candidate/tiktok-caption.txt
+          if-no-files-found: error
+
       - name: Upload rendered sample and visual review frames
         uses: actions/upload-artifact@v4
         with:
