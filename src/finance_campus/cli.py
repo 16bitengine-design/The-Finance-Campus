@@ -6,9 +6,8 @@ import json
 import sys
 from pathlib import Path
 
-from finance_campus.character_rig import render_character_sequence, validate_character_rig
 from finance_campus.blender_backend import render_blender_project
-from finance_campus.timeline_renderer import render_2d_timeline
+from finance_campus.character_rig import render_character_sequence, validate_character_rig
 from finance_campus.config import (
     load_yaml,
     validate_branding,
@@ -23,6 +22,7 @@ from finance_campus.script_generator import generate_from_library, generate_pend
 from finance_campus.script_pipeline import prepare_script
 from finance_campus.script_quality import validate_script
 from finance_campus.storyboard import render_storyboard, validate_storyboard
+from finance_campus.timeline_renderer import render_2d_timeline
 from finance_campus.video_renderer import render_video
 
 
@@ -164,7 +164,11 @@ def main() -> int:
             print(f"FAIL production: {exc}")
             return 1
     if args.command == "validate-config":
-        checks = {"branding": validate_branding(load_yaml("config/branding.yaml")), "disclaimer": validate_disclaimer(load_yaml("config/disclaimer.yaml")), "settings": validate_settings(load_yaml("config/settings.yaml"))}
+        checks = {
+            "branding": validate_branding(load_yaml("config/branding.yaml")),
+            "disclaimer": validate_disclaimer(load_yaml("config/disclaimer.yaml")),
+            "settings": validate_settings(load_yaml("config/settings.yaml")),
+        }
         failed = False
         for name, errors in checks.items():
             if errors:
@@ -231,13 +235,19 @@ def main() -> int:
                 for output in render_storyboard(storyboard, args.output_path):
                     print(f"RENDERED SVG: {output}")
             else:
-                output = render_video(storyboard, args.output_path, video_format=args.video_format, fps=args.fps, draw_fps=args.draw_fps, audio_path=args.audio, captions_path=args.captions, transition_seconds=args.transition_seconds)
+                output = render_video(
+                    storyboard, args.output_path, video_format=args.video_format,
+                    fps=args.fps, draw_fps=args.draw_fps, audio_path=args.audio,
+                    captions_path=args.captions,
+                    transition_seconds=args.transition_seconds,
+                )
                 print(f"RENDERED MP4: {output} ({args.video_format}, {args.fps} fps)")
             return 0
         except (OSError, RuntimeError, ValueError) as exc:
             print(f"FAIL rendering: {exc}")
             return 1
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())
