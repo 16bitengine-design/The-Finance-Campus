@@ -1,3 +1,5 @@
+import math
+import wave
 from pathlib import Path
 
 import pytest
@@ -95,3 +97,26 @@ def test_prop_attachment_is_validated():
     spec = rig()
     spec["props"][0]["hand"] = "middle"
     assert any("hand must be left or right" in error for error in validate_character_rig(spec))
+
+
+
+def test_character_sequence_can_sync_mouth_to_audio(tmp_path: Path):
+    audio = tmp_path / "speech.wav"
+    sample_rate = 24000
+    samples = []
+    for index in range(sample_rate):
+        value = 0 if index < sample_rate // 2 else int(
+            12000 * math.sin(2 * math.pi * 220 * index / sample_rate)
+        )
+        samples.append(value)
+    with wave.open(str(audio), "wb") as wav:
+        wav.setnchannels(1)
+        wav.setsampwidth(2)
+        wav.setframerate(sample_rate)
+        wav.writeframes(
+            b"".join(value.to_bytes(2, "little", signed=True) for value in samples)
+        )
+    spec = rig()
+    output = tmp_path / "synced-frames"
+    assert render_character_sequence(spec, output, fps=10, audio_path=audio) == 10
+    assert len(list(output.glob("character_*.png"))) == 10
