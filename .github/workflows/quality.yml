@@ -29,6 +29,37 @@ jobs:
       - name: Check formatting and lint
         run: ruff check src tests
 
+      - name: Render articulated character rig preview
+        run: |
+          python -m finance_campus.cli validate-character-rig examples/character-rig-parent.example.json
+          python -m finance_campus.cli render-character examples/character-rig-parent.example.json /tmp/finance-campus-character-rig --fps 6
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageDraw
+          frames = sorted(Path("/tmp/finance-campus-character-rig").glob("character_*.png"))
+          if len(frames) < 2:
+              raise SystemExit("Character rig did not produce an animation sequence")
+          picks = [frames[0], frames[len(frames)//2], frames[-1]]
+          sheet = Image.new("RGB", (900, 460), (238, 242, 247))
+          for i, path in enumerate(picks):
+              image = Image.open(path).convert("RGBA")
+              image.thumbnail((280, 410))
+              tile = Image.new("RGBA", (280, 410), (255, 255, 255, 255))
+              tile.alpha_composite(image, ((280-image.width)//2, (410-image.height)//2))
+              sheet.paste(tile.convert("RGB"), (i*300+10, 10))
+              ImageDraw.Draw(sheet).text((i*300+15, 430), path.stem, fill=(16, 43, 85))
+          sheet.save("/tmp/finance-campus-character-rig-contact-sheet.jpg", quality=92)
+          print(f"Rendered {len(frames)} articulated character frames")
+          PY
+      - name: Upload articulated character rig preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: finance-campus-character-rig-preview
+          path: |
+            /tmp/finance-campus-character-rig-contact-sheet.jpg
+            /tmp/finance-campus-character-rig/character_*.png
+          if-no-files-found: error
+
       - name: Render illustrated portrait sample and review frames
         run: |
           ffmpeg -hide_banner -loglevel error -y -f lavfi -i "sine=frequency=440:sample_rate=24000:duration=1" -af volume=12dB -c:a pcm_s16le /tmp/finance-campus-qc-tone.wav
