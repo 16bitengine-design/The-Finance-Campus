@@ -31,7 +31,7 @@ def test_production_pipeline_runs_all_stages_and_fails_closed(monkeypatch, tmp_p
             "captions_path": str(captions),
             "storyboard_path": str(timed),
             "voice": "af_heart",
-            "duration_seconds": 4.0,
+            "duration_seconds": 150.0,
             "scene_count": 7,
         }
 
@@ -60,7 +60,7 @@ def test_production_pipeline_runs_all_stages_and_fails_closed(monkeypatch, tmp_p
         "_probe_video",
         lambda path, video_format: {
             "width": 1080, "height": 1920, "audio_sample_rate": 24000,
-            "audio_channels": 1, "duration_seconds": 4.0,
+            "audio_channels": 1, "duration_seconds": 150.0,
         },
     )
 
