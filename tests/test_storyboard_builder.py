@@ -241,3 +241,22 @@ def test_story_scenes_are_anchored_with_environment_and_contextual_props():
         item["type"] == "rect" and item.get("color") == "gold"
         for item in pressure["elements"]
     )
+
+
+def test_visual_review_fixture_contains_character_led_story_beats():
+    fixture = Path(__file__).parents[1] / "examples" / "illustrated-savings-short.json"
+    storyboard = json.loads(fixture.read_text(encoding="utf-8"))
+    assert len(storyboard["scenes"]) == 3
+    for scene in storyboard["scenes"]:
+        person = next(
+            (item for item in scene["elements"] if item["type"] == "person"),
+            None,
+        )
+        assert person is not None
+        assert person["width"] >= storyboard["canvas"]["width"] * 0.25
+        assert person["height"] >= storyboard["canvas"]["height"] * 0.45
+        assert person.get("interaction_target")
+        assert person.get("interaction_animation", {}).get("end_seconds") > person.get(
+            "interaction_animation", {}
+        ).get("start_seconds")
+
