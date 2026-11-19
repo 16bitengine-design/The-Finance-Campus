@@ -38,9 +38,7 @@ def audio_energy_mouth_track(
     except (OSError, wave.Error) as exc:
         raise LipSyncError(f"cannot read narration WAV: {exc}") from exc
 
-    bytes_per_sample = sample_width
-    sample_count = len(raw) // bytes_per_sample
-    if sample_count == 0:
+    if not raw:
         raise LipSyncError("audio WAV contains no samples")
     if sample_width == 1:
         samples = [((value - 128) / 128.0) for value in raw]
