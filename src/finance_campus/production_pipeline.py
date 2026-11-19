@@ -153,6 +153,14 @@ def produce_video_from_script(
         draw_fps=draw_fps,
         pipeline_factory=pipeline_factory,
     )
+    settings = load_yaml("config/settings.yaml")
+    minimum_duration = float(settings["production"]["minimum_video_duration_seconds"])
+    narration_duration = float(narration["duration_seconds"])
+    if narration_duration < minimum_duration:
+        raise ValueError(
+            f"Production rejected narration of {narration_duration:.3f}s; "
+            f"minimum video duration is {minimum_duration:.3f}s"
+        )
     timed_storyboard = json.loads(Path(narration["storyboard_path"]).read_text(encoding="utf-8"))
     video_path = render_video(
         timed_storyboard,
@@ -167,11 +175,11 @@ def produce_video_from_script(
     media = _probe_video(video_path, video_format=video_format)
     final_video_report = validate_final_video(
         video_path, video_format=video_format, expected_fps=fps,
+        minimum_duration_seconds=minimum_duration,
     )
     visual_review_report = create_visual_review_sheet(
         video_path, destination / "visual-review-contact-sheet.jpg",
     )
-    narration_duration = float(narration["duration_seconds"])
     timed_scenes = timed_storyboard["scenes"]
     expected_speech_seconds = sum(
         float(scene["narration_audio_seconds"]) for scene in timed_scenes
