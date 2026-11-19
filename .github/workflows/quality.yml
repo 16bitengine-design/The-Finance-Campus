@@ -79,4 +79,5 @@ jobs:
           path: |
             /tmp/finance-campus-sample.mp4
             /tmp/finance-campus-contact-sheet.jpg
+            /tmp/finance-campus-built-storyboard.json
           if-no-files-found: error
