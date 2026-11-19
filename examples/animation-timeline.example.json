@@ -1,0 +1,8 @@
+{
+  "canvas": {"width": 1080, "height": 1920},
+  "fps": 30,
+  "scenes": [
+    {"scene": "scenes/01-kitchen.json", "asset_root": "assets/01-kitchen"},
+    {"scene": "scenes/02-budget-table.json", "asset_root": "assets/02-budget-table"}
+  ]
+}
