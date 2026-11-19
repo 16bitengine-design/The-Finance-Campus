@@ -1,6 +1,6 @@
-import pytest
 from pathlib import Path
 
+import pytest
 from PIL import Image
 
 from finance_campus.character_rig import (
