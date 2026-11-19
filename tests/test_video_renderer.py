@@ -1,6 +1,6 @@
 import shutil
-from collections import Counter
 import subprocess
+from collections import Counter
 
 import pytest
 from PIL import Image, ImageChops, ImageDraw
