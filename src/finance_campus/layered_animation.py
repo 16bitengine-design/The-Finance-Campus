@@ -6,9 +6,11 @@ and this module animates those layers with deterministic, testable timing.
 """
 from __future__ import annotations
 
+import itertools
 import math
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 from PIL import Image
 
@@ -105,7 +107,7 @@ def _sample(keyframes: list[dict[str, Any]], at: float) -> dict[str, float]:
         return {field: float(keyframes[0].get(field, {"scale": 1, "opacity": 1, "reveal_progress": 1}.get(field, 0))) for field in fields}
     if at >= keyframes[-1]["at"]:
         return {field: float(keyframes[-1].get(field, {"scale": 1, "opacity": 1, "reveal_progress": 1}.get(field, 0))) for field in fields}
-    for first, second in zip(keyframes, keyframes[1:]):
+    for first, second in itertools.pairwise(keyframes):
         if first["at"] <= at <= second["at"]:
             span = second["at"] - first["at"]
             amount = (at - first["at"]) / span if span else 1
@@ -182,7 +184,7 @@ def render_layered_frame(
         if layer.get("reveal", "none") != "none":
             artwork = _reveal(artwork, state["reveal_progress"], layer["reveal"])
         if state["opacity"] < 1:
-            alpha = artwork.getchannel("A").point(lambda value: round(value * state["opacity"]))
+            alpha = artwork.getchannel("A").point(lambda value, opacity=state["opacity"]: round(value * opacity))
             artwork.putalpha(alpha)
         x, y = round(state["x"]), round(state["y"])
         canvas.alpha_composite(artwork, (x, y))
