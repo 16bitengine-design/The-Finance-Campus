@@ -459,3 +459,16 @@ def test_character_render_uses_substantial_filled_illustration_not_only_wirefram
     # The character should occupy a meaningful silhouette, not a few thin lines.
     non_white = sum(count for rgb, count in counts.items() if rgb != (255, 255, 255))
     assert non_white > 12000
+
+
+def test_filled_rect_reveals_a_soft_tinted_surface_before_its_outline_finishes():
+    from finance_campus.video_renderer import _draw_element
+
+    image = Image.new("RGB", (200, 120), (255, 255, 255))
+    _draw_element(
+        ImageDraw.Draw(image),
+        {"type": "rect", "x": 20, "y": 20, "width": 150, "height": 70,
+         "color": "navy", "fill": True},
+        0.5, image.size,
+    )
+    assert image.getpixel((80, 55)) == (222, 231, 242)
