@@ -425,3 +425,17 @@ def test_topic_specific_illustrations_render_in_raster_and_svg():
         assert validate_storyboard({"scenes": [scene]}) == []
         svg = render_scene_svg(scene)
         assert "<svg" in svg and "<path" in svg or "<svg" in svg and "<rect" in svg
+
+def test_active_marker_hand_stays_compact_at_full_hd_scale():
+    from finance_campus.video_renderer import _draw_pen_hand
+
+    image = Image.new("RGB", (320, 220), (255, 255, 255))
+    _draw_pen_hand(ImageDraw.Draw(image), (150, 60), (22, 140, 67), 1.08)
+    difference = ImageChops.difference(
+        image, Image.new("RGB", image.size, (255, 255, 255)),
+    )
+    bounds = difference.getbbox()
+    assert bounds is not None
+    left, top, right, bottom = bounds
+    assert right - left <= 70
+    assert bottom - top <= 70
