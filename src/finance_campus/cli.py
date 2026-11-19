@@ -6,6 +6,8 @@ import json
 import sys
 from pathlib import Path
 
+from finance_campus.blender_backend import render_blender_project
+from finance_campus.timeline_renderer import render_2d_timeline
 from finance_campus.config import (
     load_yaml,
     validate_branding,
@@ -30,7 +32,7 @@ def _read_json(path: str) -> object:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="The Finance Campus project tools")
-    parser.add_argument("command", choices=("validate-config", "validate-script", "prepare-script", "refresh-topics", "generate-script", "generate-pending-scripts", "validate-storyboard", "render-storyboard", "render-video", "synthesize-narration", "produce-video", "validate-layered-scene", "render-layered-scene"))
+    parser.add_argument("command", choices=("validate-config", "validate-script", "prepare-script", "refresh-topics", "generate-script", "generate-pending-scripts", "validate-storyboard", "render-storyboard", "render-video", "synthesize-narration", "produce-video", "validate-layered-scene", "render-layered-scene", "render-2d-timeline", "render-3d-project"))
     parser.add_argument("script_path", nargs="?", help="Input JSON script or storyboard")
     parser.add_argument("output_path", nargs="?", help="Output path for approved data, SVGs, or MP4")
     parser.add_argument("--format", choices=("short", "long"), default="short", dest="video_format")
@@ -47,6 +49,9 @@ def main() -> int:
     parser.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
     parser.add_argument("--scene-tail-seconds", type=float, default=0.35)
     parser.add_argument("--asset-root", help="Root directory containing transparent PNG scene layers")
+    parser.add_argument("--width", type=int, default=1080)
+    parser.add_argument("--height", type=int, default=1920)
+    parser.add_argument("--blender", default="blender", help="Blender executable path")
     args = parser.parse_args()
     if args.command in {"validate-layered-scene", "render-layered-scene"}:
         if not args.script_path:
@@ -72,6 +77,22 @@ def main() -> int:
             return 0
         except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as exc:
             print(f"FAIL layered scene rendering: {exc}")
+            return 1
+    if args.command in {"render-2d-timeline", "render-3d-project"}:
+        if not args.script_path or not args.output_path:
+            parser.error(f"{args.command} requires an input manifest/project and output MP4")
+        try:
+            if args.command == "render-2d-timeline":
+                result = render_2d_timeline(args.script_path, args.output_path)
+            else:
+                result = render_blender_project(
+                    args.script_path, args.output_path, width=args.width,
+                    height=args.height, fps=args.fps, blender=args.blender,
+                )
+            print(json.dumps(result, indent=2))
+            return 0
+        except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as exc:
+            print(f"FAIL animation rendering: {exc}")
             return 1
     if args.command == "refresh-topics":
         if not args.script_path:
