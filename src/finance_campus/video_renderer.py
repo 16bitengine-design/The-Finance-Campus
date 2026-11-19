@@ -295,7 +295,37 @@ def _draw_element(
             path((cx-w//12, shoulder+width), (cx, shoulder+width*4), (cx+w//12, shoulder+width))
             path((cx, shoulder+width*4), (cx, waist-h//14))
             rect(cx+w//12, shoulder+h//12, cx+w//4, shoulder+h//5)
-            path((cx-head, y+head//3), (cx-head//2, y-width), (cx+head//2, y-width), (cx+head, y+head//3))
+            # Clothing and facial details turn the protagonist into a character,
+            # rather than a generic stick figure. Each detail remains an ordered
+            # pen stroke so it participates in the whiteboard reveal.
+            path((cx-head//2, y+head//2), (cx-head//4, y+head*2//3),
+                 (cx, y+head), (cx+head//4, y+head*2//3),
+                 (cx+head//2, y+head//2))
+            path((cx, y+head), (cx, shoulder+h//5))
+            path((cx-w//4, shoulder+h//12), (cx-w//3, shoulder+h//5),
+                 (cx-w//5, shoulder+h//3))
+            path((cx+w//4, shoulder+h//12), (cx+w//3, shoulder+h//5),
+                 (cx+w//5, shoulder+h//3))
+            path((cx+w//4, waist-h//10), (cx+w//7, waist-h//10),
+                 (cx+w//7, waist-h//3), (cx+w//4, waist-h//3))
+            path((cx-w//6, waist), (cx+w//6, waist))
+            path((cx, waist), (cx-w//12, bottom-h//12))
+            path((cx, waist), (cx+w//12, bottom-h//12))
+            path((x+w//4, bottom-h//12), (x+w//5, bottom),
+                 (cx-w//12, bottom))
+            path((right-w//4, bottom-h//12), (right-w//5, bottom),
+                 (cx+w//12, bottom))
+            path((x+w//5, bottom), (cx-w//12, bottom),
+                 (cx-w//8, bottom-h//30))
+            path((right-w//5, bottom), (cx+w//12, bottom),
+                 (cx+w//8, bottom-h//30))
+            # Brows and hairline make expressions easier to read at phone size.
+            path((cx-head//2, y+head//3), (cx-head//5, y+head//4))
+            path((cx+head//5, y+head//4), (cx+head//2, y+head//3))
+            path((cx-head, y+head//3), (cx-head//2, y-width),
+                 (cx, y+head//8), (cx+head//2, y-width),
+                 (cx+head, y+head//3))
+            path((cx-head//2, y+head//2), (cx-head//3, y+head//3))
             ellipse((cx-head-width, y+head//2, cx-head+width, y+head))
             ellipse((cx+head-width, y+head//2, cx+head+width, y+head))
             elbow_y = y + int(h*.43)
