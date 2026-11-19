@@ -58,3 +58,26 @@ Manim should be used only for scenes that benefit from precise mathematical layo
 
 ## Current limitations
 The Remotion starter is not yet wired to Kokoro, the Python production manifest, Manim or Blender. Canvas is currently a frame-driven demo layer, not the complete multi-character compositor. Rough.js uses authored vector paths and is not an automatic illustration generator. The 2D character rig is not a full IK/face rig. Do not claim production readiness until these integration gaps are closed and the resulting videos pass human review.
+
+## Multi-character scene composition
+
+The Python compositor now supports a scene package with a `scene` object and a
+`character_specs` dictionary keyed by persistent character ID. Each scene
+character entry declares its ID, z-order, and independently sampled keyframes
+(`at`, `x`, `y`, optional `scale`, optional `opacity`). Characters are
+rendered as transparent RGBA layers and composited from lower to higher z-order.
+Track positions and opacity are interpolated deterministically from scene time.
+
+Validate and render frame sequences with:
+
+```bash
+python -m finance_campus.cli validate-multi-character-scene examples/multi-character-scene.example.json
+python -m finance_campus.cli render-multi-character examples/multi-character-scene.example.json build/multi-character-frames
+```
+
+This is an explicit composition layer, not yet a complete interaction system:
+props are still authored within each character rig, and cross-character handoffs,
+collision-aware blocking, camera transforms, and Remotion manifest export remain
+follow-on integration work. The current compositor expects the character rig
+canvas to fit the scene canvas after its declared scale and position; off-canvas
+placements are clipped by the output canvas.
