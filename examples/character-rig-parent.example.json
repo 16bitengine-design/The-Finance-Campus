@@ -16,10 +16,37 @@
     "shoes": "#202936",
     "trim": "#F5B817"
   },
+  "props": [
+    {
+      "type": "bill",
+      "hand": "left",
+      "from": 0,
+      "to": 1.4,
+      "offset": [
+        -28,
+        -3
+      ]
+    },
+    {
+      "type": "phone",
+      "hand": "right",
+      "from": 1.5,
+      "to": 3,
+      "offset": [
+        18,
+        -10
+      ]
+    }
+  ],
   "poses": [
     {
       "at": 0,
       "expression": "worried",
+      "mouth_open": 0.05,
+      "hands": {
+        "left": "hold",
+        "right": "open"
+      },
       "joints": {
         "head": [
           300,
@@ -29,28 +56,52 @@
           300,
           215
         ],
-        "shoulders": [
-          300,
+        "shoulder_left": [
+          265,
           255
         ],
-        "elbows": [
+        "shoulder_right": [
+          335,
+          255
+        ],
+        "elbow_left": [
           220,
           330
         ],
-        "hands": [
+        "elbow_right": [
+          380,
+          330
+        ],
+        "hand_left": [
           190,
           410
         ],
-        "hips": [
-          300,
+        "hand_right": [
+          410,
+          410
+        ],
+        "hip_left": [
+          282,
           440
         ],
-        "knees": [
+        "hip_right": [
+          318,
+          440
+        ],
+        "knee_left": [
           275,
           590
         ],
-        "feet": [
+        "knee_right": [
+          325,
+          590
+        ],
+        "foot_left": [
           260,
+          735
+        ],
+        "foot_right": [
+          340,
           735
         ]
       }
@@ -58,76 +109,134 @@
     {
       "at": 1.5,
       "expression": "focused",
+      "mouth_open": 0.35,
+      "hands": {
+        "left": "closed",
+        "right": "hold"
+      },
       "joints": {
         "head": [
           305,
-          145
+          145.5
         ],
         "neck": [
           305,
-          210
+          210.5
         ],
-        "shoulders": [
-          305,
-          250
+        "shoulder_left": [
+          270,
+          250.5
         ],
-        "elbows": [
-          235,
+        "shoulder_right": [
+          340,
+          250.5
+        ],
+        "elbow_left": [
+          230,
           330
         ],
-        "hands": [
+        "elbow_right": [
+          385,
+          315
+        ],
+        "hand_left": [
+          200,
+          410
+        ],
+        "hand_right": [
+          420,
+          265
+        ],
+        "hip_left": [
+          287,
+          435.5
+        ],
+        "hip_right": [
+          323,
+          435.5
+        ],
+        "knee_left": [
           280,
-          365
+          585.5
         ],
-        "hips": [
-          305,
-          435
+        "knee_right": [
+          330,
+          585.5
         ],
-        "knees": [
-          280,
-          585
-        ],
-        "feet": [
+        "foot_left": [
           265,
-          730
+          730.5
+        ],
+        "foot_right": [
+          345,
+          730.5
         ]
       }
     },
     {
       "at": 3,
       "expression": "hopeful",
+      "mouth_open": 0.75,
+      "hands": {
+        "left": "open",
+        "right": "hold"
+      },
       "joints": {
         "head": [
           310,
-          140
+          141
         ],
         "neck": [
           310,
-          205
+          206
         ],
-        "shoulders": [
-          310,
-          245
+        "shoulder_left": [
+          275,
+          246
         ],
-        "elbows": [
+        "shoulder_right": [
+          345,
+          246
+        ],
+        "elbow_left": [
+          225,
+          310
+        ],
+        "elbow_right": [
           390,
           310
         ],
-        "hands": [
+        "hand_left": [
+          190,
+          250
+        ],
+        "hand_right": [
           435,
           245
         ],
-        "hips": [
-          310,
-          430
+        "hip_left": [
+          292,
+          431
         ],
-        "knees": [
+        "hip_right": [
+          328,
+          431
+        ],
+        "knee_left": [
           285,
-          580
+          581
         ],
-        "feet": [
+        "knee_right": [
+          335,
+          581
+        ],
+        "foot_left": [
           270,
-          725
+          726
+        ],
+        "foot_right": [
+          350,
+          726
         ]
       }
     }
