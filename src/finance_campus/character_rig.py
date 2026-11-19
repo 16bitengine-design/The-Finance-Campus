@@ -363,7 +363,11 @@ def render_character_sequence(
         if not mouth_track:
             raise CharacterRigError("audio produced an empty lip-sync track")
     for index in range(frame_count):
-        mouth_open = mouth_track[min(index, len(mouth_track)-1)] if mouth_track else None
+        mouth_open = (
+            mouth_track[index] if mouth_track and index < len(mouth_track)
+            else 0.0 if mouth_track is not None
+            else None
+        )
         render_character_frame(
             spec, index / fps, mouth_open_override=mouth_open
         ).save(destination / f"character_{index:06d}.png")
