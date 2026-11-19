@@ -12,8 +12,8 @@ from finance_campus.config import (
     validate_disclaimer,
     validate_settings,
 )
-from finance_campus.narration import synthesize_storyboard
 from finance_campus.layered_animation import iter_layered_frames, validate_layered_scene
+from finance_campus.narration import synthesize_storyboard
 from finance_campus.production_pipeline import produce_video_from_script
 from finance_campus.research_pipeline import refresh_topics
 from finance_campus.script_generator import generate_from_library, generate_pending_scripts
