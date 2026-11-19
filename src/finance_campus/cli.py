@@ -94,7 +94,9 @@ def main() -> int:
                 return 0
             if not args.output_path:
                 parser.error("render-character requires an output frame directory")
-            count = render_character_sequence(character, args.output_path, fps=args.fps)
+            count = render_character_sequence(
+                character, args.output_path, fps=args.fps, audio_path=args.audio
+            )
             print(f"RENDERED {count} articulated character frames to {args.output_path}")
             return 0
         except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as exc:
