@@ -14,11 +14,11 @@ def render_blender_project(project_path: str | Path, output_path: str | Path, *,
     """Render an authored Blender animation in background mode to MP4."""
     project = Path(project_path).resolve()
     destination = Path(output_path).resolve()
+    if not project.is_file() or project.suffix.lower() != ".blend":
+        raise BlenderRenderError("project_path must point to an existing .blend file")
     executable = shutil.which(blender)
     if not executable:
         raise BlenderRenderError("Blender was not found. Install Blender or configure its executable; 3D will not fall back to 2D.")
-    if not project.is_file() or project.suffix.lower() != ".blend":
-        raise BlenderRenderError("project_path must point to an existing .blend file")
     if min(width, height, fps) <= 0:
         raise ValueError("width, height and fps must be positive integers")
     destination.parent.mkdir(parents=True, exist_ok=True)
