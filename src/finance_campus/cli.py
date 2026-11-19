@@ -13,6 +13,7 @@ from finance_campus.config import (
     validate_settings,
 )
 from finance_campus.narration import synthesize_storyboard
+from finance_campus.layered_animation import iter_layered_frames, validate_layered_scene
 from finance_campus.production_pipeline import produce_video_from_script
 from finance_campus.research_pipeline import refresh_topics
 from finance_campus.script_generator import generate_from_library, generate_pending_scripts
@@ -29,7 +30,7 @@ def _read_json(path: str) -> object:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="The Finance Campus project tools")
-    parser.add_argument("command", choices=("validate-config", "validate-script", "prepare-script", "refresh-topics", "generate-script", "generate-pending-scripts", "validate-storyboard", "render-storyboard", "render-video", "synthesize-narration", "produce-video"))
+    parser.add_argument("command", choices=("validate-config", "validate-script", "prepare-script", "refresh-topics", "generate-script", "generate-pending-scripts", "validate-storyboard", "render-storyboard", "render-video", "synthesize-narration", "produce-video", "validate-layered-scene", "render-layered-scene"))
     parser.add_argument("script_path", nargs="?", help="Input JSON script or storyboard")
     parser.add_argument("output_path", nargs="?", help="Output path for approved data, SVGs, or MP4")
     parser.add_argument("--format", choices=("short", "long"), default="short", dest="video_format")
@@ -45,7 +46,33 @@ def main() -> int:
     parser.add_argument("--speed", type=float, default=1.0)
     parser.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
     parser.add_argument("--scene-tail-seconds", type=float, default=0.35)
+    parser.add_argument("--asset-root", help="Root directory containing transparent PNG scene layers")
     args = parser.parse_args()
+    if args.command in {"validate-layered-scene", "render-layered-scene"}:
+        if not args.script_path:
+            parser.error(f"{args.command} requires a layered scene JSON")
+        try:
+            scene = _read_json(args.script_path)
+            errors = validate_layered_scene(scene)
+            if errors:
+                for error in errors:
+                    print(f"FAIL layered scene: {error}")
+                return 1
+            if args.command == "validate-layered-scene":
+                print("PASS layered scene: layers, keyframes and reveal directions are valid")
+                return 0
+            if not args.output_path or not args.asset_root:
+                parser.error("render-layered-scene requires output path and --asset-root")
+            output = Path(args.output_path)
+            output.mkdir(parents=True, exist_ok=True)
+            count = 0
+            for count, frame in enumerate(iter_layered_frames(scene, args.asset_root, fps=args.fps), start=1):
+                frame.save(output / f"frame_{count - 1:06d}.png")
+            print(f"RENDERED {count} layered animation frames to {output}")
+            return 0
+        except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as exc:
+            print(f"FAIL layered scene rendering: {exc}")
+            return 1
     if args.command == "refresh-topics":
         if not args.script_path:
             parser.error("refresh-topics requires a topic-library JSON path")
