@@ -1,0 +1,123 @@
+{
+  "canvas": {
+    "width": 1080,
+    "height": 1920
+  },
+  "duration_seconds": 6,
+  "background_rgba": [
+    255,
+    255,
+    255,
+    255
+  ],
+  "layers": [
+    {
+      "id": "kitchen-background",
+      "asset": "kitchen/background.png",
+      "z": 0,
+      "reveal": "left_to_right",
+      "keyframes": [
+        {
+          "at": 0,
+          "x": 0,
+          "y": 0,
+          "reveal_progress": 0
+        },
+        {
+          "at": 1.1,
+          "x": 0,
+          "y": 0,
+          "reveal_progress": 1,
+          "easing": "ease_out"
+        }
+      ]
+    },
+    {
+      "id": "parent-recurring-character",
+      "asset": "characters/parent-a/worried-at-table.png",
+      "z": 10,
+      "reveal": "none",
+      "keyframes": [
+        {
+          "at": 0.8,
+          "x": 105,
+          "y": 540,
+          "scale": 0.96,
+          "opacity": 0
+        },
+        {
+          "at": 1.6,
+          "x": 105,
+          "y": 520,
+          "scale": 1,
+          "opacity": 1,
+          "easing": "ease_out"
+        },
+        {
+          "at": 5.8,
+          "x": 105,
+          "y": 520,
+          "scale": 1,
+          "opacity": 1
+        }
+      ]
+    },
+    {
+      "id": "electricity-bill",
+      "asset": "props/electricity-bill.png",
+      "z": 20,
+      "reveal": "top_to_bottom",
+      "keyframes": [
+        {
+          "at": 1.2,
+          "x": 760,
+          "y": 850,
+          "rotation": -8,
+          "reveal_progress": 0
+        },
+        {
+          "at": 2,
+          "x": 650,
+          "y": 850,
+          "rotation": 0,
+          "reveal_progress": 1,
+          "easing": "ease_out"
+        },
+        {
+          "at": 5.8,
+          "x": 650,
+          "y": 850,
+          "rotation": 0,
+          "reveal_progress": 1
+        }
+      ]
+    },
+    {
+      "id": "savings-envelope",
+      "asset": "props/savings-envelope.png",
+      "z": 15,
+      "reveal": "left_to_right",
+      "keyframes": [
+        {
+          "at": 2,
+          "x": 700,
+          "y": 1190,
+          "reveal_progress": 0
+        },
+        {
+          "at": 2.8,
+          "x": 700,
+          "y": 1190,
+          "reveal_progress": 1,
+          "easing": "ease_out"
+        },
+        {
+          "at": 5.8,
+          "x": 700,
+          "y": 1190,
+          "reveal_progress": 1
+        }
+      ]
+    }
+  ]
+}
