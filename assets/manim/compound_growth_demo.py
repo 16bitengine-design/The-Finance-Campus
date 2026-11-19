@@ -9,6 +9,7 @@ from decimal import Decimal
 
 from manim import (
     DOWN,
+    LEFT,
     UP,
     Axes,
     Create,
@@ -49,7 +50,7 @@ class CompoundGrowthDemo(Scene):
             tips=False,
         ).shift(DOWN * 0.55)
         x_label = Text("Years", font_size=24).next_to(axes, DOWN)
-        y_label = Text("Value ($)", font_size=24).rotate(1.5708).next_to(axes, DOWN)
+        y_label = Text("Value ($)", font_size=24).rotate(1.5708).next_to(axes, LEFT)
         self.play(Create(axes), FadeIn(x_label), FadeIn(y_label))
 
         curve = axes.plot(
