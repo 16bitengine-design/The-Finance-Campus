@@ -204,7 +204,7 @@ def _draw_prop(draw: ImageDraw.ImageDraw, prop: dict[str, Any],
         draw.ellipse((x-5, y-5, x+5, y+5), outline="#9B6A08", width=2)
 
 
-def render_character_frame(spec: dict[str, Any], at_seconds: float) -> Image.Image:
+def render_character_frame(\n    spec: dict[str, Any], at_seconds: float, *, mouth_open_override: float | None = None\n) -> Image.Image:
     errors = validate_character_rig(spec)
     if errors:
         raise CharacterRigError("; ".join(errors))
