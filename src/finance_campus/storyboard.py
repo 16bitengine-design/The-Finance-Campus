@@ -13,7 +13,7 @@ from typing import Any
 WIDTH = 1000
 HEIGHT = 562
 ALLOWED_TYPES = {"circle", "rect", "line", "arrow", "text", "person", "bank", "wallet", "house", "coin", "money_note", "savings_jar", "phone", "shield", "calendar", "chart", "basket"}
-ILLUSTRATION_TYPES = {"person", "bank", "wallet", "house", "coin", "money_note", "savings_jar"}
+ILLUSTRATION_TYPES = {"person", "bank", "wallet", "house", "coin", "money_note", "savings_jar", "phone", "shield", "calendar", "chart", "basket"}
 ALLOWED_COLORS = {"navy": "#102B55", "green": "#168C43", "gold": "#F5B817", "white": "#FFFFFF", "black": "#17202A"}
 
 
