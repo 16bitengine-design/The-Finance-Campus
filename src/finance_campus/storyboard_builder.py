@@ -175,6 +175,26 @@ def _scene_elements(text: str, section: str, title: str, width: int, height: int
             _element("coin", width*.75, height*.21, width*.08, height*.05, "gold", 1.7),
             _element("coin", width*.70, height*.30, width*.08, height*.05, "gold", 2.35)]
 
+    # Add a topic-specific visual metaphor so different lessons do not reuse
+    # the same wallet/coin composition.
+    topic = text.casefold()
+    motif = None
+    if any(term in topic for term in ("scam", "fraud", "phishing", "fake investment")):
+        motif = "phone"
+    elif any(term in topic for term in ("insurance", "insured", "coverage", "premium", "claim")):
+        motif = "shield"
+    elif any(term in topic for term in ("inflation", "prices rise", "price increases", "purchasing power")):
+        motif = "basket"
+    elif any(term in topic for term in ("debt", "loan", "repayment", "borrow", "credit")):
+        motif = "calendar"
+    elif any(term in topic for term in ("invest", "stocks", "bonds", "etf", "portfolio", "compound")):
+        motif = "chart"
+    if motif:
+        elements.append(_element(
+            motif, width * .66, height * .075, width * .25, height * .16,
+            "gold" if motif in {"phone", "basket"} else "green", 1.05,
+        ))
+
     # Establish a readable physical setting instead of floating symbols.
     # The shared floor/table geometry anchors props and gives the character a
     # believable place to interact with the financial objects.
