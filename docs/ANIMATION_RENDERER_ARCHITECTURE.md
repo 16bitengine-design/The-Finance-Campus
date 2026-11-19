@@ -1,59 +1,60 @@
-# Finance Campus 2D/3D Animation Renderer
+# Finance Campus hybrid animation renderer
 
 ## Goal
-A repository-owned renderer for authored 2D and 3D scenes. This is not a text-animation template. Scenes use directed artwork, stable character and prop assets, timed actions and visible consequences.
+Build a coordinated animation studio for authored financial storytelling—not a text-animation template. Visual scenes must communicate the narration through directed artwork, stable characters, timed actions, object interactions and visible consequences.
 
-## Architecture
-- Timeline contract: ordered scenes, shared canvas and frame rate.
-- 2D backend: layered transparent artwork, z-order, keyframes, motion, opacity, rotation and whiteboard-style reveals. Frames stream to FFmpeg instead of accumulating in RAM.
-- 3D backend: headless Blender rendering of authored .blend scenes, with explicit output dimensions, frame rate and render engine. No silent 2D fallback.
-- Audio and finishing: Kokoro remains narration provider; FFmpeg remains final assembly tool; existing captions, disclaimer and final-video quality gates remain mandatory.
-- Release: human visual approval is mandatory; publishing remains disabled.
+## Renderer responsibilities
+- **Remotion:** final frame-accurate composition, scene timing, transitions, typography, captions, narration/music placement and delivery formats.
+- **Rough.js:** hand-drawn treatment for selected SVG illustrations, charts, arrows and explanatory diagrams.
+- **SVG stroke-dash:** progressive whiteboard line reveals with deterministic frame timing.
+- **Canvas 2D:** deterministic moving objects, particles, compositing and camera-like transforms in frame-indexed scenes.
+- **Manim:** specialist mathematical and financial explainers—compound interest, amortization, inflation, percentages and data-driven diagrams.
+- **Blender:** genuine 3D environments, objects, lighting, camera movement and spatial interactions.
+- **Python + FFmpeg:** orchestration, asset validation, Kokoro narration, audio finishing, caption checks, final encoding and QC.
 
-## 2D timeline
-The example manifest uses relative paths. Each scene points to a layered-scene JSON and a directory containing its authored transparent PNG layers. All scene canvases must match.
+These tools are not interchangeable. Remotion coordinates the final edit; specialist backends produce the visual material best suited to each scene. All animation must be deterministic by frame number so renders can be resumed and reproduced.
 
-Render command:
-python -m finance_campus.cli render-2d-timeline examples/animation-timeline.example.json build/preview.mp4
+## Remotion starter
+The initial Remotion project is in `renderer/remotion`. It includes a frame-driven demo composition, Rough.js SVG illustration, normalized SVG stroke reveal and a Canvas 2D motion layer.
 
-The example manifest is a contract only; referenced production artwork must exist. Missing assets fail closed.
-
-## 3D workflow
-Create and art-direct a Blender project with real models, materials, lights, cameras and keyframed actions. Render it headlessly:
-python -m finance_campus.cli render-3d-project assets/3d/household-scene.blend build/household-scene.mp4 --width 1080 --height 1920 --fps 30
-
-Install Blender on the worker and ensure its executable is on PATH. Blender is not installed by the Python package and is not assumed available on GitHub-hosted runners. Use a self-hosted worker with Blender installed for reproducible cloud renders. CPU rendering is supported but may be slow.
-
-## Quality and safety
-Keep the legacy renderer until the new renderer is tested end-to-end and visually approved. Do not add paid assets, APIs or compute without explicit approval. No generic primitive-character fallback when artwork is missing. The production minimum remains 150 seconds; final production QC enforces it even though isolated previews can be shorter. A technical render pass does not replace full-video visual inspection. YouTube and TikTok remain disabled.
-
-
-## Reusable 2D character rigs
-
-The bilateral 2D character rig module is available at
-`src/finance_campus/character_rig.py`. A character has a persistent identity,
-skin/hair/clothing palette, accessory and a time-ordered joint pose track.
-Left and right shoulders, elbows, hands, hips, knees and feet are independently
-controlled and interpolated. Pose tracks can select open, closed, pointing or
-holding hand poses. Props (phone, bill, envelope and coin) can be attached to a
-specified hand over a time range. A `mouth_open` value animates mouth aperture
-between closed and open states. When a narration WAV is supplied to
-`render-character --audio`, an audio-envelope analyzer measures real PCM energy
-per video frame and drives mouth aperture in sync with the speech signal. This
-is amplitude-driven synchronization, not phoneme/viseme recognition. Frames
-render as transparent RGBA layers.
-
-Validate and render the included sample:
+From the repository root:
 
 ```bash
-python -m finance_campus.cli validate-character-rig examples/character-rig-parent.example.json
-python -m finance_campus.cli render-character examples/character-rig-parent.example.json build/character-frames --fps 30 --audio build/narration.wav
+cd renderer/remotion
+npm install
+npm run typecheck
+npm run compositions
+npm run studio
+npm run render:demo
 ```
 
-The output is an independent transparent character layer sequence. It can be
-composited into a directed scene and animated separately from the background.
-This is a lightweight 2D puppet rig, not a full professional skeletal/IK system.
-Separate finger articulation, phoneme-driven lip-sync, multi-character
-interaction, automated prop handoff and rig authoring tools remain future
-milestones. The current 2D timeline and standalone Blender backend are not yet
-a unified hybrid timeline.
+Node.js 20+ is required. The included demo is an integration smoke-test, not a production-quality sample or approved final visual. Its basic illustration must not be mistaken for the final art direction.
+
+## Manim
+Install the optional Python extra in a worker with the required system dependencies:
+
+```bash
+python -m pip install -e ".[manim]"
+```
+
+Manim should be used only for scenes that benefit from precise mathematical layout and animation. It should export scene assets/video segments for the shared timeline, not take over the whole production.
+
+## Existing Python renderers
+- The layered 2D timeline streams authored transparent PNG layers to FFmpeg.
+- The character rig provides bilateral pose animation, props and audio-envelope mouth movement.
+- The Blender backend renders authored `.blend` projects.
+- These backends are not yet connected to Remotion through one production timeline. The next integration step is a validated scene interchange format with explicit dimensions, frame rate, duration, asset paths, z-order, timing and audio/caption references.
+
+## Production gates
+- Final videos must be at least **150 seconds**.
+- Vertical: 1080×1920; horizontal: 1920×1080; final delivery at 30 FPS.
+- Kokoro remains the required narration engine.
+- Spoken, readable on-screen and description disclaimers remain mandatory.
+- Keep source references, financial calculations and geographic scope attached to scripts.
+- Human visual approval remains mandatory. A passing renderer test does not prove visual quality.
+- The existing production pipeline remains active until the hybrid renderer passes end-to-end validation and is visually approved.
+- No paid assets, APIs or compute without explicit approval.
+- YouTube and TikTok publishing remain disabled.
+
+## Current limitations
+The Remotion starter is not yet wired to Kokoro, the Python production manifest, Manim or Blender. Canvas is currently a frame-driven demo layer, not the complete multi-character compositor. Rough.js uses authored vector paths and is not an automatic illustration generator. The 2D character rig is not a full IK/face rig. Do not claim production readiness until these integration gaps are closed and the resulting videos pass human review.
