@@ -37,14 +37,17 @@ Left and right shoulders, elbows, hands, hips, knees and feet are independently
 controlled and interpolated. Pose tracks can select open, closed, pointing or
 holding hand poses. Props (phone, bill, envelope and coin) can be attached to a
 specified hand over a time range. A `mouth_open` value animates mouth aperture
-between closed and open states; phoneme/viseme-driven narration lip-sync is not
-implemented yet. Frames render as transparent RGBA layers.
+between closed and open states. When a narration WAV is supplied to
+`render-character --audio`, an audio-envelope analyzer measures real PCM energy
+per video frame and drives mouth aperture in sync with the speech signal. This
+is amplitude-driven synchronization, not phoneme/viseme recognition. Frames
+render as transparent RGBA layers.
 
 Validate and render the included sample:
 
 ```bash
 python -m finance_campus.cli validate-character-rig examples/character-rig-parent.example.json
-python -m finance_campus.cli render-character examples/character-rig-parent.example.json build/character-frames --fps 30
+python -m finance_campus.cli render-character examples/character-rig-parent.example.json build/character-frames --fps 30 --audio build/narration.wav
 ```
 
 The output is an independent transparent character layer sequence. It can be
