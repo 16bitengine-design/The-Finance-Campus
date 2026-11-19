@@ -30,12 +30,15 @@ Keep the legacy renderer until the new renderer is tested end-to-end and visuall
 
 ## Reusable 2D character rigs
 
-The first articulated character rig module is available at
+The bilateral 2D character rig module is available at
 `src/finance_campus/character_rig.py`. A character has a persistent identity,
 skin/hair/clothing palette, accessory and a time-ordered joint pose track.
-The renderer interpolates joints between poses and draws the character to
-transparent RGBA frames. Expressions include worried, focused, relieved,
-hopeful, joyful, surprised and others.
+Left and right shoulders, elbows, hands, hips, knees and feet are independently
+controlled and interpolated. Pose tracks can select open, closed, pointing or
+holding hand poses. Props (phone, bill, envelope and coin) can be attached to a
+specified hand over a time range. A `mouth_open` value animates mouth aperture
+between closed and open states; phoneme/viseme-driven narration lip-sync is not
+implemented yet. Frames render as transparent RGBA layers.
 
 Validate and render the included sample:
 
@@ -45,7 +48,9 @@ python -m finance_campus.cli render-character examples/character-rig-parent.exam
 ```
 
 The output is an independent transparent character layer sequence. It can be
-composited into a directed scene and animated separately from the background
-and financial props. This is an initial puppet-rig system: advanced hand
-articulation, separate finger controls, lip-sync, multi-character interaction,
-inverse kinematics and rig authoring tools remain future milestones.
+composited into a directed scene and animated separately from the background.
+This is a lightweight 2D puppet rig, not a full professional skeletal/IK system.
+Separate finger articulation, phoneme-driven lip-sync, multi-character
+interaction, automated prop handoff and rig authoring tools remain future
+milestones. The current 2D timeline and standalone Blender backend are not yet
+a unified hybrid timeline.
