@@ -439,3 +439,23 @@ def test_active_marker_hand_stays_compact_at_full_hd_scale():
     left, top, right, bottom = bounds
     assert right - left <= 70
     assert bottom - top <= 70
+
+
+def test_character_render_uses_substantial_filled_illustration_not_only_wireframe():
+    from collections import Counter
+    from finance_campus.video_renderer import _draw_element
+
+    image = Image.new("RGB", (360, 520), (255, 255, 255))
+    character = {
+        "type": "person", "x": 75, "y": 35, "width": 210, "height": 440,
+        "color": "navy", "pose": "worried", "expression": "worried",
+    }
+    _draw_element(ImageDraw.Draw(image), character, 1.0, image.size)
+    counts = Counter(image.getdata())
+    # Skin, hair, clothing and trousers should create real filled colour areas.
+    assert counts[(193, 132, 94)] + counts[(224, 174, 137)] > 150
+    assert counts[(22, 74, 137)] > 500
+    assert counts[(48, 57, 72)] > 300
+    # The character should occupy a meaningful silhouette, not a few thin lines.
+    non_white = sum(count for rgb, count in counts.items() if rgb != (255, 255, 255))
+    assert non_white > 12000
