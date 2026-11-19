@@ -40,7 +40,7 @@ def test_multi_character_scene_validates_and_composites_in_z_order():
     assert frame.mode == "RGBA"
     assert frame.size == (240, 240)
     # Both figures occupy the same area; the higher-z figure is composited last.
-    assert frame.getbbox() is not None
+    assert frame.getpixel((120, 90))[:3] == (245, 184, 23)
 
 
 def test_character_tracks_interpolate_position_and_opacity():
