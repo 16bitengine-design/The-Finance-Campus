@@ -122,6 +122,12 @@ def _sample(keyframes: list[dict[str, Any]], at: float) -> dict[str, float]:
 
 def _reveal(image: Image.Image, progress: float, direction: str) -> Image.Image:
     width, height = image.size
+    if progress <= 0:
+        hidden = image.copy()
+        hidden.putalpha(0)
+        return hidden
+    if progress >= 1:
+        return image
     mask = Image.new("L", (width, height), 0)
     draw_width = round(width * progress)
     draw_height = round(height * progress)
