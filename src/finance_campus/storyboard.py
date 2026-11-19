@@ -199,8 +199,16 @@ def _render_element(element: dict[str, Any], index: int) -> str:
     delay = index * 0.35
     animation = f'style="stroke-dasharray:1200;stroke-dashoffset:1200;animation:draw 1.1s ease-out {delay:.2f}s forwards"'
     if kind == "circle":
+        if element.get("fill"):
+            tint = {"navy": "#DEE7F2", "green": "#DEEFE3", "gold": "#FFF6D3",
+                    "white": "#FFFFFF", "black": "#E6E8EB"}[element.get("color", "navy")]
+            return f'<circle cx="{_number(element["cx"])}" cy="{_number(element["cy"])}" r="{_number(element["r"])}" stroke="{color}" stroke-width="4" fill="{tint}" {animation}/>'
         return f'<circle cx="{_number(element["cx"])}" cy="{_number(element["cy"])}" r="{_number(element["r"])}" {common} {animation}/>'
     if kind == "rect":
+        if element.get("fill"):
+            tint = {"navy": "#DEE7F2", "green": "#DEEFE3", "gold": "#FFF6D3",
+                    "white": "#FFFFFF", "black": "#E6E8EB"}[element.get("color", "navy")]
+            return f'<rect x="{_number(element["x"])}" y="{_number(element["y"])}" width="{_number(element["width"])}" height="{_number(element["height"])}" rx="8" stroke="{color}" stroke-width="4" fill="{tint}" {animation}/>'
         return f'<rect x="{_number(element["x"])}" y="{_number(element["y"])}" width="{_number(element["width"])}" height="{_number(element["height"])}" rx="8" {common} {animation}/>'
     if kind in {"line", "arrow"}:
         marker = ' marker-end="url(#arrowhead)"' if kind == "arrow" else ""
@@ -283,7 +291,7 @@ def render_scene_svg(scene: dict[str, Any], canvas: dict[str, Any] | None = None
   <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8" fill="#102B55"/></marker>
   <style>@keyframes draw {{ to {{ stroke-dashoffset: 0; }} }} @keyframes appear {{ to {{ opacity: 1; }} }}</style>
 </defs>
-<rect width="{WIDTH}" height="{HEIGHT}" fill="#FFFFFF"/>
+<rect width="{_number(canvas_width)}" height="{_number(canvas_height)}" fill="#FFFFFF"/>
 {elements}
 </svg>
 """
