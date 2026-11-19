@@ -175,6 +175,49 @@ def _scene_elements(text: str, section: str, title: str, width: int, height: int
             _element("coin", width*.75, height*.21, width*.08, height*.05, "gold", 1.7),
             _element("coin", width*.70, height*.30, width*.08, height*.05, "gold", 2.35)]
 
+    # Establish a readable physical setting instead of floating symbols.
+    # The shared floor/table geometry anchors props and gives the character a
+    # believable place to interact with the financial objects.
+    environment = [
+        {"type": "line", "x1": round(width*.045), "y1": round(height*.735),
+         "x2": round(width*.955), "y2": round(height*.735), "color": "navy",
+         "start_seconds": .05, "draw_seconds": .55},
+        {"type": "line", "x1": round(width*.42), "y1": round(height*.69),
+         "x2": round(width*.91), "y2": round(height*.69), "color": "navy",
+         "start_seconds": .12, "draw_seconds": .35},
+        {"type": "line", "x1": round(width*.46), "y1": round(height*.69),
+         "x2": round(width*.46), "y2": round(height*.735), "color": "navy",
+         "start_seconds": .42, "draw_seconds": .25},
+        {"type": "line", "x1": round(width*.87), "y1": round(height*.69),
+         "x2": round(width*.87), "y2": round(height*.735), "color": "navy",
+         "start_seconds": .52, "draw_seconds": .25},
+    ]
+    if section == "escalating_real_world_stakes":
+        # A household bill is shown as a document with a due marker, not
+        # another unexplained floating rectangle.
+        environment.extend([
+            {"type": "rect", "x": round(width*.66), "y": round(height*.40),
+             "width": round(width*.12), "height": round(height*.12), "color": "gold",
+             "start_seconds": 1.35, "draw_seconds": .4},
+            {"type": "line", "x1": round(width*.68), "y1": round(height*.445),
+             "x2": round(width*.755), "y2": round(height*.445), "color": "navy",
+             "start_seconds": 1.8, "draw_seconds": .2},
+            {"type": "line", "x1": round(width*.68), "y1": round(height*.475),
+             "x2": round(width*.735), "y2": round(height*.475), "color": "navy",
+             "start_seconds": 2.0, "draw_seconds": .2},
+        ])
+    elif section in {"hopeful_and_realistic_possibility", "practical_action_viewers_can_take", "empowering_close"}:
+        # A small, grounded savings station makes the goal feel tangible.
+        environment.extend([
+            {"type": "line", "x1": round(width*.58), "y1": round(height*.72),
+             "x2": round(width*.84), "y2": round(height*.72), "color": "green",
+             "start_seconds": 1.0, "draw_seconds": .3},
+            {"type": "circle", "cx": round(width*.90), "cy": round(height*.66),
+             "r": round(width*.025), "color": "gold",
+             "start_seconds": 1.25, "draw_seconds": .35},
+        ])
+    elements.extend(environment)
+
     # Give the protagonist a specific physical relationship with the key prop.
     # Targets are expressed in storyboard canvas coordinates and are consumed by
     # the renderer when drawing the character's arm and hand.
