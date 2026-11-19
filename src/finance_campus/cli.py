@@ -6,6 +6,7 @@ import json
 import sys
 from pathlib import Path
 
+from finance_campus.character_rig import render_character_sequence, validate_character_rig
 from finance_campus.blender_backend import render_blender_project
 from finance_campus.timeline_renderer import render_2d_timeline
 from finance_campus.config import (
@@ -32,7 +33,7 @@ def _read_json(path: str) -> object:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="The Finance Campus project tools")
-    parser.add_argument("command", choices=("validate-config", "validate-script", "prepare-script", "refresh-topics", "generate-script", "generate-pending-scripts", "validate-storyboard", "render-storyboard", "render-video", "synthesize-narration", "produce-video", "validate-layered-scene", "render-layered-scene", "render-2d-timeline", "render-3d-project"))
+    parser.add_argument("command", choices=("validate-config", "validate-script", "prepare-script", "refresh-topics", "generate-script", "generate-pending-scripts", "validate-storyboard", "render-storyboard", "render-video", "synthesize-narration", "produce-video", "validate-layered-scene", "render-layered-scene", "render-2d-timeline", "render-3d-project", "validate-character-rig", "render-character"))
     parser.add_argument("script_path", nargs="?", help="Input JSON script or storyboard")
     parser.add_argument("output_path", nargs="?", help="Output path for approved data, SVGs, or MP4")
     parser.add_argument("--format", choices=("short", "long"), default="short", dest="video_format")
@@ -77,6 +78,27 @@ def main() -> int:
             return 0
         except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as exc:
             print(f"FAIL layered scene rendering: {exc}")
+            return 1
+    if args.command in {"validate-character-rig", "render-character"}:
+        if not args.script_path:
+            parser.error(f"{args.command} requires a character rig JSON")
+        try:
+            character = _read_json(args.script_path)
+            errors = validate_character_rig(character)
+            if errors:
+                for error in errors:
+                    print(f"FAIL character rig: {error}")
+                return 1
+            if args.command == "validate-character-rig":
+                print("PASS character rig: identity, joints and pose timeline are valid")
+                return 0
+            if not args.output_path:
+                parser.error("render-character requires an output frame directory")
+            count = render_character_sequence(character, args.output_path, fps=args.fps)
+            print(f"RENDERED {count} articulated character frames to {args.output_path}")
+            return 0
+        except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as exc:
+            print(f"FAIL character rig: {exc}")
             return 1
     if args.command in {"render-2d-timeline", "render-3d-project"}:
         if not args.script_path or not args.output_path:
