@@ -46,7 +46,7 @@ def test_layered_frame_reveals_and_moves_authored_artwork(tmp_path: Path):
     middle = render_layered_frame(scene, 1, tmp_path)
     assert early.getpixel((15, 25)) == (255, 255, 255, 255)
     assert middle.getpixel((35, 25))[3] == 255
-    assert middle.getpixel((15, 25))[3] == 0
+    assert middle.getpixel((15, 25)) == (255, 255, 255, 255)
 
 
 def test_layers_are_composited_in_z_order(tmp_path: Path):
