@@ -37,8 +37,17 @@ jobs:
           from PIL import Image, ImageDraw
           from finance_campus.video_renderer import render_video
           from finance_campus.final_video_qc import validate_final_video
+          from finance_campus.storyboard_builder import build_storyboard
+          from finance_campus.config import load_yaml
           import json
-          storyboard = json.loads(Path("examples/illustrated-savings-short.json").read_text(encoding="utf-8"))
+          script = json.loads(Path("examples/script-package.example.json").read_text(encoding="utf-8"))
+          storyboard = build_storyboard(
+              script, video_format="short",
+              disclaimer_config=load_yaml("config/disclaimer.yaml"),
+          )
+          Path("/tmp/finance-campus-built-storyboard.json").write_text(
+              json.dumps(storyboard, indent=2), encoding="utf-8"
+          )
           output = Path("/tmp/finance-campus-sample.mp4")
           render_video(
               storyboard, output, video_format="short", fps=30, draw_fps=24,
