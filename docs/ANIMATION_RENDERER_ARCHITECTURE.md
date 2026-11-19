@@ -26,3 +26,26 @@ Install Blender on the worker and ensure its executable is on PATH. Blender is n
 
 ## Quality and safety
 Keep the legacy renderer until the new renderer is tested end-to-end and visually approved. Do not add paid assets, APIs or compute without explicit approval. No generic primitive-character fallback when artwork is missing. The production minimum remains 150 seconds; final production QC enforces it even though isolated previews can be shorter. A technical render pass does not replace full-video visual inspection. YouTube and TikTok remain disabled.
+
+
+## Reusable 2D character rigs
+
+The first articulated character rig module is available at
+`src/finance_campus/character_rig.py`. A character has a persistent identity,
+skin/hair/clothing palette, accessory and a time-ordered joint pose track.
+The renderer interpolates joints between poses and draws the character to
+transparent RGBA frames. Expressions include worried, focused, relieved,
+hopeful, joyful, surprised and others.
+
+Validate and render the included sample:
+
+```bash
+python -m finance_campus.cli validate-character-rig examples/character-rig-parent.example.json
+python -m finance_campus.cli render-character examples/character-rig-parent.example.json build/character-frames --fps 30
+```
+
+The output is an independent transparent character layer sequence. It can be
+composited into a directed scene and animated separately from the background
+and financial props. This is an initial puppet-rig system: advanced hand
+articulation, separate finger controls, lip-sync, multi-character interaction,
+inverse kinematics and rig authoring tools remain future milestones.
