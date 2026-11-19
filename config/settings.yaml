@@ -33,7 +33,8 @@ audio:
     - "male"
     - "female"
 production:
-  shorts_target_seconds: [45, 90]
+  minimum_video_duration_seconds: 150
+  shorts_target_seconds: [150, 180]
   long_form_target_minutes: [5, 10]
   publishing_enabled: false
   require_quality_gate: true
