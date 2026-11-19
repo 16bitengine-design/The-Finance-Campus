@@ -415,6 +415,33 @@ def _draw_element(
             path((x, roof_y), (cx, y), (right, roof_y))
             rect(x+w//8, roof_y, right-w//8, bottom)
             rect(cx-w//10, bottom-h//3, cx+w//10, bottom)
+        elif kind == "phone":
+            rect(x+w//5, y, right-w//5, bottom)
+            path((x+w//4, y+h//7), (right-w//4, y+h//7))
+            path((x+w//4, bottom-h//5), (right-w//4, bottom-h//5))
+            ellipse((cx-width, bottom-h//10, cx+width, bottom-h//10+width*2))
+        elif kind == "shield":
+            path((cx, y), (right, y+h//5), (right-w//10, y+h*3//5),
+                 (cx, bottom), (x+w//10, y+h*3//5), (x, y+h//5), (cx, y))
+            path((x+w//4, y+h//2), (cx-width, y+h*2//3), (right-w//4, y+h//3))
+        elif kind == "calendar":
+            rect(x, y+h//8, right, bottom)
+            path((x, y+h//3), (right, y+h//3))
+            path((x+w//4, y), (x+w//4, y+h//4))
+            path((right-w//4, y), (right-w//4, y+h//4))
+            for row in (0.52, 0.72):
+                path((x+w//5, y+int(h*row)), (right-w//5, y+int(h*row)))
+        elif kind == "chart":
+            path((x+w//8, y+h//10), (x+w//8, bottom), (right, bottom))
+            path((x+w//5, y+h*4//5), (x+w*2//5, y+h*3//5),
+                 (x+w*3//5, y+h*2//3), (right-w//8, y+h//5))
+        elif kind == "basket":
+            path((x+w//10, y+h//3), (right-w//10, y+h//3),
+                 (right-w//5, bottom), (x+w//5, bottom), (x+w//10, y+h//3))
+            path((x+w//4, y+h//3), (cx, y), (right-w//4, y+h//3))
+            path((x+w//3, y+h//2), (x+w*2//5, bottom-h//10))
+            path((cx, y+h//2), (cx, bottom-h//10))
+            path((right-w//3, y+h//2), (right-w*2//5, bottom-h//10))
         elif kind == "coin":
             ellipse((x, y, right, bottom))
             ellipse((x+w//5, y+h//5, right-w//5, bottom-h//5))
