@@ -13,6 +13,7 @@ dependencies = ["PyYAML>=6.0", "Pillow>=10.0", "numpy>=1.26", "soundfile>=0.12"]
 [project.optional-dependencies]
 dev = ["pytest>=8.0", "ruff>=0.5"]
 tts = ["kokoro>=0.9.4,<1.0"]
+manim = ["manim>=0.19,<1.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
