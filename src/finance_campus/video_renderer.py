@@ -250,6 +250,11 @@ def _draw_element(
         cx, cy = _point(element["cx"], element["cy"], sx, sy)
         radius = max(1, round(element["r"] * min(sx, sy)))
         path = _ellipse_path((cx-radius, cy-radius, cx+radius, cy+radius))
+        if element.get("fill") and progress >= 0.32:
+            tint = {"navy": (222, 231, 242), "green": (222, 239, 227),
+                    "gold": (255, 246, 211), "white": (255, 255, 255),
+                    "black": (230, 232, 235)}[element.get("color", "navy")]
+            draw.ellipse((cx-radius, cy-radius, cx+radius, cy+radius), fill=tint)
         _draw_progressive_strokes(draw, [path], progress, color, width)
         _draw_active_hand(draw, [path], progress, color, min(sx, sy))
         return
@@ -280,7 +285,6 @@ def _draw_element(
             # This avoids the hollow wireframe/stick-figure appearance.
             if progress >= 0.38:
                 skin = (193, 132, 94)
-                skin_light = (224, 174, 137)
                 skin_shadow = (143, 91, 67)
                 hair = (42, 35, 32)
                 shirt = (22, 74, 137) if element.get("wardrobe", "blue") == "blue" else (22, 140, 67)
@@ -592,6 +596,11 @@ def _draw_element(
         h = round(element["height"] * sy)
         if w > 0 and h > 0:
             points = [(x,y), (x+w,y), (x+w,y+h), (x,y+h), (x,y)]
+            if element.get("fill") and progress >= 0.32:
+                tint = {"navy": (222, 231, 242), "green": (222, 239, 227),
+                        "gold": (255, 246, 211), "white": (255, 255, 255),
+                        "black": (230, 232, 235)}[element.get("color", "navy")]
+                draw.rounded_rectangle((x, y, x+w, y+h), radius=max(2, width*2), fill=tint)
             _draw_progressive_strokes(draw, [points], progress, color, width)
             _draw_active_hand(draw, [points], progress, color, min(sx, sy))
         return
