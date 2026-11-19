@@ -219,3 +219,25 @@ def test_hopeful_and_practical_scenes_include_walking_choreography():
         character = next(item for item in scene["elements"] if item["type"] == "person")
         assert character["motion"]["to_x"] > character["motion"]["from_x"]
         assert character["walk_cycle"]["cycle_seconds"] > 0
+
+
+def test_story_scenes_are_anchored_with_environment_and_contextual_props():
+    storyboard = build_storyboard(
+        _script(), video_format="short",
+        disclaimer_config=load_yaml("config/disclaimer.yaml"),
+    )
+    scenes = storyboard["scenes"][:-1]
+    for scene in scenes:
+        lines = [item for item in scene["elements"] if item["type"] == "line"]
+        assert len(lines) >= 3
+        assert any(
+            item["type"] == "line"
+            and item["y1"] == item["y2"]
+            and item["y1"] >= storyboard["canvas"]["height"] * .68
+            for item in lines
+        )
+    pressure = scenes[1]
+    assert any(
+        item["type"] == "rect" and item.get("color") == "gold"
+        for item in pressure["elements"]
+    )
