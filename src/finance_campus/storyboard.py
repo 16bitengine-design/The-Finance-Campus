@@ -12,7 +12,7 @@ from typing import Any
 
 WIDTH = 1000
 HEIGHT = 562
-ALLOWED_TYPES = {"circle", "rect", "line", "arrow", "text", "person", "bank", "wallet", "house", "coin", "money_note", "savings_jar"}
+ALLOWED_TYPES = {"circle", "rect", "line", "arrow", "text", "person", "bank", "wallet", "house", "coin", "money_note", "savings_jar", "phone", "shield", "calendar", "chart", "basket"}
 ILLUSTRATION_TYPES = {"person", "bank", "wallet", "house", "coin", "money_note", "savings_jar"}
 ALLOWED_COLORS = {"navy": "#102B55", "green": "#168C43", "gold": "#F5B817", "white": "#FFFFFF", "black": "#17202A"}
 
@@ -235,6 +235,16 @@ def _render_element(element: dict[str, Any], index: int) -> str:
         elif kind == "house":
             roof = y + h/3
             art = f'<path d="M {_number(x)} {_number(roof)} L {_number(cx)} {_number(y)} L {_number(right)} {_number(roof)} M {_number(x+w/8)} {_number(roof)} V {_number(bottom)} H {_number(right-w/8)} V {_number(roof)} M {_number(cx-w/10)} {_number(bottom)} V {_number(bottom-h/3)} H {_number(cx+w/10)} V {_number(bottom)}" {common}/>'
+        elif kind == "phone":
+            art = f'<rect x="{_number(x+w*.18)}" y="{_number(y)}" width="{_number(w*.64)}" height="{_number(h)}" rx="16" {common}/><path d="M {_number(x+w*.25)} {_number(y+h*.14)} H {_number(x+w*.75)} M {_number(x+w*.25)} {_number(y+h*.78)} H {_number(x+w*.75)}" {common}/><circle cx="{_number(cx)}" cy="{_number(y+h*.9)}" r="{_number(w*.025)}" {common}/>'
+        elif kind == "shield":
+            art = f'<path d="M {_number(cx)} {_number(y)} L {_number(right)} {_number(y+h*.18)} L {_number(right-w*.08)} {_number(y+h*.62)} Q {_number(cx)} {_number(bottom)} {_number(x+w*.08)} {_number(y+h*.62)} L {_number(x)} {_number(y+h*.18)} Z" {common}/><path d="M {_number(x+w*.28)} {_number(y+h*.5)} L {_number(x+w*.44)} {_number(y+h*.66)} L {_number(x+w*.74)} {_number(y+h*.34)}" {common}/>'
+        elif kind == "calendar":
+            art = f'<rect x="{_number(x)}" y="{_number(y+h*.12)}" width="{_number(w)}" height="{_number(h*.88)}" rx="8" {common}/><path d="M {_number(x)} {_number(y+h*.34)} H {_number(right)} M {_number(x+w*.25)} {_number(y)} V {_number(y+h*.23)} M {_number(x+w*.75)} {_number(y)} V {_number(y+h*.23)} M {_number(x+w*.2)} {_number(y+h*.52)} H {_number(x+w*.8)} M {_number(x+w*.2)} {_number(y+h*.7)} H {_number(x+w*.8)}" {common}/>'
+        elif kind == "chart":
+            art = f'<path d="M {_number(x+w*.12)} {_number(y+h*.08)} V {_number(bottom)} H {_number(right)} M {_number(x+w*.2)} {_number(y+h*.78)} L {_number(x+w*.42)} {_number(y+h*.58)} L {_number(x+w*.59)} {_number(y+h*.66)} L {_number(x+w*.84)} {_number(y+h*.24)}" {common}/>'
+        elif kind == "basket":
+            art = f'<path d="M {_number(x+w*.08)} {_number(y+h*.32)} H {_number(right-w*.08)} L {_number(right-w*.2)} {_number(bottom)} H {_number(x+w*.2)} Z M {_number(x+w*.28)} {_number(y+h*.32)} Q {_number(cx)} {_number(y-h*.18)} {_number(right-w*.28)} {_number(y+h*.32)}" {common}/><path d="M {_number(x+w*.35)} {_number(y+h*.4)} L {_number(x+w*.4)} {_number(bottom-h*.08)} M {_number(cx)} {_number(y+h*.4)} V {_number(bottom-h*.08)} M {_number(right-w*.35)} {_number(y+h*.4)} L {_number(right-w*.4)} {_number(bottom-h*.08)}" {common}/>'
         elif kind == "coin":
             art = f'<circle cx="{_number(cx)}" cy="{_number(cy)}" r="{_number(min(w,h)/2)}" {common}/><circle cx="{_number(cx)}" cy="{_number(cy)}" r="{_number(min(w,h)/3)}" {common}/><text x="{_number(cx)}" y="{_number(cy+h*.16)}" text-anchor="middle" fill="{color}" font-size="{_number(h*.45)}">$</text>'
         elif kind == "money_note":
