@@ -7,6 +7,7 @@ frames so each character can be composited independently over authored scenes.
 from __future__ import annotations
 
 import math
+from itertools import pairwise
 from pathlib import Path
 from typing import Any
 
@@ -58,7 +59,7 @@ def _sample_pose(poses: list[dict[str, Any]], at: float) -> dict[str, Any]:
         return poses[0]
     if at >= poses[-1]["at"]:
         return poses[-1]
-    for first, second in zip(poses, poses[1:]):
+    for first, second in pairwise(poses):
         if first["at"] <= at <= second["at"]:
             t = (at - first["at"]) / (second["at"] - first["at"])
             joints = {part: [first["joints"][part][axis] + (second["joints"][part][axis] - first["joints"][part][axis]) * t for axis in (0, 1)] for part in POSE_PARTS}
@@ -94,7 +95,6 @@ def render_character_frame(spec: dict[str, Any], at_seconds: float) -> Image.Ima
     limb("hips", "knees", clothes.get("trousers", "#26364A"), 30)
     # Both legs share the knee/hip anchor but splay naturally at the feet.
     hip_x, hip_y = j["hips"]
-    knee_x, knee_y = j["knees"]
     foot_x, foot_y = j["feet"]
     limb("knees", "feet", clothes.get("trousers", "#26364A"), 26)
     draw.ellipse((foot_x-28, foot_y-12, foot_x+30, foot_y+12), fill=clothes.get("shoes", "#202936"), outline=outline, width=3)
