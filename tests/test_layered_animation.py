@@ -44,7 +44,7 @@ def test_layered_frame_reveals_and_moves_authored_artwork(tmp_path: Path):
 
     early = render_layered_frame(scene, 0, tmp_path)
     middle = render_layered_frame(scene, 1, tmp_path)
-    assert early.getchannel("A").getbbox() is None
+    assert early.getpixel((15, 25)) == (255, 255, 255, 255)
     assert middle.getpixel((35, 25))[3] == 255
     assert middle.getpixel((15, 25))[3] == 0
 
