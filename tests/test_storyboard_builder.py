@@ -260,3 +260,25 @@ def test_visual_review_fixture_contains_character_led_story_beats():
             "interaction_animation", {}
         ).get("start_seconds")
 
+
+
+
+def test_topic_specific_visual_metaphors_change_with_financial_subject():
+    cases = {
+        "A phishing scam sends a deceptive message asking for bank details.": "phone",
+        "Insurance coverage can protect a household from specified risks.": "shield",
+        "Inflation means food prices rise and purchasing power falls.": "basket",
+        "A loan creates a debt repayment obligation every month.": "calendar",
+        "Investing in stocks and bonds involves risk over time.": "chart",
+    }
+    for narration, expected in cases.items():
+        script = _script()
+        script["sections"]["relatable_financial_problem"] = narration
+        storyboard = build_storyboard(
+            script, video_format="short",
+            disclaimer_config=load_yaml("config/disclaimer.yaml"),
+        )
+        scene = storyboard["scenes"][0]
+        assert scene.get("visual_intent")
+        assert any(element["type"] == expected for element in scene["elements"])
+        assert validate_storyboard(storyboard) == []
