@@ -148,21 +148,27 @@ def _draw_pen_hand(
 ) -> None:
     """Draw a small hand gripping a colored marker at the active stroke tip."""
     x, y = tip
-    unit = max(2, round(13 * scale))
+    # Keep the drawing hand subordinate to the artwork. The previous palm
+    # was almost 100 px wide at 1080p and read as a floating brown circle.
+    unit = max(2, round(6 * scale))
     skin = (224, 176, 137)
-    dark = (111, 77, 58)
-    # Marker points into the board; the hand follows behind its nib.
-    draw.line((x - unit * 2, y + unit * 2, x, y), fill=dark, width=max(2, unit // 3))
-    draw.line((x - unit * 2, y + unit * 2, x - unit * 5, y + unit * 5),
+    skin_shadow = (168, 119, 91)
+    dark = (70, 76, 84)
+    # Slim marker barrel, nib, cap and a compact gripping hand.
+    draw.line((x - unit * 3, y + unit * 3, x + unit, y - unit),
+              fill=dark, width=max(2, unit // 2))
+    draw.line((x - unit * 3, y + unit * 3, x - unit * 5, y + unit * 5),
               fill=color, width=max(3, unit // 2))
-    draw.ellipse((x - unit * 5, y + unit * 3, x + unit * 2, y + unit * 10),
-                 fill=skin, outline=dark, width=max(1, unit // 5))
-    # Curled fingers around the marker barrel.
-    for offset in (0, 1, 2):
-        px = x - unit * (3 + offset)
-        py = y + unit * (4 + offset)
-        draw.arc((px - unit, py - unit, px + unit * 2, py + unit * 2),
-                 start=190, end=350, fill=dark, width=max(1, unit // 5))
+    draw.line((x + unit, y - unit, x + unit * 2, y - unit * 2),
+              fill=dark, width=max(2, unit // 3))
+    palm = (x - unit * 4, y + unit * 2, x + unit, y + unit * 7)
+    draw.ellipse(palm, fill=skin, outline=skin_shadow, width=max(1, unit // 4))
+    # Short finger arcs visibly wrap around the marker instead of forming a blob.
+    for offset in (0, 1):
+        px = x - unit * (2 + offset)
+        py = y + unit * (3 + offset)
+        draw.arc((px - unit, py, px + unit * 2, py + unit * 3),
+                 start=185, end=330, fill=skin_shadow, width=max(1, unit // 3))
 
 
 def _draw_progressive_strokes(
@@ -268,7 +274,7 @@ def _draw_element(
             path((left, top), (r, top), (r, b), (left, b), (left, top))
 
         if kind == "person":
-            head = max(5, w // 7)
+            head = max(7, w // 5)
             ellipse((cx-head, y, cx+head, y+2*head))
             # Facial details are deliberately separate pen strokes.
             eye_y, eye_r = y + head, max(2, width)
@@ -291,7 +297,15 @@ def _draw_element(
             shoulder = neck_y + max(8, h//24)
             waist = y + int(h*.66)
             path((cx, neck_y), (cx, shoulder))
-            path((cx-w//4, shoulder), (cx+w//4, shoulder), (cx+w//6, waist), (cx-w//6, waist), (cx-w//4, shoulder))
+            torso = [
+                (cx-w//3, shoulder), (cx+w//3, shoulder),
+                (cx+w//4, waist), (cx-w//4, waist),
+            ]
+            # A faint shirt fill gives the character visual weight while the
+            # navy outline is still revealed progressively like marker ink.
+            if progress >= .62:
+                draw.polygon(torso, fill=(246, 249, 252))
+            path(*torso, torso[0])
             path((cx-w//12, shoulder+width), (cx, shoulder+width*4), (cx+w//12, shoulder+width))
             path((cx, shoulder+width*4), (cx, waist-h//14))
             rect(cx+w//12, shoulder+h//12, cx+w//4, shoulder+h//5)
@@ -309,16 +323,18 @@ def _draw_element(
             path((cx+w//4, waist-h//10), (cx+w//7, waist-h//10),
                  (cx+w//7, waist-h//3), (cx+w//4, waist-h//3))
             path((cx-w//6, waist), (cx+w//6, waist))
-            path((cx, waist), (cx-w//12, bottom-h//12))
-            path((cx, waist), (cx+w//12, bottom-h//12))
-            path((x+w//4, bottom-h//12), (x+w//5, bottom),
-                 (cx-w//12, bottom))
-            path((right-w//4, bottom-h//12), (right-w//5, bottom),
-                 (cx+w//12, bottom))
-            path((x+w//5, bottom), (cx-w//12, bottom),
-                 (cx-w//8, bottom-h//30))
-            path((right-w//5, bottom), (cx+w//12, bottom),
-                 (cx+w//8, bottom-h//30))
+            # Clear trouser legs and broad shoes replace the old thin,
+            # disconnected stick-like feet.
+            path((cx-w//7, waist), (cx-w//5, bottom-h//8),
+                 (cx-w//4, bottom-h//18))
+            path((cx+w//7, waist), (cx+w//5, bottom-h//8),
+                 (cx+w//4, bottom-h//18))
+            path((cx-w//4, bottom-h//18), (cx-w//3, bottom),
+                 (cx-w//10, bottom))
+            path((cx+w//4, bottom-h//18), (cx+w//3, bottom),
+                 (cx+w//10, bottom))
+            path((cx-w//3, bottom), (cx-w//10, bottom))
+            path((cx+w//10, bottom), (cx+w//3, bottom))
             # Brows and hairline make expressions easier to read at phone size.
             path((cx-head//2, y+head//3), (cx-head//5, y+head//4))
             path((cx+head//5, y+head//4), (cx+head//2, y+head//3))
