@@ -1,0 +1,135 @@
+{
+  "id": "parent_01",
+  "name": "Amina",
+  "canvas": {
+    "width": 600,
+    "height": 800
+  },
+  "duration_seconds": 3,
+  "skin": "#8A5238",
+  "hair": "#211A18",
+  "outline": "#26364A",
+  "accessory": "glasses",
+  "clothing": {
+    "top": "#2F6F9F",
+    "trousers": "#26364A",
+    "shoes": "#202936",
+    "trim": "#F5B817"
+  },
+  "poses": [
+    {
+      "at": 0,
+      "expression": "worried",
+      "joints": {
+        "head": [
+          300,
+          150
+        ],
+        "neck": [
+          300,
+          215
+        ],
+        "shoulders": [
+          300,
+          255
+        ],
+        "elbows": [
+          220,
+          330
+        ],
+        "hands": [
+          190,
+          410
+        ],
+        "hips": [
+          300,
+          440
+        ],
+        "knees": [
+          275,
+          590
+        ],
+        "feet": [
+          260,
+          735
+        ]
+      }
+    },
+    {
+      "at": 1.5,
+      "expression": "focused",
+      "joints": {
+        "head": [
+          305,
+          145
+        ],
+        "neck": [
+          305,
+          210
+        ],
+        "shoulders": [
+          305,
+          250
+        ],
+        "elbows": [
+          235,
+          330
+        ],
+        "hands": [
+          280,
+          365
+        ],
+        "hips": [
+          305,
+          435
+        ],
+        "knees": [
+          280,
+          585
+        ],
+        "feet": [
+          265,
+          730
+        ]
+      }
+    },
+    {
+      "at": 3,
+      "expression": "hopeful",
+      "joints": {
+        "head": [
+          310,
+          140
+        ],
+        "neck": [
+          310,
+          205
+        ],
+        "shoulders": [
+          310,
+          245
+        ],
+        "elbows": [
+          390,
+          310
+        ],
+        "hands": [
+          435,
+          245
+        ],
+        "hips": [
+          310,
+          430
+        ],
+        "knees": [
+          285,
+          580
+        ],
+        "feet": [
+          270,
+          725
+        ]
+      }
+    }
+  ]
+}
