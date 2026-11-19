@@ -19,14 +19,14 @@ SECTION_ORDER = (
 
 VISUAL_PATTERNS = (
     (("compound", "compounding", "interest on interest"), ("coin", "bank", "savings_jar"), "Repeated growth can build on earlier growth"),
-    (("inflation", "purchasing power", "prices rise", "price increases"), ("money_note", "coin", "wallet"), "Rising prices reduce what the same money can buy"),
-    (("repayment", "debt", "borrow", "borrowing", "loan", "credit"), ("wallet", "money_note", "house"), "Borrowed money creates a repayment obligation"),
+    (("inflation", "purchasing power", "prices rise", "price increases"), ("basket", "money_note", "coin"), "Rising prices reduce what the same money can buy"),
+    (("repayment", "debt", "borrow", "borrowing", "loan", "credit"), ("calendar", "wallet", "money_note"), "Borrowed money creates a repayment obligation"),
     (("emergency fund", "emergency savings", "unexpected bill", "unexpected expense", "rainy day"), ("house", "wallet", "savings_jar"), "A reserve can absorb an unexpected cost"),
     (("budget", "spending plan", "allocate", "expenses"), ("wallet", "money_note", "savings_jar"), "Income is divided between needs and goals"),
     (("income", "payday", "salary", "wages", "earnings"), ("person", "money_note", "wallet"), "Earnings flow into the household budget"),
-    (("invest", "investment", "stocks", "bonds", "etf", "portfolio"), ("person", "bank", "coin"), "Investing puts money into assets that carry risk"),
-    (("insurance", "cover", "premium", "claim", "risk"), ("house", "bank", "wallet"), "Protection helps manage specified financial risks"),
-    (("scam", "fraud", "phishing", "fake investment"), ("person", "wallet", "bank"), "A deceptive request can put money at risk"),
+    (("invest", "investment", "stocks", "bonds", "etf", "portfolio"), ("chart", "coin", "bank"), "Investing puts money into assets that carry risk"),
+    (("insurance", "cover", "premium", "claim", "risk"), ("shield", "house", "wallet"), "Protection helps manage specified financial risks"),
+    (("scam", "fraud", "phishing", "fake investment"), ("phone", "wallet", "bank"), "A deceptive request can put money at risk"),
     (("save", "savings", "buffer", "fund", "deposit"), ("person", "savings_jar", "coin"), "Regular deposits build a financial buffer"),
 )
 
@@ -65,7 +65,7 @@ def _element(kind: str, x: float, y: float, width: float, height: float, color: 
 
 def _scene_elements(text: str, section: str, title: str, width: int, height: int) -> list[dict[str, Any]]:
     """Compose a distinct illustrated story beat for each part of the lesson."""
-    _, _, _ = _visual_types(text, section)
+    visual_objects, _, _ = _visual_types(text, section)
     # A stable per-video signature varies composition and accent choices without
     # introducing randomness between retries of the same production.
     signature = hashlib.sha256(f"{title}|{section}|{text}".encode()).hexdigest()
@@ -175,25 +175,24 @@ def _scene_elements(text: str, section: str, title: str, width: int, height: int
             _element("coin", width*.75, height*.21, width*.08, height*.05, "gold", 1.7),
             _element("coin", width*.70, height*.30, width*.08, height*.05, "gold", 2.35)]
 
-    # Add a topic-specific visual metaphor so different lessons do not reuse
-    # the same wallet/coin composition.
-    topic = text.casefold()
-    motif = None
-    if any(term in topic for term in ("scam", "fraud", "phishing", "fake investment")):
-        motif = "phone"
-    elif any(term in topic for term in ("insurance", "insured", "coverage", "premium", "claim")):
-        motif = "shield"
-    elif any(term in topic for term in ("inflation", "prices rise", "price increases", "purchasing power")):
-        motif = "basket"
-    elif any(term in topic for term in ("debt", "loan", "repayment", "borrow", "credit")):
-        motif = "calendar"
-    elif any(term in topic for term in ("invest", "stocks", "bonds", "etf", "portfolio", "compound")):
-        motif = "chart"
+    # Use the semantic mapper as the source of truth for the topic-specific
+    # illustration so metadata and visible artwork cannot disagree.
+    motif = next(
+        (kind for kind in visual_objects if kind in {"phone", "shield", "basket", "calendar", "chart"}),
+        None,
+    )
     if motif:
         elements.append(_element(
-            motif, width * .66, height * .075, width * .25, height * .16,
+            motif, width * .68, height * .105, width * .23, height * .17,
             "gold" if motif in {"phone", "basket"} else "green", 1.05,
         ))
+        # Connect the metaphor to the decision instead of leaving it floating.
+        elements.append({
+            "type": "line",
+            "x1": round(width * .66), "y1": round(height * .30),
+            "x2": round(width * .78), "y2": round(height * .30),
+            "color": "gold", "start_seconds": 1.45, "draw_seconds": .35,
+        })
 
     # Establish a readable physical setting instead of floating symbols.
     # The shared floor/table geometry anchors props and gives the character a
