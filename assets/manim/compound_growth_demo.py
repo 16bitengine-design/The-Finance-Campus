@@ -7,7 +7,17 @@ The assumed 5% rate is a teaching input, not a forecast or promised return.
 """
 from decimal import Decimal
 
-from manim import Axes, Create, DecimalNumber, FadeIn, MathTex, Scene, Text, VGroup, WHITE
+from manim import (
+    DOWN,
+    UP,
+    Axes,
+    Create,
+    DecimalNumber,
+    FadeIn,
+    Scene,
+    Text,
+    VGroup,
+)
 
 
 class CompoundGrowthDemo(Scene):
@@ -20,13 +30,13 @@ class CompoundGrowthDemo(Scene):
             for year in range(years + 1)
         ]
 
-        title = Text("How compound growth works", color=WHITE, font_size=42)
+        title = Text("How compound growth works", color="#FFFFFF", font_size=42)
         subtitle = Text(
             "Hypothetical example • $1,000 at 5% annually",
-            color=WHITE,
+            color="#FFFFFF",
             font_size=24,
         )
-        header = VGroup(title, subtitle).arrange(direction="DOWN", buff=0.18)
+        header = VGroup(title, subtitle).arrange(direction=DOWN, buff=0.18)
         header.to_edge(UP)
         self.play(FadeIn(header))
 
@@ -35,15 +45,15 @@ class CompoundGrowthDemo(Scene):
             y_range=[0, 1800, 300],
             x_length=10,
             y_length=5,
-            axis_config={"color": WHITE, "include_numbers": True},
+            axis_config={"color": "#FFFFFF", "include_numbers": True},
             tips=False,
         ).shift(DOWN * 0.55)
         x_label = Text("Years", font_size=24).next_to(axes, DOWN)
-        y_label = Text("Value ($)", font_size=24).rotate(1.5708).next_to(axes, LEFT)
+        y_label = Text("Value ($)", font_size=24).rotate(1.5708).next_to(axes, DOWN)
         self.play(Create(axes), FadeIn(x_label), FadeIn(y_label))
 
         curve = axes.plot(
-            lambda t: float(principal * (Decimal("1") + annual_rate) ** Decimal(str(t))),
+            lambda t: 1000 * (1.05**t),
             x_range=[0, years],
             color="#168C43",
             use_smoothing=True,
@@ -58,7 +68,7 @@ class CompoundGrowthDemo(Scene):
             font_size=40,
         )
         final_value.next_to(axes, UP, buff=0.22)
-        label = Text("After 10 years:", font_size=26, color=WHITE)
-        label.next_to(final_value, LEFT, buff=0.25)
+        label = Text("After 10 years:", font_size=26, color="#FFFFFF")
+        label.next_to(final_value, DOWN, buff=0.12)
         self.play(FadeIn(label), FadeIn(final_value))
         self.wait(1.5)
