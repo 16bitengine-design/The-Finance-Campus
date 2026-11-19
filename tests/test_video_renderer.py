@@ -1,4 +1,5 @@
 import shutil
+from collections import Counter
 import subprocess
 
 import pytest
@@ -442,7 +443,6 @@ def test_active_marker_hand_stays_compact_at_full_hd_scale():
 
 
 def test_character_render_uses_substantial_filled_illustration_not_only_wireframe():
-    from collections import Counter
     from finance_campus.video_renderer import _draw_element
 
     image = Image.new("RGB", (360, 520), (255, 255, 255))
