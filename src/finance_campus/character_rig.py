@@ -204,7 +204,12 @@ def _draw_prop(draw: ImageDraw.ImageDraw, prop: dict[str, Any],
         draw.ellipse((x-5, y-5, x+5, y+5), outline="#9B6A08", width=2)
 
 
-def render_character_frame(\n    spec: dict[str, Any], at_seconds: float, *, mouth_open_override: float | None = None\n) -> Image.Image:
+def render_character_frame(
+    spec: dict[str, Any],
+    at_seconds: float,
+    *,
+    mouth_open_override: float | None = None,
+) -> Image.Image:
     errors = validate_character_rig(spec)
     if errors:
         raise CharacterRigError("; ".join(errors))
@@ -213,7 +218,16 @@ def render_character_frame(\n    spec: dict[str, Any], at_seconds: float, *, mou
     width, height = spec["canvas"]["width"], spec["canvas"]["height"]
     image = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     draw = ImageDraw.Draw(image)
-    pose = _sample_pose(spec["poses"], at_seconds)
+    pose = dict(_sample_pose(spec["poses"], at_seconds))
+    if mouth_open_override is not None:
+        if (
+            isinstance(mouth_open_override, bool)
+            or not isinstance(mouth_open_override, (int, float))
+            or not math.isfinite(mouth_open_override)
+            or not 0 <= mouth_open_override <= 1
+        ):
+            raise CharacterRigError("mouth_open_override must be between 0 and 1")
+        pose["mouth_open"] = float(mouth_open_override)
     joints = {
         key: tuple(round(value) for value in point)
         for key, point in pose["joints"].items()
@@ -324,7 +338,11 @@ def render_character_frame(\n    spec: dict[str, Any], at_seconds: float, *, mou
 
 
 def render_character_sequence(
-    spec: dict[str, Any], output_dir: str | Path, *, fps: int = 30
+    spec: dict[str, Any],
+    output_dir: str | Path,
+    *,
+    fps: int = 30,
+    audio_path: str | Path | None = None,
 ) -> int:
     if isinstance(fps, bool) or not isinstance(fps, int) or fps <= 0:
         raise CharacterRigError("fps must be a positive integer")
@@ -337,8 +355,16 @@ def render_character_sequence(
     if not math.isfinite(duration) or duration <= 0:
         raise CharacterRigError("duration_seconds must be positive and finite")
     frame_count = math.ceil(duration * fps)
+    mouth_track = None
+    if audio_path is not None:
+        from finance_campus.lip_sync import audio_energy_mouth_track
+
+        mouth_track = audio_energy_mouth_track(audio_path, fps=fps)
+        if not mouth_track:
+            raise CharacterRigError("audio produced an empty lip-sync track")
     for index in range(frame_count):
-        render_character_frame(spec, index / fps).save(
-            destination / f"character_{index:06d}.png"
-        )
+        mouth_open = mouth_track[min(index, len(mouth_track)-1)] if mouth_track else None
+        render_character_frame(
+            spec, index / fps, mouth_open_override=mouth_open
+        ).save(destination / f"character_{index:06d}.png")
     return frame_count
