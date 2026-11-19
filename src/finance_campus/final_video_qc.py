@@ -22,6 +22,7 @@ def validate_final_video(
     *,
     video_format: str,
     expected_fps: int = 30,
+    minimum_duration_seconds: float = 150.0,
     ffmpeg: str = "ffmpeg",
     ffprobe: str = "ffprobe",
 ) -> dict[str, Any]:
@@ -83,8 +84,11 @@ def validate_final_video(
         )
 
     duration = float(data.get("format", {}).get("duration", 0))
-    if duration <= 0:
-        raise RuntimeError("Final MP4 has no positive duration")
+    if duration < minimum_duration_seconds:
+        raise RuntimeError(
+            f"Final video is too short ({duration:.3f}s); minimum is "
+            f"{minimum_duration_seconds:.3f}s"
+        )
     frame_count_raw = video.get("nb_frames")
     frame_count = int(frame_count_raw) if frame_count_raw not in (None, "N/A") else None
     if frame_count is not None and abs(frame_count / fps - duration) > max(0.15, 2 / fps):
