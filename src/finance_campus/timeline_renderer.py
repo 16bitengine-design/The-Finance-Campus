@@ -1,14 +1,19 @@
 """Multi-scene 2D renderer built on the layered illustration compositor."""
 from __future__ import annotations
+
 import json
 import shutil
 import subprocess
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
+
 from finance_campus.layered_animation import iter_layered_frames, validate_layered_scene
+
 
 class TimelineRenderError(ValueError):
     """Raised when a timeline is invalid or cannot be rendered."""
+
 
 def validate_timeline(timeline: Any) -> list[str]:
     errors: list[str] = []
@@ -38,6 +43,7 @@ def validate_timeline(timeline: Any) -> list[str]:
                     errors.append(f"scenes[{index}].{field} must be a non-empty path")
     return errors
 
+
 def _frames(timeline: dict[str, Any], manifest_dir: Path) -> Iterator[Any]:
     canvas = timeline["canvas"]
     for index, entry in enumerate(timeline["scenes"]):
@@ -54,7 +60,10 @@ def _frames(timeline: dict[str, Any], manifest_dir: Path) -> Iterator[Any]:
             raise TimelineRenderError(f"scene {index} canvas does not match timeline canvas")
         yield from iter_layered_frames(scene, asset_root, fps=timeline.get("fps", 30))
 
-def render_2d_timeline(timeline_path: str | Path, output_path: str | Path, *, ffmpeg: str = "ffmpeg") -> dict[str, Any]:
+
+def render_2d_timeline(
+    timeline_path: str | Path, output_path: str | Path, *, ffmpeg: str = "ffmpeg"
+) -> dict[str, Any]:
     """Stream ordered layered scenes to an H.264 MP4 without buffering all frames."""
     manifest_path = Path(timeline_path).resolve()
     timeline = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -68,9 +77,12 @@ def render_2d_timeline(timeline_path: str | Path, output_path: str | Path, *, ff
     fps = timeline.get("fps", 30)
     destination = Path(output_path)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    command = [ffmpeg_path, "-hide_banner", "-loglevel", "error", "-y", "-f", "rawvideo",
+    command = [
+        ffmpeg_path, "-hide_banner", "-loglevel", "error", "-y", "-f", "rawvideo",
         "-pix_fmt", "rgba", "-s", f"{width}x{height}", "-r", str(fps), "-i", "-",
-        "-an", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(destination)]
+        "-an", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-movflags", "+faststart",
+        str(destination),
+    ]
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
     frame_count = 0
     try:
@@ -87,6 +99,13 @@ def render_2d_timeline(timeline_path: str | Path, output_path: str | Path, *, ff
         raise
     if return_code != 0 or frame_count == 0 or not destination.is_file():
         raise TimelineRenderError(f"FFmpeg timeline render failed ({return_code}): {stderr}")
-    return {"passed": True, "renderer": "2d_layered_timeline", "frames": frame_count,
-        "fps": fps, "width": width, "height": height, "duration_seconds": round(frame_count / fps, 3),
-        "output": str(destination)}
+    return {
+        "passed": True,
+        "renderer": "2d_layered_timeline",
+        "frames": frame_count,
+        "fps": fps,
+        "width": width,
+        "height": height,
+        "duration_seconds": round(frame_count / fps, 3),
+        "output": str(destination),
+    }
