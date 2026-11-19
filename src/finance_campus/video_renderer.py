@@ -275,6 +275,105 @@ def _draw_element(
 
         if kind == "person":
             head = max(7, w // 5)
+            # Build a filled, readable character silhouette first; the marker
+            # strokes below then reveal the defining contours and details.
+            # This avoids the hollow wireframe/stick-figure appearance.
+            if progress >= 0.38:
+                skin = (193, 132, 94)
+                skin_light = (224, 174, 137)
+                skin_shadow = (143, 91, 67)
+                hair = (42, 35, 32)
+                shirt = (22, 74, 137) if element.get("wardrobe", "blue") == "blue" else (22, 140, 67)
+                shirt_light = (48, 111, 177) if shirt[2] > shirt[1] else (55, 164, 96)
+                trousers = (48, 57, 72)
+                shoe = (35, 39, 46)
+                pose = element.get("pose", "neutral")
+                expression = element.get("expression", "calm")
+                head_box = (cx-head, y, cx+head, y+2*head)
+                draw.ellipse(head_box, fill=skin, outline=skin_shadow, width=max(1, width//2))
+                # Hair cap and side locks give the face a recognisable silhouette.
+                draw.pieslice((cx-head-2, y-3, cx+head+2, y+int(head*1.08)),
+                              start=180, end=360, fill=hair)
+                draw.polygon([
+                    (cx-head, y+int(head*.28)), (cx-head+int(head*.16), y-int(head*.08)),
+                    (cx-int(head*.18), y-int(head*.34)), (cx+int(head*.12), y-int(head*.16)),
+                    (cx+head-int(head*.08), y+int(head*.18)), (cx+head, y+int(head*.62)),
+                    (cx+int(head*.70), y+int(head*.50)), (cx+int(head*.52), y+int(head*.78)),
+                    (cx-int(head*.48), y+int(head*.72)),
+                ], fill=hair)
+                shoulder_fill = y + 2*head + max(8, h//24)
+                waist_fill = y + int(h*.66)
+                torso_fill = [
+                    (cx-w//3, shoulder_fill), (cx+w//3, shoulder_fill),
+                    (cx+w//4, waist_fill), (cx-w//4, waist_fill),
+                ]
+                draw.polygon(torso_fill, fill=shirt)
+                draw.polygon([
+                    (cx, shoulder_fill+2), (cx+w//10, shoulder_fill+2),
+                    (cx+w//16, waist_fill), (cx, waist_fill),
+                ], fill=shirt_light)
+                # Sleeves and arms are substantial shapes, not single strokes.
+                sleeve_y = shoulder_fill + h//13
+                draw.polygon([
+                    (cx-w//3, shoulder_fill), (cx-w//2, sleeve_y),
+                    (cx-w//2+w//18, y+int(h*.48)), (cx-w//4, y+int(h*.43)),
+                ], fill=shirt)
+                draw.polygon([
+                    (cx+w//3, shoulder_fill), (cx+w//2, sleeve_y),
+                    (cx+w//2-w//18, y+int(h*.48)), (cx+w//4, y+int(h*.43)),
+                ], fill=shirt)
+                if pose in {"worried", "overwhelmed"}:
+                    arm_points = [
+                        [(cx-w//2, sleeve_y), (cx-w//2-w//12, y+int(h*.28)),
+                         (cx-w//2-w//20, y+int(h*.19))],
+                        [(cx+w//2, sleeve_y), (cx+w//2+w//12, y+int(h*.28)),
+                         (cx+w//2+w//20, y+int(h*.19))],
+                    ]
+                elif pose == "celebrating":
+                    arm_points = [
+                        [(cx-w//3, sleeve_y), (cx-w//2, y+int(h*.20)),
+                         (cx-w//2-w//12, y+int(h*.08))],
+                        [(cx+w//3, sleeve_y), (cx+w//2, y+int(h*.20)),
+                         (cx+w//2+w//12, y+int(h*.08))],
+                    ]
+                else:
+                    arm_points = [
+                        [(cx-w//3, sleeve_y), (x+w//10, y+int(h*.56)),
+                         (x+w//10-w//18, y+int(h*.57))],
+                        [(cx+w//3, sleeve_y), (right-w//10, y+int(h*.56)),
+                         (right-w//10+w//18, y+int(h*.57))],
+                    ]
+                for arm in arm_points:
+                    draw.line(arm, fill=skin, width=max(5, w//13), joint="curve")
+                # Trouser legs, hems and shoes ground the figure visually.
+                leg_top = waist_fill
+                draw.polygon([
+                    (cx-w//4, leg_top), (cx-2, leg_top),
+                    (cx-w//12, bottom-h//12), (cx-w//3, bottom-h//12),
+                ], fill=trousers)
+                draw.polygon([
+                    (cx+2, leg_top), (cx+w//4, leg_top),
+                    (cx+w//3, bottom-h//12), (cx+w//12, bottom-h//12),
+                ], fill=trousers)
+                draw.rounded_rectangle(
+                    (cx-w//3, bottom-h//12, cx-w//12, bottom),
+                    radius=max(2, width), fill=shoe,
+                )
+                draw.rounded_rectangle(
+                    (cx+w//12, bottom-h//12, cx+w//3, bottom),
+                    radius=max(2, width), fill=shoe,
+                )
+                # Facial features are filled shapes for clarity at mobile size.
+                eye_y = y + head
+                eye_r = max(2, width)
+                draw.ellipse((cx-head//3-eye_r, eye_y-eye_r, cx-head//3+eye_r, eye_y+eye_r), fill=(35, 31, 30))
+                draw.ellipse((cx+head//3-eye_r, eye_y-eye_r, cx+head//3+eye_r, eye_y+eye_r), fill=(35, 31, 30))
+                if expression in {"worried", "overwhelmed"}:
+                    draw.arc((cx-head//3, y+int(head*1.45), cx+head//3, y+int(head*1.95)),
+                             start=200, end=340, fill=(90, 42, 42), width=max(2, width))
+                else:
+                    draw.arc((cx-head//3, y+int(head*1.35), cx+head//3, y+int(head*1.85)),
+                             start=15, end=165, fill=(90, 42, 42), width=max(2, width))
             ellipse((cx-head, y, cx+head, y+2*head))
             # Facial details are deliberately separate pen strokes.
             eye_y, eye_r = y + head, max(2, width)
