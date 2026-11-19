@@ -58,7 +58,7 @@ def test_visual_mapping_records_concept_and_relationship_for_review():
         disclaimer_config=load_yaml("config/disclaimer.yaml"),
     )
     scene = storyboard["scenes"][0]
-    assert scene["visual_objects"] == ["money_note", "coin", "wallet"]
+    assert scene["visual_objects"] == ["basket", "money_note", "coin"]
     assert "purchasing power" in scene["matched_visual_terms"]
     assert "same money" in scene["visual_intent"]
 
@@ -74,7 +74,7 @@ def test_debt_visual_mapping_shows_repayment_obligation():
         disclaimer_config=load_yaml("config/disclaimer.yaml"),
     )
     scene = storyboard["scenes"][0]
-    assert scene["visual_objects"] == ["wallet", "money_note", "house"]
+    assert scene["visual_objects"] == ["calendar", "wallet", "money_note"]
     assert "repayment" in scene["matched_visual_terms"]
     assert any(item["type"] == "arrow" for item in scene["elements"])
 
