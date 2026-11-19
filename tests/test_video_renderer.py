@@ -472,3 +472,19 @@ def test_filled_rect_reveals_a_soft_tinted_surface_before_its_outline_finishes()
         0.5, image.size,
     )
     assert image.getpixel((80, 55)) == (222, 231, 242)
+
+
+def test_svg_preserves_filled_room_surfaces_and_full_portrait_canvas():
+    scene = {
+        "id": "room",
+        "narration": "A household reviews its budget at a table.",
+        "duration_seconds": 3,
+        "elements": [
+            {"type": "rect", "x": 20, "y": 30, "width": 900, "height": 1500,
+             "color": "navy", "fill": True},
+        ],
+    }
+    svg = render_scene_svg(scene, {"width": 1000, "height": 1778})
+    assert 'width="1080" height="1920"' in svg
+    assert 'height="1778" fill="#FFFFFF"' in svg
+    assert 'fill="#DEE7F2"' in svg
