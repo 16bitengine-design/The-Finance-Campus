@@ -469,7 +469,7 @@ def test_filled_rect_reveals_a_soft_tinted_surface_before_its_outline_finishes()
         ImageDraw.Draw(image),
         {"type": "rect", "x": 20, "y": 20, "width": 150, "height": 70,
          "color": "navy", "fill": True},
-        0.5, image.size,
+        0.5, image.size, image.size,
     )
     assert image.getpixel((80, 55)) == (222, 231, 242)
 
