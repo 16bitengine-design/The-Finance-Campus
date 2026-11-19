@@ -10,6 +10,30 @@
       "duration_seconds": 5,
       "elements": [
         {
+          "type": "person",
+          "x": 55,
+          "y": 390,
+          "width": 280,
+          "height": 900,
+          "color": "navy",
+          "pose": "worried",
+          "expression": "worried",
+          "interaction": "receives_paycheck",
+          "interaction_target": {
+            "x": 570,
+            "y": 310
+          },
+          "interaction_animation": {
+            "from_x": 310,
+            "from_y": 760,
+            "start_seconds": 1.1,
+            "end_seconds": 2,
+            "easing": "ease_out"
+          },
+          "start_seconds": 0.1,
+          "draw_seconds": 1
+        },
+        {
           "type": "money_note",
           "x": 350,
           "y": 170,
@@ -86,6 +110,30 @@
       "duration_seconds": 5,
       "elements": [
         {
+          "type": "person",
+          "x": 55,
+          "y": 440,
+          "width": 280,
+          "height": 900,
+          "color": "navy",
+          "pose": "overwhelmed",
+          "expression": "overwhelmed",
+          "interaction": "reaches_for_bill",
+          "interaction_target": {
+            "x": 760,
+            "y": 900
+          },
+          "interaction_animation": {
+            "from_x": 310,
+            "from_y": 810,
+            "start_seconds": 2.2,
+            "end_seconds": 3.3,
+            "easing": "ease_out"
+          },
+          "start_seconds": 0.1,
+          "draw_seconds": 1
+        },
+        {
           "type": "house",
           "x": 90,
           "y": 210,
@@ -151,6 +199,30 @@
       "narration": "A small emergency buffer can change that outcome. Start with an amount you can manage, save regularly, and build protection one step at a time.",
       "duration_seconds": 5,
       "elements": [
+        {
+          "type": "person",
+          "x": 55,
+          "y": 420,
+          "width": 280,
+          "height": 900,
+          "color": "navy",
+          "pose": "determined",
+          "expression": "determined",
+          "interaction": "deposits_money",
+          "interaction_target": {
+            "x": 640,
+            "y": 780
+          },
+          "interaction_animation": {
+            "from_x": 310,
+            "from_y": 790,
+            "start_seconds": 2.1,
+            "end_seconds": 3.3,
+            "easing": "ease_out"
+          },
+          "start_seconds": 0.1,
+          "draw_seconds": 1
+        },
         {
           "type": "coin",
           "x": 430,
