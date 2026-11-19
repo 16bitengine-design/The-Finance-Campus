@@ -282,3 +282,16 @@ def test_topic_specific_visual_metaphors_change_with_financial_subject():
         assert scene.get("visual_intent")
         assert any(element["type"] == expected for element in scene["elements"])
         assert validate_storyboard(storyboard) == []
+
+
+def test_story_scenes_include_filled_room_planes_window_and_work_surface():
+    storyboard = build_storyboard(
+        _script(), video_format="short",
+        disclaimer_config=load_yaml("config/disclaimer.yaml"),
+    )
+    for scene in storyboard["scenes"][:-1]:
+        filled = [item for item in scene["elements"] if item["type"] == "rect" and item.get("fill")]
+        assert len(filled) >= 4
+        assert any(item["color"] == "navy" for item in filled)
+        assert any(item["color"] == "white" for item in filled)
+        assert any(item["color"] == "gold" for item in filled)
