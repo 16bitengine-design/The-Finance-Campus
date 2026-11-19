@@ -45,3 +45,19 @@ No paid image APIs, paid assets or paid compute may be introduced under the curr
 ## Release gate
 
 A technical pass is not a visual pass. The contact sheet and complete video must be inspected. Human review remains mandatory; any visual rubric score below 4/5 requires revision. Captions and disclaimers must be readable and must not overlap key action. Publishing remains disabled until the user explicitly approves the visual quality.
+
+## Layered animation preview commands
+
+The first executable compositor is `finance_campus.layered_animation`. It consumes transparent PNG artwork authored as separate background, character and prop layers, then interpolates position, scale, rotation, opacity and reveal progress at the requested frame time. Layers are composited by z-order. Supported reveals are directional wipes that can serve as a whiteboard-style introduction before the full-colour artwork is fully visible.
+
+Validate a scene manifest:
+
+`python -m finance_campus.cli validate-layered-scene examples/layered-kitchen-scene.example.json`
+
+Render a PNG frame sequence (the asset directory must contain the named scene-specific artwork):
+
+`python -m finance_campus.cli render-layered-scene examples/layered-kitchen-scene.example.json build/layered-preview --asset-root assets/scenes/payday-kitchen --fps 30`
+
+The example manifest deliberately references a character pose, kitchen environment, bill and savings envelope as independent assets. It is an animation specification, not a claim that those production artwork files have already been created. Missing assets fail closed; there is no generic-character fallback.
+
+Current milestone boundary: the compositor and preview command are implemented, but the legacy end-to-end MP4 production pipeline has not yet been switched to this compositor. That integration requires a complete, reviewed layered artwork pack and narration/action timing alignment. Until then, the old renderer remains legacy-only and cannot be treated as meeting the new visual target.
