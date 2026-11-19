@@ -382,3 +382,21 @@ def test_open_wallet_render_differs_from_closed_wallet():
     _draw_element(ImageDraw.Draw(closed), {**wallet, "open_progress": 0}, 1, closed.size)
     _draw_element(ImageDraw.Draw(opened), {**wallet, "open_progress": 1}, 1, opened.size)
     assert ImageChops.difference(closed, opened).getbbox() is not None
+
+
+def test_character_render_includes_clothing_and_body_detail():
+    from finance_campus.video_renderer import _draw_element
+
+    image = Image.new("RGB", (500, 500), (255, 255, 255))
+    draw = ImageDraw.Draw(image)
+    _draw_element(
+        draw,
+        {
+            "type": "person", "x": 120, "y": 35,
+            "width": 240, "height": 410,
+            "pose": "determined", "expression": "determined",
+        },
+        1.0, image.size,
+    )
+    non_white = sum(1 for pixel in image.getdata() if pixel != (255, 255, 255))
+    assert non_white > 1800
