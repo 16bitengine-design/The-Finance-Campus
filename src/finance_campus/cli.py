@@ -15,7 +15,7 @@ from finance_campus.config import (
     validate_settings,
 )
 from finance_campus.layered_animation import iter_layered_frames, validate_layered_scene
-from finance_campus.narration import synthesize_storyboard
+from finance_campus.multi_character_compositor import iter_multi_character_frames, validate_multi_character_scene\nfrom finance_campus.narration import synthesize_storyboard
 from finance_campus.production_pipeline import produce_video_from_script
 from finance_campus.research_pipeline import refresh_topics
 from finance_campus.script_generator import generate_from_library, generate_pending_scripts
@@ -33,7 +33,7 @@ def _read_json(path: str) -> object:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="The Finance Campus project tools")
-    parser.add_argument("command", choices=("validate-config", "validate-script", "prepare-script", "refresh-topics", "generate-script", "generate-pending-scripts", "validate-storyboard", "render-storyboard", "render-video", "synthesize-narration", "produce-video", "validate-layered-scene", "render-layered-scene", "render-2d-timeline", "render-3d-project", "validate-character-rig", "render-character"))
+    parser.add_argument("command", choices=("validate-config", "validate-script", "prepare-script", "refresh-topics", "generate-script", "generate-pending-scripts", "validate-storyboard", "render-storyboard", "render-video", "synthesize-narration", "produce-video", "validate-layered-scene", "render-layered-scene", "render-2d-timeline", "render-3d-project", "validate-character-rig", "render-character", "validate-multi-character-scene", "render-multi-character"))
     parser.add_argument("script_path", nargs="?", help="Input JSON script or storyboard")
     parser.add_argument("output_path", nargs="?", help="Output path for approved data, SVGs, or MP4")
     parser.add_argument("--format", choices=("short", "long"), default="short", dest="video_format")
@@ -101,6 +101,33 @@ def main() -> int:
             return 0
         except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as exc:
             print(f"FAIL character rig: {exc}")
+            return 1
+    if args.command in {"validate-multi-character-scene", "render-multi-character"}:
+        if not args.script_path:
+            parser.error(f"{args.command} requires a multi-character scene JSON package")
+        try:
+            package = _read_json(args.script_path)
+            if not isinstance(package, dict) or not isinstance(package.get("scene"), dict) or not isinstance(package.get("character_specs"), dict):
+                raise ValueError("package must contain scene and character_specs objects")
+            errors = validate_multi_character_scene(package["scene"], package["character_specs"])
+            if errors:
+                for error in errors:
+                    print(f"FAIL multi-character scene: {error}")
+                return 1
+            if args.command == "validate-multi-character-scene":
+                print("PASS multi-character scene: identities, tracks, rigs and timing are valid")
+                return 0
+            if not args.output_path:
+                parser.error("render-multi-character requires an output frame directory")
+            output = Path(args.output_path)
+            output.mkdir(parents=True, exist_ok=True)
+            count = 0
+            for count, frame in enumerate(iter_multi_character_frames(package["scene"], package["character_specs"]), start=1):
+                frame.save(output / f"frame_{count - 1:06d}.png")
+            print(f"RENDERED {count} multi-character frames to {output}")
+            return 0
+        except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as exc:
+            print(f"FAIL multi-character rendering: {exc}")
             return 1
     if args.command in {"render-2d-timeline", "render-3d-project"}:
         if not args.script_path or not args.output_path:
