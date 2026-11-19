@@ -198,6 +198,36 @@ def _scene_elements(text: str, section: str, title: str, width: int, height: int
     # The shared floor/table geometry anchors props and gives the character a
     # believable place to interact with the financial objects.
     environment = [
+        # Tinted room planes give the scene depth before foreground art appears.
+        {"type": "rect", "x": round(width*.025), "y": round(height*.035),
+         "width": round(width*.95), "height": round(height*.695), "color": "navy",
+         "fill": True, "start_seconds": .0, "draw_seconds": .18},
+        {"type": "rect", "x": round(width*.025), "y": round(height*.735),
+         "width": round(width*.95), "height": round(height*.115), "color": "green",
+         "fill": True, "start_seconds": .08, "draw_seconds": .2},
+        # Window, sill and mullions make the setting read as a real interior.
+        {"type": "rect", "x": round(width*.715), "y": round(height*.12),
+         "width": round(width*.205), "height": round(height*.205), "color": "white",
+         "fill": True, "start_seconds": .28, "draw_seconds": .42},
+        {"type": "line", "x1": round(width*.817), "y1": round(height*.12),
+         "x2": round(width*.817), "y2": round(height*.325), "color": "navy",
+         "start_seconds": .72, "draw_seconds": .22},
+        {"type": "line", "x1": round(width*.715), "y1": round(height*.222),
+         "x2": round(width*.92), "y2": round(height*.222), "color": "navy",
+         "start_seconds": .86, "draw_seconds": .22},
+        {"type": "rect", "x": round(width*.69), "y": round(height*.325),
+         "width": round(width*.255), "height": round(height*.018), "color": "gold",
+         "fill": True, "start_seconds": 1.0, "draw_seconds": .2},
+        # Foreground table and legs anchor financial props in the room.
+        {"type": "rect", "x": round(width*.405), "y": round(height*.665),
+         "width": round(width*.50), "height": round(height*.045), "color": "gold",
+         "fill": True, "start_seconds": .95, "draw_seconds": .28},
+        {"type": "line", "x1": round(width*.455), "y1": round(height*.71),
+         "x2": round(width*.455), "y2": round(height*.735), "color": "navy",
+         "start_seconds": 1.2, "draw_seconds": .2},
+        {"type": "line", "x1": round(width*.855), "y1": round(height*.71),
+         "x2": round(width*.855), "y2": round(height*.735), "color": "navy",
+         "start_seconds": 1.3, "draw_seconds": .2},
         {"type": "line", "x1": round(width*.045), "y1": round(height*.735),
          "x2": round(width*.955), "y2": round(height*.735), "color": "navy",
          "start_seconds": .05, "draw_seconds": .55},
