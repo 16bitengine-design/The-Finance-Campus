@@ -400,3 +400,28 @@ def test_character_render_includes_clothing_and_body_detail():
     )
     non_white = sum(1 for pixel in image.getdata() if pixel != (255, 255, 255))
     assert non_white > 1800
+
+
+
+def test_topic_specific_illustrations_render_in_raster_and_svg():
+    from finance_campus.video_renderer import _draw_element
+
+    kinds = ("phone", "shield", "calendar", "chart", "basket")
+    for kind in kinds:
+        element = {
+            "type": kind, "x": 50, "y": 40, "width": 180, "height": 220,
+            "color": "green",
+        }
+        image = Image.new("RGB", (300, 320), (255, 255, 255))
+        _draw_element(ImageDraw.Draw(image), element, 1.0, image.size)
+        white = Image.new("RGB", image.size, (255, 255, 255))
+        assert ImageChops.difference(image, white).getbbox() is not None
+        scene = {
+            "id": f"topic-{kind}",
+            "narration": f"A financial lesson illustrated with a {kind}.",
+            "duration_seconds": 2,
+            "elements": [element],
+        }
+        assert validate_storyboard({"scenes": [scene]}) == []
+        svg = render_scene_svg(scene)
+        assert "<svg" in svg and "<path" in svg or "<svg" in svg and "<rect" in svg
