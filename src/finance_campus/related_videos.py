@@ -8,14 +8,23 @@ from typing import Any
 from urllib.parse import urlparse
 
 
+GENERIC_CONCEPTS = {
+    "financial", "finance", "money", "investing", "investment", "risk",
+    "decisions", "goals", "performance", "education", "basics",
+}
+
+
 def _tokens(values: list[str]) -> set[str]:
-    return {
-        token.casefold()
-        for value in values
-        if isinstance(value, str)
-        for token in re.findall(r"[a-z0-9]+", value.casefold())
-        if len(token) > 2
-    }
+    tokens = set()
+    for value in values:
+        if not isinstance(value, str):
+            continue
+        for token in re.findall(r"[a-z0-9]+", value.casefold()):
+            if len(token) > 2:
+                normalized = token[:-1] if token.endswith("s") and len(token) > 4 else token
+                if normalized not in GENERIC_CONCEPTS:
+                    tokens.add(normalized)
+    return tokens
 
 
 def _is_youtube_watch_url(value: Any) -> bool:
