@@ -104,7 +104,7 @@ def generate_post_metadata(
         "why it matters, and one practical step you can consider. "
         "Learn, apply, and grow.\n\n"
         "Subscribe to The Finance Campus for clear, practical money lessons.\n\n"
-        + related_youtube_line + "\\n\\n"
+        + related_youtube_line + "\n\n"
         + " ".join(youtube_hashtags)
     )
     tiktok_body = (
