@@ -96,7 +96,7 @@ The hosting workflow does not approve publication. It records public media URLs 
 
 ## Publication monitoring
 
-The workflow `.github/workflows/buffer-publication-monitor.yml` runs every 30 minutes and can also be dispatched manually. It reads Buffer post states for tracked post IDs, records `scheduled`, `sending`, `sent` and `error`, and checks Buffer's `externalLink` for sent posts.
+The workflow `.github/workflows/buffer-publication-monitor.yml` is scheduled every 30 minutes and can also be dispatched manually. It remains dormant until the repository Actions variable `BUFFER_MONITOR_ENABLED` is set to `true` after Buffer is connected. It reads Buffer post states for tracked post IDs, records `scheduled`, `sending`, `sent` and `error`, and checks Buffer's `externalLink` for sent posts.
 
 A post is marked `publicly_accessible_verified` only when Buffer reports `sent`, provides a destination URL on an approved YouTube or TikTok domain, and an unauthenticated HTTPS request can reach that URL. A Buffer `sent` state alone is not enough. If the destination URL is absent or cannot be verified, the ledger remains `sent_awaiting_public_verification`. Failed Buffer posts are recorded as `failed`.
 
