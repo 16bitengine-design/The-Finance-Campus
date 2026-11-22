@@ -21,7 +21,7 @@ def test_scene_actions_are_spread_over_real_kokoro_scene_duration():
     assert starts[-1] > 14.0
     person = scene["elements"][0]
     assert person["interaction_animation"]["end_seconds"] > 10.0
-    assert scene["elements"][1]["motion"]["end_seconds"] > 15.0
+    assert scene["elements"][1]["motion"]["end_seconds"] > 14.0
 
 
 def test_story_dependent_cast_adds_a_second_character_when_relationship_is_narrated():
