@@ -600,8 +600,26 @@ def _draw_element(
         if w > 0 and h > 0:
             points = [(x,y), (x+w,y), (x+w,y+h), (x,y+h), (x,y)]
             if element.get("fill") and progress >= 0.32:
-                tint = (255, 255, 255)
-                draw.rounded_rectangle((x, y, x+w, y+h), radius=max(2, width*2), fill=tint)
+                # Keep the surface white, then add restrained black hatching
+                # for depth. Every hatch segment is clipped geometrically to
+                # the rectangle so the fill never spills beyond its outline.
+                draw.rounded_rectangle(
+                    (x, y, x+w, y+h), radius=max(2, width*2), fill=(255, 255, 255)
+                )
+                spacing = max(10, round(14 * min(sx, sy)))
+                for offset in range(-h + spacing, w, spacing):
+                    start_t = max(0, -offset)
+                    end_t = min(h, w - offset)
+                    if end_t <= start_t:
+                        continue
+                    draw.line(
+                        (
+                            x + offset + start_t, y + start_t,
+                            x + offset + end_t, y + end_t,
+                        ),
+                        fill=(0, 0, 0),
+                        width=max(1, width // 3),
+                    )
             _draw_progressive_strokes(draw, [points], progress, color, width)
             _draw_active_hand(draw, [points], progress, color, min(sx, sy))
         return
