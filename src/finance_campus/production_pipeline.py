@@ -1,6 +1,7 @@
 """End-to-end production from an approved script to a narrated illustrated MP4."""
 from __future__ import annotations
 
+import hashlib
 import json
 import shutil
 import subprocess
@@ -265,7 +266,11 @@ def produce_video_from_script(
             and final_video_report["passed"]
         ),
     )
+    video_identity = hashlib.sha256(
+        json.dumps(script, sort_keys=True, ensure_ascii=False).encode("utf-8")
+    ).hexdigest()[:20]
     manifest = {
+        "video_id": f"fc-{video_identity}",
         "title": script["title"],
         "status": "awaiting_visual_review" if quality.passed else "rejected",
         "technical_quality_approved": quality.passed,
