@@ -1,0 +1,411 @@
+"""Safe Buffer GraphQL publisher for approved Finance Campus video packages.
+
+The adapter schedules one post per Buffer channel. It never uploads media: video
+files must already have stable, public HTTPS URLs in the production manifest.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import re
+import sys
+import urllib.error
+import urllib.request
+from pathlib import Path
+from typing import Any
+
+
+BUFFER_API_URL = "https://api.buffer.com"
+SUPPORTED_FORMATS = {"short", "long"}
+
+
+class BufferAPIError(RuntimeError):
+    """Raised when Buffer rejects a request or returns an invalid response."""
+
+
+class BufferClient:
+    def __init__(self, api_key: str, *, timeout: int = 30) -> None:
+        if not api_key.strip():
+            raise ValueError("Buffer API key is required")
+        self.api_key = api_key.strip()
+        self.timeout = timeout
+
+    def execute(self, query: str) -> dict[str, Any]:
+        payload = json.dumps({"query": query}).encode("utf-8")
+        request = urllib.request.Request(
+            BUFFER_API_URL,
+            data=payload,
+            headers={
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "User-Agent": "The-Finance-Campus/1.0",
+            },
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                data = json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            detail = exc.read().decode("utf-8", errors="replace")[:1000]
+            raise BufferAPIError(f"Buffer HTTP {exc.code}: {detail}") from exc
+        except (urllib.error.URLError, TimeoutError) as exc:
+            raise BufferAPIError(f"Buffer request failed: {exc}") from exc
+        except json.JSONDecodeError as exc:
+            raise BufferAPIError("Buffer returned invalid JSON") from exc
+
+        if not isinstance(data, dict):
+            raise BufferAPIError("Buffer returned an unexpected response")
+        if data.get("errors"):
+            messages = [
+                str(item.get("message", "GraphQL error"))
+                for item in data["errors"] if isinstance(item, dict)
+            ]
+            raise BufferAPIError("; ".join(messages) or "Buffer GraphQL request failed")
+        return data.get("data") or {}
+
+    def list_channels(self, organization_id: str) -> list[dict[str, Any]]:
+        query = f"""
+        query FinanceCampusChannels {{
+          channels(input: {{ organizationId: "{_graphql_string(organization_id)}" }}) {{
+            id
+            name
+            service
+          }}
+        }}
+        """
+        result = self.execute(query)
+        channels = result.get("channels")
+        if not isinstance(channels, list):
+            raise BufferAPIError("Buffer did not return a channel list")
+        return channels
+
+    def list_existing_posts(self, organization_id: str, channel_id: str) -> list[dict[str, Any]]:
+        query = f"""
+        query FinanceCampusExistingPosts {{
+          posts(first: 100, input: {{
+            organizationId: "{_graphql_string(organization_id)}"
+            filter: {{ status: [scheduled, sent], channelIds: ["{_graphql_string(channel_id)}"] }}
+          }}) {{
+            edges {{
+              node {{
+                id
+                text
+                channelId
+                status
+                assets {{ source }}
+              }}
+            }}
+          }}
+        }}
+        """
+        result = self.execute(query)
+        connection = result.get("posts") or {}
+        edges = connection.get("edges") or []
+        return [
+            edge.get("node", {}) for edge in edges
+            if isinstance(edge, dict) and isinstance(edge.get("node"), dict)
+        ]
+
+    def create_video_post(
+        self,
+        *,
+        channel_id: str,
+        text: str,
+        video_url: str,
+        platform: str,
+        title: str,
+        thumbnail_offset_ms: int | None = None,
+    ) -> dict[str, Any]:
+        metadata = ""
+        asset_metadata = ""
+        if platform == "youtube":
+            metadata = (
+                'metadata: { youtube: { title: "' + _graphql_string(title)
+                + '", categoryId: "27", privacy: public, madeForKids: false, '
+                "notifySubscribers: true } }"
+            )
+        elif platform == "tiktok" and thumbnail_offset_ms is not None:
+            asset_metadata = f"metadata: {{ thumbnailOffset: {int(thumbnail_offset_ms)} }}"
+        asset_meta_fragment = f", {asset_metadata}" if asset_metadata else ""
+        metadata_fragment = f", {metadata}" if metadata else ""
+        query = f"""
+        mutation FinanceCampusCreatePost {{
+          createPost(input: {{
+            text: "{_graphql_string(text)}"
+            channelId: "{_graphql_string(channel_id)}"
+            schedulingType: automatic
+            mode: addToQueue
+            assets: [{{ video: {{ url: "{_graphql_string(video_url)}"{asset_meta_fragment} }} }}]
+            {metadata_fragment}
+          }}) {{
+            ... on PostActionSuccess {{
+              post {{ id status dueAt channelId text }}
+            }}
+            ... on MutationError {{ message }}
+          }}
+        }}
+        """
+        result = self.execute(query)
+        outcome = result.get("createPost")
+        if not isinstance(outcome, dict):
+            raise BufferAPIError("Buffer returned no createPost result")
+        if outcome.get("message"):
+            raise BufferAPIError(str(outcome["message"]))
+        post = outcome.get("post")
+        if not isinstance(post, dict) or not post.get("id"):
+            raise BufferAPIError("Buffer did not confirm that the post was created")
+        return post
+
+
+def _graphql_string(value: str) -> str:
+    return json.dumps(str(value), ensure_ascii=False)[1:-1]
+
+
+def _load_json(path: str | Path) -> dict[str, Any]:
+    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError(f"Expected a JSON object in {path}")
+    return payload
+
+
+def validate_publish_package(package_dir: str | Path) -> dict[str, Any]:
+    """Fail closed unless a package has passed all editorial and visual gates."""
+    root = Path(package_dir)
+    manifest = _load_json(root / "production-manifest.json")
+    metadata = _load_json(root / "post-metadata.json")
+
+    if manifest.get("status") != "quality_approved":
+        raise ValueError("Package is not quality_approved")
+    if manifest.get("technical_quality_approved") is not True:
+        raise ValueError("Technical quality approval is missing")
+    if manifest.get("human_visual_review_passed") is not True:
+        raise ValueError("Human visual review has not passed")
+    if manifest.get("publication_approved") is not True:
+        raise ValueError("Publication approval is missing")
+    if manifest.get("video_format") not in SUPPORTED_FORMATS:
+        raise ValueError("Manifest has an unsupported video format")
+
+    stages = manifest.get("stages")
+    if not isinstance(stages, dict):
+        raise ValueError("Manifest stages are missing")
+    required_stages = (
+        "script_validated", "script_approved", "kokoro_narration_generated",
+        "captions_validated", "video_rendered", "media_streams_verified",
+        "final_video_qc_passed",
+    )
+    missing = [stage for stage in required_stages if stages.get(stage) is not True]
+    if missing:
+        raise ValueError("Required production stages did not pass: " + ", ".join(missing))
+
+    artifacts = manifest.get("artifacts") or {}
+    thumbnail_path = artifacts.get("thumbnail")
+    if not isinstance(thumbnail_path, str):
+        raise ValueError("A branded channel thumbnail is required in manifest artifacts.thumbnail")
+    thumbnail = Path(thumbnail_path)
+    if not thumbnail.is_absolute():
+        thumbnail = root / thumbnail
+    if not thumbnail.is_file() or thumbnail.stat().st_size < 1024:
+        raise ValueError("Branded thumbnail is missing or implausibly small")
+
+    public_media = manifest.get("public_media") or {}
+    video_url = public_media.get("video_url")
+    if not isinstance(video_url, str) or not video_url.startswith("https://"):
+        raise ValueError("A stable public HTTPS video_url is required in manifest.public_media")
+    if public_media.get("thumbnail_frame_embedded") is not True:
+        raise ValueError(
+            "A branded thumbnail frame must be embedded in the video for Buffer's "
+            "TikTok thumbnail-frame selection"
+        )
+    thumbnail_offset_ms = public_media.get("thumbnail_offset_ms")
+    if manifest["video_format"] == "short":
+        if not isinstance(thumbnail_offset_ms, int) or thumbnail_offset_ms < 0:
+            raise ValueError("Short-form packages require a valid thumbnail_offset_ms")
+
+    platforms = metadata.get("platforms") or {}
+    youtube = platforms.get("youtube") or {}
+    if not isinstance(youtube.get("description"), str) or not youtube["description"].strip():
+        raise ValueError("YouTube description is missing")
+    validation = metadata.get("validation") or {}
+    if validation.get("youtube_disclaimer_present") is not True:
+        raise ValueError("YouTube description disclaimer validation failed")
+    if metadata.get("title") != manifest.get("title"):
+        raise ValueError("Metadata title does not match the production manifest")
+
+    tiktok = platforms.get("tiktok")
+    if manifest["video_format"] == "short":
+        if not isinstance(tiktok, dict) or not isinstance(tiktok.get("caption"), str):
+            raise ValueError("TikTok caption is missing for a short-form package")
+        if validation.get("tiktok_disclaimer_present") is not True:
+            raise ValueError("TikTok caption disclaimer validation failed")
+        if validation.get("platform_copy_is_distinct") is not True:
+            raise ValueError("Platform-specific copy must be distinct")
+    return {
+        "manifest": manifest,
+        "metadata": metadata,
+        "video_url": video_url,
+        "thumbnail_offset_ms": thumbnail_offset_ms,
+        "thumbnail_path": str(thumbnail),
+    }
+
+
+def _load_ledger(path: str | Path) -> dict[str, Any]:
+    target = Path(path)
+    if not target.exists():
+        return {"version": 1, "posts": {}}
+    payload = json.loads(target.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict) or not isinstance(payload.get("posts"), dict):
+        raise ValueError("Publishing ledger is malformed")
+    return payload
+
+
+def _save_ledger(path: str | Path, ledger: dict[str, Any]) -> None:
+    target = Path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    temporary = target.with_suffix(target.suffix + ".tmp")
+    temporary.write_text(json.dumps(ledger, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    temporary.replace(target)
+
+
+def schedule_package(
+    package_dir: str | Path,
+    *,
+    client: BufferClient,
+    organization_id: str,
+    youtube_channel_id: str,
+    tiktok_channel_id: str | None,
+    ledger_path: str | Path,
+    live: bool = False,
+) -> dict[str, Any]:
+    """Validate and queue one approved package; dry-run is the default."""
+    package = validate_publish_package(package_dir)
+    manifest = package["manifest"]
+    metadata = package["metadata"]
+    video_format = manifest["video_format"]
+    destinations = [("youtube", youtube_channel_id)]
+    if video_format == "short":
+        if not tiktok_channel_id:
+            raise ValueError("TikTok channel ID is required for short-form publishing")
+        destinations.append(("tiktok", tiktok_channel_id))
+
+    ledger = _load_ledger(ledger_path)
+    video_key = str(manifest.get("video_id") or manifest.get("title"))
+    if not video_key.strip():
+        raise ValueError("A stable video_id or title is required")
+    results: list[dict[str, Any]] = []
+
+    channels = client.list_channels(organization_id)
+    channel_by_id = {item.get("id"): item for item in channels if isinstance(item, dict)}
+    for platform, channel_id in destinations:
+        channel = channel_by_id.get(channel_id)
+        if not channel:
+            raise ValueError(f"Configured Buffer {platform} channel was not found")
+        if str(channel.get("service", "")).casefold() != platform:
+            raise ValueError(
+                f"Configured {platform} channel points to Buffer service "
+                f"{channel.get('service')!r}"
+            )
+        ledger_key = f"{video_key}:{platform}:{channel_id}"
+        if ledger_key in ledger["posts"]:
+            results.append({
+                "platform": platform,
+                "status": "already_recorded",
+                "buffer_post_id": ledger["posts"][ledger_key].get("buffer_post_id"),
+            })
+            continue
+
+        copy = metadata["platforms"][platform]
+        text = copy["description"] if platform == "youtube" else copy["caption"]
+        # Detect a prior successful API write if the runner lost its ledger update.
+        duplicate = next((
+            post for post in client.list_existing_posts(organization_id, channel_id)
+            if post.get("text") == text
+            and any(asset.get("source") == package["video_url"] for asset in post.get("assets", []))
+        ), None)
+        if duplicate:
+            record = {
+                "buffer_post_id": duplicate.get("id"),
+                "status": str(duplicate.get("status", "scheduled")),
+                "due_at": duplicate.get("dueAt"),
+                "recovered_existing_post": True,
+            }
+            ledger["posts"][ledger_key] = record
+            _save_ledger(ledger_path, ledger)
+            results.append({"platform": platform, "status": "already_in_buffer", **record})
+            continue
+
+        if not live:
+            results.append({
+                "platform": platform,
+                "status": "dry_run_validated",
+                "channel_name": channel.get("name"),
+                "title": manifest["title"],
+                "video_url": package["video_url"],
+            })
+            continue
+
+        post = client.create_video_post(
+            channel_id=channel_id,
+            text=text,
+            video_url=package["video_url"],
+            platform=platform,
+            title=manifest["title"],
+            thumbnail_offset_ms=(
+                package["thumbnail_offset_ms"] if platform == "tiktok" else None
+            ),
+        )
+        record = {
+            "buffer_post_id": post["id"],
+            "status": post.get("status", "scheduled"),
+            "due_at": post.get("dueAt"),
+            "recovered_existing_post": False,
+        }
+        ledger["posts"][ledger_key] = record
+        _save_ledger(ledger_path, ledger)
+        results.append({"platform": platform, "status": "scheduled_in_buffer", **record})
+
+    return {
+        "video_id": video_key,
+        "title": manifest["title"],
+        "mode": "live" if live else "dry_run",
+        "results": results,
+        "ledger_path": str(ledger_path),
+    }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Validate or schedule a Finance Campus package in Buffer")
+    parser.add_argument("package_dir", help="Directory containing production manifest and post metadata")
+    parser.add_argument("--live", action="store_true", help="Actually create scheduled Buffer posts")
+    parser.add_argument("--ledger", default="production/buffer-publishing-ledger.json")
+    args = parser.parse_args()
+
+    try:
+        api_key = os.environ.get("BUFFER_API_KEY", "")
+        organization_id = os.environ.get("BUFFER_ORGANIZATION_ID", "")
+        youtube_channel_id = os.environ.get("BUFFER_YOUTUBE_CHANNEL_ID", "")
+        tiktok_channel_id = os.environ.get("BUFFER_TIKTOK_CHANNEL_ID")
+        if not organization_id or not youtube_channel_id:
+            raise ValueError("BUFFER_ORGANIZATION_ID and BUFFER_YOUTUBE_CHANNEL_ID are required")
+        if args.live and os.environ.get("BUFFER_PUBLISH_ENABLED", "").casefold() != "true":
+            raise ValueError("Live scheduling is locked; set BUFFER_PUBLISH_ENABLED=true only after approval")
+        client = BufferClient(api_key)
+        result = schedule_package(
+            args.package_dir,
+            client=client,
+            organization_id=organization_id,
+            youtube_channel_id=youtube_channel_id,
+            tiktok_channel_id=tiktok_channel_id,
+            ledger_path=args.ledger,
+            live=args.live,
+        )
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+    except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as exc:
+        print(f"BUFFER PUBLISHING REJECTED: {exc}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
