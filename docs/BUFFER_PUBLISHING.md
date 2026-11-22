@@ -94,6 +94,16 @@ The hosting workflow does not approve publication. It records public media URLs 
 - The adapter also checks existing Buffer posts to recover from a lost local ledger update.
 - Buffer's `scheduled` state means queued, not published. Only a Buffer `sent` state plus a verified public platform URL can update the project's publication ledger to publicly accessible.
 
+## Publication monitoring
+
+The workflow `.github/workflows/buffer-publication-monitor.yml` runs every 30 minutes and can also be dispatched manually. It reads Buffer post states for tracked post IDs, records `scheduled`, `sending`, `sent` and `error`, and checks Buffer's `externalLink` for sent posts.
+
+A post is marked `publicly_accessible_verified` only when Buffer reports `sent`, provides a destination URL on an approved YouTube or TikTok domain, and an unauthenticated HTTPS request can reach that URL. A Buffer `sent` state alone is not enough. If the destination URL is absent or cannot be verified, the ledger remains `sent_awaiting_public_verification`. Failed Buffer posts are recorded as `failed`.
+
+Buffer's GraphQL Post object exposes `status`, `sentAt` and `externalLink`; the API documents `sent` as published and `error` as a failed delivery. The monitor uses those fields rather than inferring publication from queue status. See the [Buffer API reference](https://developers.buffer.com/reference.html) and [Posts & Scheduling guide](https://developers.buffer.com/guides/posts-and-scheduling.html).
+
+The monitor requires a read-capable Buffer personal API key. If Buffer returns a permission error for post retrieval, monitoring must be treated as failed—not as evidence of publication.
+
 ## GitHub Actions workflow
 
 The workflow `.github/workflows/buffer-scheduling.yml` can be started manually with the completed production workflow run ID and artifact name, or called from a future production workflow using `workflow_call`. The artifact must contain `production-manifest.json`, `post-metadata.json`, the MP4 and the branded thumbnail at the package root/manifest paths. The reusable caller must pass Buffer secrets (for example, with `secrets: inherit`).
