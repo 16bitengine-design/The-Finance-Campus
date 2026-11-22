@@ -4,7 +4,6 @@ from pathlib import Path
 import pytest
 
 from finance_campus.buffer_publisher import (
-    BufferAPIError,
     schedule_package,
     validate_publish_package,
 )
@@ -103,7 +102,8 @@ def test_dry_run_validates_both_destinations_without_creating_posts(tmp_path):
     assert client.created == []
 
 
-def test_live_scheduling_creates_one_post_per_platform_and_records_ledger(tmp_path):
+def test_live_scheduling_creates_one_post_per_platform_and_records_ledger(tmp_path, monkeypatch):
+    monkeypatch.setattr("finance_campus.buffer_publisher.verify_public_video_url", lambda url: None)
     package = make_package(tmp_path / "package")
     ledger = tmp_path / "ledger.json"
     result = schedule_package(
@@ -120,7 +120,8 @@ def test_live_scheduling_creates_one_post_per_platform_and_records_ledger(tmp_pa
     assert len(saved["posts"]) == 2
 
 
-def test_ledger_prevents_duplicate_scheduling(tmp_path):
+def test_ledger_prevents_duplicate_scheduling(tmp_path, monkeypatch):
+    monkeypatch.setattr("finance_campus.buffer_publisher.verify_public_video_url", lambda url: None)
     package = make_package(tmp_path / "package")
     ledger = tmp_path / "ledger.json"
     first_client = FakeBuffer()
