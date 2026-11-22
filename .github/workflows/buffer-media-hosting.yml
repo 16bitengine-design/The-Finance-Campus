@@ -156,6 +156,57 @@ jobs:
           print("Release assets exist and are attached to a non-draft, non-prerelease release.")
           PY
 
+
+      - name: Confirm repository is public and verify public media URLs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ steps.validate.outputs.tag }}
+        run: |
+          visibility="$(gh repo view "$GH_REPO" --json visibility --jq .visibility)"
+          if [ "$visibility" != "PUBLIC" ]; then
+            echo "GitHub Releases media hosting requires a public repository; current visibility is $visibility."
+            exit 1
+          fi
+          video_url="https://github.com/$GH_REPO/releases/download/$RELEASE_TAG/finance-campus-video.mp4"
+          thumbnail_url="https://github.com/$GH_REPO/releases/download/$RELEASE_TAG/thumbnail-youtube.jpg"
+          curl --fail --location --silent --show-error --range 0-0 "$video_url" --output /dev/null
+          curl --fail --location --silent --show-error "$thumbnail_url" --output /dev/null
+          echo "Both public release assets can be fetched without authentication."
+
+      - name: Write stable public URLs into production manifest
+        env:
+          RELEASE_TAG: ${{ steps.validate.outputs.tag }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          matches = list(Path("package").rglob("production-manifest.json"))
+          if len(matches) != 1:
+              raise SystemExit("Could not uniquely locate production manifest after hosting")
+          path = matches[0]
+          manifest = json.loads(path.read_text(encoding="utf-8"))
+          tag = os.environ["RELEASE_TAG"]
+          repo = os.environ["GH_REPO"]
+          base = f"https://github.com/{repo}/releases/download/{tag}"
+          manifest["public_media"] = {
+              **(manifest.get("public_media") or {}),
+              "video_url": f"{base}/finance-campus-video.mp4",
+              "thumbnail_url": f"{base}/thumbnail-youtube.jpg",
+              "hosting_provider": "github_releases",
+              "release_tag": tag,
+              "publicly_accessible": True
+          }
+          manifest.setdefault("stages", {})["media_hosted"] = True
+          manifest["stages"]["public_media_verified"] = True
+          manifest.setdefault("artifacts", {})["thumbnail"] = "thumbnail-youtube.jpg"
+          path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+          print("Recorded verified public media URLs in production manifest.")
+          PY
+
       - name: Upload hosted package for Buffer scheduling dry-run
         uses: actions/upload-artifact@v4
         with:
