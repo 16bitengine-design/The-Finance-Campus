@@ -20,22 +20,33 @@ const Coin:React.FC<{x:number;y:number;delay:number;index:number}> = ({x,y,delay
  return <g opacity={p} transform={`translate(${x} ${drop}) rotate(${f*2+index*22})`}><ellipse rx="29" ry="22" fill={P.caramel} stroke={P.ink} strokeWidth="5"/><ellipse rx="17" ry="12" fill="none" stroke={P.cream} strokeWidth="3"/></g>
 };
 const Person:React.FC<{worried:boolean;action:number}> = ({worried,action})=>{
- const f=useCurrentFrame();const bob=Math.sin(f/11)*3;const reach=ease(f,action,action+18);const enter=ease(f,Math.max(0,action-24),action+12);
- return <g opacity={enter} transform={`translate(350 ${bob+(1-enter)*90}) scale(.82)`} stroke={P.ink} strokeWidth="9" strokeLinecap="round" strokeLinejoin="round">
- <ellipse cx="0" cy="650" rx="170" ry="24" fill={P.brown} opacity=".12" stroke="none"/>
- <path d="M-88 270Q-135 300-120 470L-100 570Q0 605 100 570L120 460Q120 310 78 270Z" fill={P.brown}/>
- <path d="M-58 292Q0 320 58 292L48 530Q0 554-48 530Z" fill={P.cream} stroke="none"/>
- <path d="M-70 560L-82 690Q-85 715-52 718H-4L0 585M12 585L24 700Q28 722 65 718L105 710Q116 700 94 680L70 560" fill={P.ink}/>
- <path d="M-85 705Q-130 700-142 728Q-150 748-120 754H-18Q0 740-12 720M70 708Q120 700 142 728Q150 748 120 754H20Q5 740 20 720" fill={P.brown}/>
- <path d={`M-88 315Q-160 340-150 445L-118 490Q-92 500-80 468M88 315Q150 340 150 ${410+reach*70}L115 ${450+reach*70}Q90 ${460+reach*70} 78 ${430+reach*70}`} fill="none" stroke={P.brown} strokeWidth="34"/>
- <path d="M-24 250V285H24V250" fill={P.sand}/>
- <ellipse cx="0" cy="160" rx="92" ry="112" fill={P.sand}/>
- <path d="M-92 150Q-104 55-28 34Q60 20 94 105L88 146Q54 88 22 95Q-30 110-92 150Z" fill={P.ink}/>
- <path d="M-62 153q14-12 29 0m34 0q14-12 29 0" fill="none" stroke={P.ink} strokeWidth="7"/>
- <ellipse cx="-34" cy="172" rx="8" ry="11" fill={P.ink} stroke="none"/><ellipse cx="34" cy="172" rx="8" ry="11" fill={P.ink} stroke="none"/>
- <path d={worried?"M-18 218q18-15 36 0":"M-18 207q18 17 36 0"} fill="none" stroke={P.brown} strokeWidth="7"/>
- <path d="M-5 182l-8 20h15" fill="none" stroke={P.brown} strokeWidth="5"/>
- </g>
+ const f=useCurrentFrame();
+ const step=Math.sin(f/7);
+ const lean=interpolate(f,[action,action+24],[0,-9],clamp);
+ const handY=interpolate(f,[action,action+24],[410,345],clamp)+Math.sin(f/9)*7;
+ const armX=interpolate(f,[action,action+24],[105,205],clamp);
+ const blink=(Math.floor(f/83)%5===0 && f%83<5);
+ const eyeY=blink?164:158;
+ return <g transform={"translate(245 "+(Math.sin(f/8)*3)+") scale(.78) rotate("+lean+" 0 390)"} stroke={P.ink} strokeWidth="10" strokeLinecap="round" strokeLinejoin="round">
+ <ellipse cx="0" cy="735" rx="130" ry="20" fill={P.ink} opacity=".13" stroke="none"/>
+ <path d={"M-48 555L-64 690Q-67 715-42 720L-5 720L18 "+(690+step*13)+"L35 570"} fill={P.ink}/>
+ <path d={"M18 570L42 680Q48 704 78 704L116 704Q130 692 105 675L80 555"} fill={P.brown}/>
+ <path d="M-58 710Q-102 708-112 733Q-116 750-88 752H-12Q4 740-5 722M78 700Q120 690 140 716Q150 739 125 746H48Q32 735 42 716" fill={P.ink}/>
+ <path d="M-84 270Q-122 300-112 460L-92 574Q0 606 92 574L112 460Q122 300 76 270Z" fill={P.brown}/>
+ <path d="M-54 292L0 345L54 292L39 535Q0 556-39 535Z" fill={P.cream} stroke="none"/>
+ <path d="M-54 292L0 345L54 292M0 345V520" fill="none" stroke={P.caramel} strokeWidth="8"/>
+ <path d="M-20 275L0 315L20 275" fill="none" stroke={P.white} strokeWidth="8"/>
+ <path d="M-86 320Q-150 350-142 440L-110 480Q-86 490-76 462L-65 405" fill="none" stroke={P.brown} strokeWidth="34"/>
+ <path d={"M78 320Q132 350 142 405L"+armX+" "+(handY-70)+"L"+(armX+16)+" "+(handY-18)} fill="none" stroke={P.brown} strokeWidth="34"/>
+ <path d={"M"+(armX+16)+" "+(handY-18)+"q18 4 20 22q-2 18-20 20q-19-5-18-22q1-14 18-20"} fill={P.sand} stroke={P.ink} strokeWidth="8"/>
+ <path d="M-24 250V282H24V250" fill={P.sand}/>
+ <g transform="rotate(13 8 158)"><ellipse cx="8" cy="158" rx="88" ry="108" fill={P.sand}/>
+ <path d="M-80 145Q-95 58-22 35Q58 15 96 100L90 143Q52 91 16 96Q-30 108-80 145Z" fill={P.ink}/>
+ <path d="M-48 151q13-10 27 0m31 0q13-10 27 0" fill="none" stroke={P.ink} strokeWidth="7"/>
+ <ellipse cx="-31" cy={eyeY} rx="7" ry={blink?2:10} fill={P.ink} stroke="none"/><ellipse cx="35" cy={eyeY} rx="7" ry={blink?2:10} fill={P.ink} stroke="none"/>
+ <path d="M3 170l-13 20h18" fill="none" stroke={P.brown} strokeWidth="6"/>
+ <path d={worried?"M-13 218q18-17 36 0":"M-15 210q18 18 38 0"} fill="none" stroke={P.brown} strokeWidth="7"/>
+ <path d={worried?"M-52 130l25 8m25-8l25 8":"M-52 138l25-3m25-3l25 3"} fill="none" stroke={P.ink} strokeWidth="6"/></g></g>
 };
 const Room:React.FC=()=> {const f=useCurrentFrame();const reveal=ease(f,0,54);return <g opacity={reveal} transform={`translate(${(1-reveal)*-70} 0)`}>
  <path d="M80 90H1000V1110H80Z" fill={P.cream} stroke={P.brown} strokeWidth="8"/>
@@ -66,19 +77,19 @@ const Story:React.FC<{cues:Cue[];duration:number}> = ({cues,duration})=>{
  <svg viewBox="0 0 1080 1920" preserveAspectRatio="xMidYMid meet" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}>
  <defs><linearGradient id="warm" x1="0" x2="0" y1="0" y2="1"><stop stopColor={P.paper}/><stop offset="1" stopColor={P.cream}/></linearGradient></defs>
  <rect width="1080" height="1920" fill="url(#warm)"/>
- <g transform="translate(0 360)"><Room/>
+ <g transform="translate(0 360)"><Room/><Person worried={phase===1} action={phaseFrameStart+phaseFrames*.12}/>
  {phase===0&&<g>
  <Person worried={false} action={phaseFrameStart+phaseFrames*.12}/>
  <g opacity={wallet}><rect x="600" y="650" width="240" height="130" rx="22" fill={P.brown}/><text x="720" y="705" textAnchor="middle" fontSize="22" fill={P.cream} fontWeight="800">SALARY RECEIVED</text><text x="720" y="752" textAnchor="middle" fontSize="35" fill={P.white} fontWeight="900">+ INCOME</text></g>
- <g>{[0,1,2,3].map(i=><g key={i} transform={`translate(${540+i*75} ${610-i*42})`}><Bill x={0} y={0} delay={phaseFrameStart+phaseFrames*(.2+i*.12)} label="INCOME"/></g>)}</g>
+ <g><Bill x={560} y={570} delay={phaseFrameStart+phaseFrames*.20} label="INCOME"/><Bill x={805} y={570} delay={phaseFrameStart+phaseFrames*.34} label="INCOME"/><Bill x={560} y={830} delay={phaseFrameStart+phaseFrames*.48} label="INCOME"/><Bill x={805} y={830} delay={phaseFrameStart+phaseFrames*.62} label="INCOME"/></g><g transform="translate(685 385)"><rect x="-120" y="-48" width="240" height="92" rx="24" fill={P.brown} stroke={P.ink} strokeWidth="7"/><text y="8" textAnchor="middle" fontSize="27" fill={P.white} fontWeight="900">PAYDAY!</text></g>
  </g>}
  {phase===1&&<g><Person worried={true} action={phaseFrameStart+phaseFrames*.12}/>
- <Bill x={540} y={510} delay={phaseFrameStart+phaseFrames*.06} label="RENT"/><Bill x={760} y={650} delay={phaseFrameStart+phaseFrames*.28} label="POWER"/><Bill x={570} y={760} delay={phaseFrameStart+phaseFrames*.5} label="FOOD"/>
+ <Bill x={560} y={520} delay={phaseFrameStart+phaseFrames*.06} label="RENT"/><Bill x={810} y={650} delay={phaseFrameStart+phaseFrames*.28} label="POWER"/><Bill x={560} y={850} delay={phaseFrameStart+phaseFrames*.5} label="FOOD"/>
  <g opacity={paid}><path d="M470 600Q650 530 860 620" fill="none" stroke={P.caramel} strokeWidth="12" strokeDasharray="20 18"/><text x="660" y="555" fontSize="28" fontWeight="900" fill={P.ink}>PAYMENT LEAVES</text></g>
  </g>}
  {phase===2&&<g>
- {[0,1,2].map(i=><g key={i} transform={`translate(${220+i*320} 650)`}><rect x="-125" y="-105" width="250" height="235" rx="25" fill={[P.cream,P.sand,P.white][i]} stroke={P.brown} strokeWidth="8"/><text y="-55" textAnchor="middle" fontSize="26" fontWeight="900" fill={P.ink}>{["NEEDS","OBLIGATIONS","FUTURE YOU"][i]}</text><Bill x={0} y={30} delay={phaseFrameStart+phaseFrames*(.18+i*.2)} label="ALLOCATE"/></g>)}
- <path d="M540 410V510M220 510H860M220 510V545M540 510V545M860 510V545" fill="none" stroke={P.brown} strokeWidth="12" strokeLinecap="round"/>
+ {[0,1,2].map(i=><g key={i} transform={`translate(${530+i*185} 650)`}><rect x="-82" y="-105" width="164" height="235" rx="25" fill={[P.cream,P.sand,P.white][i]} stroke={P.brown} strokeWidth="8"/><text y="-55" textAnchor="middle" fontSize="20" fontWeight="900" fill={P.ink}>{["NEEDS","OBLIGATIONS","FUTURE YOU"][i]}</text><Bill x={0} y={30} delay={phaseFrameStart+phaseFrames*(.18+i*.2)} label="ALLOCATE"/></g>)}
+ <path d="M710 410V510M530 510H900M530 510V545M715 510V545M900 510V545" fill="none" stroke={P.brown} strokeWidth="12" strokeLinecap="round"/>
  </g>}
  {phase===3&&<g><Person worried={false} action={phaseFrameStart+phaseFrames*.12}/>
  <path d="M600 600H850L820 930Q725 1010 630 930Z" fill={P.cream} stroke={P.brown} strokeWidth="12"/>
@@ -87,10 +98,10 @@ const Story:React.FC<{cues:Cue[];duration:number}> = ({cues,duration})=>{
  <text x="720" y="1060" textAnchor="middle" fontSize="30" fontWeight="900" fill={P.ink}>SAVINGS BUFFER</text>
  </g>}
  {phase===4&&<g>
- <path d="M240 950V500M240 950H900" stroke={P.brown} strokeWidth="12" fill="none"/>
- <path d="M280 880L410 810L540 750L670 620L820 500" stroke={P.caramel} strokeWidth="22" fill="none" strokeLinecap="round" strokeDasharray="1" pathLength="1" strokeDashoffset={1-chart}/>
- {[0,1,2,3,4].map(i=><circle key={i} cx={280+i*135} cy={[880,810,750,620,500][i]} r="17" fill={P.brown} opacity={chart}/>)}
- <text x="565" y="1030" textAnchor="middle" fontSize="30" fontWeight="900" fill={P.ink}>CONSISTENCY OVER TIME</text>
+ <path d="M500 950V500M500 950H970" stroke={P.brown} strokeWidth="12" fill="none"/>
+ <path d="M540 880L635 810L730 750L825 620L930 500" stroke={P.caramel} strokeWidth="22" fill="none" strokeLinecap="round" strokeDasharray="1" pathLength="1" strokeDashoffset={1-chart}/>
+ {[0,1,2,3,4].map(i=><circle key={i} cx={540+i*97.5} cy={[880,810,750,620,500][i]} r="17" fill={P.brown} opacity={chart}/>)}
+ <text x="735" y="1030" textAnchor="middle" fontSize="30" fontWeight="900" fill={P.ink}>CONSISTENCY OVER TIME</text>
  </g>}
  </g>
  </svg>
