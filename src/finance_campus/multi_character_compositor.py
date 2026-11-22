@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 import math
-from itertools import pairwise
 from collections.abc import Iterator
+from itertools import pairwise
 from typing import Any
 
 from PIL import Image
