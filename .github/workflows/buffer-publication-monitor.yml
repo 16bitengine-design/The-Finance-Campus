@@ -85,10 +85,10 @@ jobs:
               record["thumbnail_artifact_created_at"] = datetime.now(timezone.utc).isoformat()
               prepared += 1
 
-          ledger_path.write_text(json.dumps(ledger, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+          ledger_path.write_text(json.dumps(ledger, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
           print(f"Prepared {prepared} newly verified thumbnail(s).")
           with open(__import__("os").environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
-              out.write(f"count={prepared}\\n")
+              out.write(f"count={prepared}\n")
           PY
 
       - name: Make published thumbnails downloadable on phone and laptop
