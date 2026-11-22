@@ -81,3 +81,19 @@ collision-aware blocking, camera transforms, and Remotion manifest export remain
 follow-on integration work. The current compositor expects the character rig
 canvas to fit the scene canvas after its declared scale and position; off-canvas
 placements are clipped by the output canvas.
+
+
+## Visual art direction — monochrome vector
+
+New Finance Campus artwork should use a consistent black-and-white vector system:
+white backgrounds, black outlines, expressive character drawing, detailed props
+and environments, selective cross-hatching, negative space and progressive SVG
+stroke reveals. Do not use coloured illustration fills or multicolour charts as
+the default. Build depth with line weight, hatching, overlap, scale and motion.
+Use vector paths for authored storytelling assets so they remain crisp at 1080p
+and can be animated stroke-by-stroke. Captions and typography remain subordinate
+to the illustrated action.
+
+The Remotion demo now includes an authored SVG household-bills scene and uses
+monochrome black linework. This is a direction-setting prototype, not yet a
+visually approved production sample.
