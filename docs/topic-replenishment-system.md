@@ -2,9 +2,9 @@
 
 ## Operating schedule
 
-- GitHub Actions runs every Monday at 05:30 UTC (08:30 East Africa Time).
-- The weekly target is 20 newly accepted topic records.
-- A manual run can override the target through the workflow input.
+- GitHub Actions runs daily at 05:30 UTC (08:30 East Africa Time).
+- The daily target is 3 newly accepted topic records (21 per week).
+- A manual run can override the daily target through the workflow input.
 - The workflow writes only to `production/topic-library.json` and `production/reports/topic-refresh-report.json`.
 
 ## Research and acceptance gates
@@ -35,12 +35,16 @@ A reachable PDF without extracted text is rejected. A source reachability/keywor
 
 ## Reserve monitoring
 
-Every refresh report records the catalogue size, number of unused blueprints, estimated weeks of cover at 20 topics per week, rejected candidates and any catalogue-exhaustion warning. The current curated blueprint catalogue is finite; the warning is intentional. The reserve must be expanded with genuinely distinct, source-mapped editorial briefs before it is exhausted. The system must never fabricate an endless supply or silently recycle old topics.
+Every refresh report records the catalogue size, number of unused blueprints, estimated weeks of cover at 21 topics per week, rejected candidates and any catalogue-exhaustion warning. The current curated blueprint catalogue is finite; at 3 topics per day, the 66-topic seed catalogue represents only about 22 days of supply. The warning is intentional. Daily replenishment increases freshness but does not itself create an unlimited supply. The next development step is broader, ongoing discovery from authoritative financial education resources, with extracted evidence and duplicate screening. The system must never fabricate an endless supply or silently recycle old topics.
+
+## Editorial voice
+
+Research sources supply evidence and factual grounding only. Topic titles, editorial briefs, examples and eventual scripts must use The Finance Campus' own distinctive voice—not copy the source's tone, phrasing or presentation. Explain ideas in clear, relatable language with engaging storytelling and realistic, hopeful framing.
 
 ## Canonical files
 
 - Topic library: `production/topic-library.json`
-- Weekly workflow: `.github/workflows/weekly-topic-refresh.yml`
+- Daily workflow: `.github/workflows/weekly-topic-refresh.yml`
 - Source and duplicate logic: `src/finance_campus/research_pipeline.py`
 - Curated evergreen blueprint catalogue: `src/finance_campus/mindset_topics.py`
 - Tests: `tests/test_topics.py`, `tests/test_research_pipeline.py`
