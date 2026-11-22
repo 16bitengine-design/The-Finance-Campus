@@ -81,15 +81,15 @@ jobs:
           summary = Path(os.environ["GITHUB_STEP_SUMMARY"])
           if rows:
               with summary.open("a", encoding="utf-8") as out:
-                  out.write("## Your published thumbnails\\n\\n")
-                  out.write("Tap an individual image link to download that thumbnail to this device.\\n\\n")
+                  out.write("## Your published thumbnails\n\n")
+                  out.write("Tap an individual image link to download that thumbnail to this device.\n\n")
                   for title, platform, url in rows:
-                      safe_title = title.replace("|", "\\\\|").replace("\\n", " ")
-                      out.write(f"- **{safe_title}** ({platform}) — [Download thumbnail]({url})\\n")
+                      safe_title = title.replace("|", "\\|").replace("\n", " ")
+                      out.write(f"- **{safe_title}** ({platform}) — [Download thumbnail]({url})\n")
           else:
               print("No newly verified thumbnails need a download link.")
 
-          ledger_path.write_text(json.dumps(ledger, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+          ledger_path.write_text(json.dumps(ledger, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
           print(f"Added {len(rows)} individual thumbnail download link(s) to the Actions run summary.")
           PY
 
