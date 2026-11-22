@@ -21,7 +21,7 @@ const Coin:React.FC<{x:number;y:number;delay:number;index:number}> = ({x,y,delay
 };
 const Person:React.FC<{worried:boolean;action:number}> = ({worried,action})=>{
  const f=useCurrentFrame();const bob=Math.sin(f/11)*3;const reach=ease(f,action,action+18);const enter=ease(f,Math.max(0,action-24),action+12);
- return <g opacity={enter} transform={`translate(180 ${bob+(1-enter)*90})`} stroke={P.ink} strokeWidth="9" strokeLinecap="round" strokeLinejoin="round">
+ return <g opacity={enter} transform={`translate(350 ${bob+(1-enter)*90}) scale(.82)`} stroke={P.ink} strokeWidth="9" strokeLinecap="round" strokeLinejoin="round">
  <ellipse cx="0" cy="650" rx="170" ry="24" fill={P.brown} opacity=".12" stroke="none"/>
  <path d="M-88 270Q-135 300-120 470L-100 570Q0 605 100 570L120 460Q120 310 78 270Z" fill={P.brown}/>
  <path d="M-58 292Q0 320 58 292L48 530Q0 554-48 530Z" fill={P.cream} stroke="none"/>
@@ -39,6 +39,8 @@ const Person:React.FC<{worried:boolean;action:number}> = ({worried,action})=>{
 };
 const Room:React.FC=()=> {const f=useCurrentFrame();const reveal=ease(f,0,54);return <g opacity={reveal} transform={`translate(${(1-reveal)*-70} 0)`}>
  <path d="M80 90H1000V1110H80Z" fill={P.cream} stroke={P.brown} strokeWidth="8"/>
+ <path d="M95 106H985V1094H95Z" fill="none" stroke={P.white} strokeWidth="3" opacity=".8"/>
+ <ellipse cx="520" cy="790" rx="390" ry="34" fill={P.brown} opacity=".07" stroke="none"/>
  <path d="M120 130H460V410H120Z" fill={P.paper} stroke={P.brown} strokeWidth="8"/>
  <path d="M290 130V410M120 270H460" stroke={P.sand} strokeWidth="8"/>
  <path d="M120 800H960V850H120Z" fill={P.brown}/>
@@ -71,10 +73,10 @@ const Story:React.FC<{cues:Cue[];duration:number}> = ({cues,duration})=>{
  <g>{[0,1,2,3].map(i=><g key={i} transform={`translate(${540+i*75} ${610-i*42})`}><Bill x={0} y={0} delay={phaseFrameStart+phaseFrames*(.2+i*.12)} label="INCOME"/></g>)}</g>
  </g>}
  {phase===1&&<g><Person worried={true} action={phaseFrameStart+phaseFrames*.12}/>
- <Bill x={540} y={510} delay={phaseFrameStart+phaseFrames*.06} label="RENT"/><Bill x={760} y={650} delay={phaseFrameStart+phaseFrames*.28} label="POWER"/><Bill x={330} y={690} delay={phaseFrameStart+phaseFrames*.5} label="FOOD"/>
+ <Bill x={540} y={510} delay={phaseFrameStart+phaseFrames*.06} label="RENT"/><Bill x={760} y={650} delay={phaseFrameStart+phaseFrames*.28} label="POWER"/><Bill x={570} y={760} delay={phaseFrameStart+phaseFrames*.5} label="FOOD"/>
  <g opacity={paid}><path d="M470 600Q650 530 860 620" fill="none" stroke={P.caramel} strokeWidth="12" strokeDasharray="20 18"/><text x="660" y="555" fontSize="28" fontWeight="900" fill={P.ink}>PAYMENT LEAVES</text></g>
  </g>}
- {phase===2&&<g><Person worried={false} action={phaseFrameStart+phaseFrames*.12}/>
+ {phase===2&&<g>
  {[0,1,2].map(i=><g key={i} transform={`translate(${220+i*320} 650)`}><rect x="-125" y="-105" width="250" height="235" rx="25" fill={[P.cream,P.sand,P.white][i]} stroke={P.brown} strokeWidth="8"/><text y="-55" textAnchor="middle" fontSize="26" fontWeight="900" fill={P.ink}>{["NEEDS","OBLIGATIONS","FUTURE YOU"][i]}</text><Bill x={0} y={30} delay={phaseFrameStart+phaseFrames*(.18+i*.2)} label="ALLOCATE"/></g>)}
  <path d="M540 410V510M220 510H860M220 510V545M540 510V545M860 510V545" fill="none" stroke={P.brown} strokeWidth="12" strokeLinecap="round"/>
  </g>}
@@ -84,7 +86,7 @@ const Story:React.FC<{cues:Cue[];duration:number}> = ({cues,duration})=>{
  {Array.from({length:12},(_,i)=><Coin key={i} x={650+(i%4)*48} y={720+Math.floor(i/4)*58} delay={phaseFrameStart+phaseFrames*(.12+i*.075)} index={i}/>)}
  <text x="720" y="1060" textAnchor="middle" fontSize="30" fontWeight="900" fill={P.ink}>SAVINGS BUFFER</text>
  </g>}
- {phase===4&&<g><Person worried={false} action={phaseFrameStart+phaseFrames*.12}/>
+ {phase===4&&<g>
  <path d="M240 950V500M240 950H900" stroke={P.brown} strokeWidth="12" fill="none"/>
  <path d="M280 880L410 810L540 750L670 620L820 500" stroke={P.caramel} strokeWidth="22" fill="none" strokeLinecap="round" strokeDasharray="1" pathLength="1" strokeDashoffset={1-chart}/>
  {[0,1,2,3,4].map(i=><circle key={i} cx={280+i*135} cy={[880,810,750,620,500][i]} r="17" fill={P.brown} opacity={chart}/>)}
