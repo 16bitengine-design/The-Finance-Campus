@@ -109,11 +109,11 @@ jobs:
               raise SystemExit("video_id cannot produce a safe release tag")
 
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
-              output.write(f"tag=finance-campus-media-{safe_id}\\n")
-              output.write(f"video={video}\\n")
-              output.write(f"thumbnail={thumbnail}\\n")
-              output.write(f"title={title.replace(chr(10), ' ')[:180]}\\n")
-              output.write(f"video_id={video_id}\\n")
+              output.write(f"tag=finance-campus-media-{safe_id}\n")
+              output.write(f"video={video}\n")
+              output.write(f"thumbnail={thumbnail}\n")
+              output.write(f"title={title.replace(chr(10), ' ')[:180]}\n")
+              output.write(f"video_id={video_id}\n")
           PY
 
       - name: Create public GitHub Release and host approved media
@@ -203,7 +203,7 @@ jobs:
           manifest.setdefault("stages", {})["media_hosted"] = True
           manifest["stages"]["public_media_verified"] = True
           manifest.setdefault("artifacts", {})["thumbnail"] = "thumbnail-youtube.jpg"
-          path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+          path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
           print("Recorded verified public media URLs in production manifest.")
           PY
 
