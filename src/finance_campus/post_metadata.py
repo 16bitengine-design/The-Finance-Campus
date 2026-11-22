@@ -86,16 +86,31 @@ def generate_post_metadata(
     keywords = _keywords(title, category)
     youtube_hashtags = _topic_hashtags(title, category, 3)
     tiktok_hashtags = _topic_hashtags(title, category, 5)
+    related = script.get("related_video")
+    related_youtube_line = ""
+    related_tiktok_line = ""
+    if isinstance(related, dict) and related.get("status") == "publicly_accessible_verified":
+        related_title = _clean_text(related.get("title"))
+        related_url = _clean_text(related.get("url"))
+        if related_title and related_url.startswith("https://"):
+            related_youtube_line = (
+                f"\n\nGo deeper: watch our lesson, {related_title}: {related_url}"
+            )
+            related_tiktok_line = (
+                f"\n\nWant the full lesson on {related_title}? Find it on The Finance Campus YouTube channel."
+            )
     youtube_body = (
         f"{base}\n\nIn this Finance Campus lesson, we explore {title.casefold()}, "
         "why it matters, and one practical step you can consider. "
         "Learn, apply, and grow.\n\n"
         "Subscribe to The Finance Campus for clear, practical money lessons.\n\n"
+        + related_youtube_line + "\\n\\n"
         + " ".join(youtube_hashtags)
     )
     tiktok_body = (
         f"{base}\n\nA money mindset lesson from The Finance Campus. "
         "Follow for practical ideas that help you think more clearly about money.\n\n"
+        + related_tiktok_line + "\\n\\n"
         + " ".join(tiktok_hashtags)
     )
     youtube_description = append_description_disclaimer(youtube_body, disclaimer_config)
