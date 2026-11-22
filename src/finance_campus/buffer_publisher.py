@@ -103,7 +103,7 @@ class BufferClient:
         query FinanceCampusExistingPosts {{
           posts(first: 100, input: {{
             organizationId: "{_graphql_string(organization_id)}"
-            filter: {{ status: [scheduled, sent], channelIds: ["{_graphql_string(channel_id)}"] }}
+            filter: {{ status: [scheduled, sending, sent, error], channelIds: ["{_graphql_string(channel_id)}"] }}
           }}) {{
             edges {{
               node {{
