@@ -354,7 +354,7 @@ def _scene_elements(text: str, section: str, title: str, width: int, height: int
                 "character_role": role,
                 "pose": pose if pose in {"thinking", "reaching", "determined", "celebrating", "worried", "overwhelmed"} else "neutral",
                 "expression": expression,
-                "entrance": {
+                "motion": {
                     "from_x": round(width * 1.02),
                     "from_y": round(height * .28),
                     "to_x": round(width * .67),
