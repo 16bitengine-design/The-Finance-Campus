@@ -29,3 +29,5 @@ target-version = "py311"
 [tool.ruff.lint.per-file-ignores]
 "src/finance_campus/script_quality.py" = ["I001"]
 "src/finance_campus/post_metadata.py" = ["I001"]
+"src/finance_campus/buffer_publisher.py" = ["I001"]
+"src/finance_campus/related_videos.py" = ["I001"]
