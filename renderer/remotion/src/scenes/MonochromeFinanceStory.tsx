@@ -1,205 +1,49 @@
 import React from "react";
-import {
-  AbsoluteFill,
-  Sequence,
-  interpolate,
-  useCurrentFrame,
-} from "remotion";
-import { FinancialStoryVector } from "../components/FinancialStoryVector";
+import { AbsoluteFill, Sequence, interpolate, useCurrentFrame } from "remotion";
 
-const INK = "#111111";
-const PAPER = "#FFFFFF";
+const C = { ink: "#30231E", brown: "#704A35", caramel: "#A77B56", sand: "#D1B895", cream: "#E9DDC9", paper: "#F8F3EA", white: "#FFFDF8" };
+const clamp = { extrapolateLeft: "clamp" as const, extrapolateRight: "clamp" as const };
 
-const Draw: React.FC<{
-  d: string;
-  start?: number;
-  duration?: number;
-  width?: number;
-  fill?: string;
-}> = ({ d, start = 0, duration = 45, width = 8, fill = "none" }) => {
-  const frame = useCurrentFrame();
-  const progress = interpolate(frame, [start, start + duration], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  return (
-    <path d={d} fill={fill} stroke={INK} strokeWidth={width}
-      strokeLinecap="round" strokeLinejoin="round"
-      pathLength={1} strokeDasharray={1} strokeDashoffset={1 - progress} />
-  );
+const Grain: React.FC = () => <svg style={{position:"absolute",inset:0,width:"100%",height:"100%",opacity:.16,pointerEvents:"none"}} viewBox="0 0 1080 1920"><defs><pattern id="grain" width="34" height="34" patternUnits="userSpaceOnUse"><circle cx="4" cy="7" r="1.2" fill={C.brown}/><circle cx="23" cy="21" r=".8" fill={C.brown}/></pattern></defs><rect width="1080" height="1920" fill="url(#grain)"/></svg>;
+
+const Heading: React.FC<{kicker:string; title:string; sub:string}> = ({kicker,title,sub}) => <div style={{position:"absolute",top:95,left:76,right:76,fontFamily:"Arial,sans-serif",color:C.ink}}><div style={{fontSize:25,letterSpacing:6,fontWeight:800,color:C.brown}}>{kicker}</div><div style={{fontSize:66,lineHeight:1.03,fontWeight:900,marginTop:18}}>{title}</div><div style={{fontSize:29,marginTop:20,color:C.brown,fontWeight:600}}>{sub}</div></div>;
+
+const Character: React.FC<{x?:number;y?:number;scale?:number;pose?:number;worried?:boolean}> = ({x=0,y=0,scale=1,pose=0,worried=true}) => {
+ const f=useCurrentFrame(); const bob=Math.sin(f/13)*4; const arm=interpolate(f,[0,35,70,110],[0,-18,8,-8],clamp);
+ return <g transform={`translate(${x} ${y+bob}) scale(${scale})`} stroke={C.ink} strokeWidth="9" strokeLinecap="round" strokeLinejoin="round">
+  <ellipse cx="0" cy="510" rx="170" ry="27" fill={C.brown} opacity=".12" stroke="none"/>
+  <path d="M-86 220 Q-112 245 -116 370 L-102 485 Q0 520 104 485 L115 365 Q110 250 76 220Z" fill={C.brown}/>
+  <path d="M-65 246 Q0 282 65 246 L50 455 Q0 478 -50 455Z" fill={C.cream} stroke="none"/>
+  <path d="M-75 465 L-83 590 Q-88 625 -55 632 L-10 632 L0 500Z" fill={C.ink}/>
+  <path d="M12 500 L24 625 Q28 642 65 638 L100 630 Q114 622 94 600 L72 470Z" fill={C.ink}/>
+  <path d="M-63 626 Q-110 620 -124 651 Q-132 670 -105 675 L-8 675 Q7 664 -8 641Z" fill={C.brown}/>
+  <path d="M62 628 Q105 618 126 646 Q137 666 111 675 L20 675 Q5 662 25 642Z" fill={C.brown}/>
+  <path d={`M-92 275 Q-160 300 -150 ${365+arm} L-115 ${405+arm} Q-95 ${415+arm} -84 ${390+arm}`} fill={C.brown}/>
+  <path d={`M90 275 Q150 300 145 ${350-arm/2} L110 ${390-arm/2} Q90 ${400-arm/2} 78 ${375-arm/2}`} fill={C.brown}/>
+  <path d="M-22 195 L-22 235 L24 235 L24 195" fill={C.sand}/>
+  <ellipse cx="0" cy="115" rx="92" ry="112" fill={C.sand}/>
+  <path d="M-92 105 Q-100 8 -20 -12 Q62 -28 94 60 L88 98 Q56 47 25 52 Q-30 70 -92 105Z" fill={C.ink}/>
+  <path d="M-82 70 Q-72 14 -18 4 M38 12 Q78 26 86 70" fill="none" stroke={C.brown} strokeWidth="10"/>
+  <ellipse cx="-34" cy="115" rx="9" ry="13" fill={C.ink} stroke="none"/><ellipse cx="34" cy="115" rx="9" ry="13" fill={C.ink} stroke="none"/>
+  <path d={worried?"M-54 92 Q-34 76 -16 90 M16 90 Q34 76 54 92":"M-54 88 Q-34 96 -16 88 M16 88 Q34 96 54 88"} fill="none" stroke={C.ink} strokeWidth="7"/>
+  <path d={worried?"M-17 164 Q0 146 17 164":"M-17 153 Q0 171 17 153"} fill="none" stroke={C.brown} strokeWidth="7"/>
+  <path d="M-5 125 L-12 145 L3 147" fill="none" stroke={C.brown} strokeWidth="5"/>
+  <path d="M-108 305 Q-65 280 -32 285 M32 285 Q75 280 108 305" fill="none" stroke={C.sand} strokeWidth="6"/>
+ </g>;
 };
 
-const SceneTitle: React.FC<{ title: string; subtitle: string }> = ({ title, subtitle }) => (
-  <div style={{ position: "absolute", top: 105, left: 65, right: 65, textAlign: "center", color: INK, fontFamily: "Arial, sans-serif" }}>
-    <div style={{ fontSize: 62, lineHeight: 1.08, fontWeight: 800 }}>{title}</div>
-    <div style={{ marginTop: 22, fontSize: 30, fontWeight: 500 }}>{subtitle}</div>
-  </div>
-);
+const Bill: React.FC<{x:number;y:number;rot?:number;scale?:number}> = ({x,y,rot=0,scale=1}) => <g transform={`translate(${x} ${y}) rotate(${rot}) scale(${scale})`}><rect x="-78" y="-48" width="156" height="96" rx="8" fill={C.white} stroke={C.brown} strokeWidth="6"/><rect x="-62" y="-32" width="124" height="64" rx="5" fill="none" stroke={C.sand} strokeWidth="4"/><circle r="20" fill={C.cream} stroke={C.brown} strokeWidth="4"/><path d="M-9 0 H9 M0 -10 V10" stroke={C.brown} strokeWidth="4" strokeLinecap="round"/></g>;
 
-const SceneOne: React.FC = () => (
-  <AbsoluteFill style={{ backgroundColor: PAPER }}>
-    <SceneTitle title="WHEN THE BILLS ARRIVE" subtitle="One income. Many demands. A difficult choice." />
-    <div style={{ position: "absolute", top: 390, left: 75, width: 930 }}>
-      <FinancialStoryVector startFrame={15} />
-    </div>
-    <div style={{ position: "absolute", bottom: 125, left: 80, right: 80, textAlign: "center", fontSize: 31, color: INK, fontWeight: 600 }}>
-      The pressure feels bigger when every bill arrives at once.
-    </div>
-  </AbsoluteFill>
-);
+const SceneOne: React.FC=()=>{const f=useCurrentFrame();const bills=interpolate(f,[25,150],[0,1],clamp);const camera=interpolate(f,[0,900],[1,1.08],clamp);return <AbsoluteFill style={{background:C.paper}}><Grain/><Heading kicker="THE REALITY OF MONEY" title="WHEN THE BILLS ARRIVE" sub="One income. Many demands. A difficult choice."/><svg viewBox="0 0 1080 1150" style={{position:"absolute",top:510,width:"100%",height:1150}}><g transform={`translate(540 220) scale(${camera})`}><rect x="-430" y="260" width="860" height="410" rx="28" fill={C.cream} stroke={C.brown} strokeWidth="10"/><path d="M-390 330 H390 M-390 570 H390" stroke={C.sand} strokeWidth="8"/><Character x={-210} y={-10} scale={.78}/><g transform={`translate(130 400)`}><rect x="-180" y="-60" width="360" height="22" rx="10" fill={C.brown}/><rect x="-155" y="-38" width="18" height="190" fill={C.brown}/><rect x="137" y="-38" width="18" height="190" fill={C.brown}/><g opacity={bills}><Bill x={-85} y={-115} rot={-8}/><Bill x={65} y={-105} rot={9}/><Bill x={0} y={-195} rot={-2} scale={.8}/></g></g></g></svg><div style={{position:"absolute",bottom:180,left:90,right:90,textAlign:"center",fontSize:34,lineHeight:1.35,color:C.ink,fontWeight:700}}>The pressure grows when every expense arrives at once.</div></AbsoluteFill>};
 
-const SceneTwo: React.FC = () => {
-  const frame = useCurrentFrame();
-  const slide = interpolate(frame, [80, 150], [220, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const stamps = interpolate(frame, [280, 350], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  return (
-    <AbsoluteFill style={{ backgroundColor: PAPER }}>
-      <SceneTitle title="MAKE THE MONEY VISIBLE" subtitle="Separate the bills before deciding what to do." />
-      <svg viewBox="0 0 1080 1200" style={{ position: "absolute", top: 430, width: "100%", height: 1200 }}>
-        <g fill="none" stroke={INK} strokeWidth="9" strokeLinecap="round" strokeLinejoin="round">
-          <Draw d="M130 250 H950 V820 H130 Z" start={0} duration={50} />
-          <Draw d="M175 310 H905 M175 370 H905" start={40} duration={30} width={5} />
-          <Draw d="M220 440 H470 V760 H220 Z" start={90} duration={40} />
-          <Draw d="M515 440 H765 V760 H515 Z" start={125} duration={40} />
-          <Draw d="M810 440 H900 V760 H810 Z" start={160} duration={40} />
-          <Draw d="M250 500 H430 M250 555 H410 M250 610 H380" start={200} duration={50} width={6} />
-          <Draw d="M545 500 H735 M545 555 H710 M545 610 H680" start={235} duration={50} width={6} />
-          <Draw d="M830 500 H880 M830 555 H870" start={270} duration={30} width={6} />
-          <Draw d="M260 685 L320 735 L425 620" start={300} duration={45} width={11} />
-          <Draw d="M555 685 L615 735 L720 620" start={340} duration={45} width={11} />
-        </g>
-        <g fill={INK} fontFamily="Arial, sans-serif" fontSize="35" fontWeight="700" textAnchor="middle" opacity={stamps}>
-          <text x="345" y="405">ESSENTIALS</text>
-          <text x="640" y="405">OBLIGATIONS</text>
-          <text x="855" y="405">EXTRAS</text>
-        </g>
-        <g transform={`translate(0 ${slide})`} fill="none" stroke={INK} strokeWidth="8">
-          <Draw d="M350 150 L430 150 L450 215 L370 215 Z M370 170 H430" start={20} duration={40} />
-          <Draw d="M580 140 H700 V225 H580 Z M580 140 L640 190 L700 140" start={50} duration={45} />
-        </g>
-      </svg>
-      <div style={{ position: "absolute", bottom: 125, left: 80, right: 80, textAlign: "center", fontSize: 31, color: INK, fontWeight: 600 }}>
-        List what must be paid, what can wait, and what can be reduced.
-      </div>
-    </AbsoluteFill>
-  );
-};
+const SceneTwo: React.FC=()=>{const f=useCurrentFrame();const drift=interpolate(f,[0,160],[100,-20],clamp);return <AbsoluteFill style={{background:C.paper}}><Grain/><Heading kicker="STEP 01" title="MAKE THE MONEY VISIBLE" sub="Clarity starts when you see where it must go."/><svg viewBox="0 0 1080 1250" style={{position:"absolute",top:470,width:"100%",height:1250}}><g transform={`translate(0 ${drift})`}><g>{[0,1,2].map((i)=><g key={i} transform={`translate(${180+i*270} 250)`}><rect x="-110" y="-70" width="220" height="500" rx="24" fill={[C.cream,C.sand,C.white][i]} stroke={C.brown} strokeWidth="8"/><path d="M-80 -20 H80" stroke={C.brown} strokeWidth="8"/><text x="0" y="-105" textAnchor="middle" fontSize="27" fontWeight="800" fill={C.ink}>{["NEEDS","BILLS","EXTRAS"][i]}</text>{[0,1,2].map((n)=><g key={n} transform={`translate(0 ${60+n*105})`}><Bill x={0} y={0} scale={.48} rot={n%2?4:-4}/></g>)}</g>)}</g><Character x={540} y={670} scale={.48} worried={false}/></g></svg><div style={{position:"absolute",bottom:175,left:85,right:85,textAlign:"center",fontSize:33,color:C.ink,fontWeight:700}}>Separate essentials, obligations and expenses you can reduce.</div></AbsoluteFill>};
 
-const SceneThree: React.FC = () => {
-  const frame = useCurrentFrame();
-  const coinX = interpolate(frame, [80, 220], [540, 300], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const coinY = interpolate(frame, [80, 220], [350, 730], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  return (
-    <AbsoluteFill style={{ backgroundColor: PAPER }}>
-      <SceneTitle title="GIVE EVERY SHILLING A JOB" subtitle="A simple plan creates clarity before the money is spent." />
-      <svg viewBox="0 0 1080 1200" style={{ position: "absolute", top: 420, width: "100%", height: 1200 }}>
-        <g fill="none" stroke={INK} strokeWidth="9" strokeLinecap="round" strokeLinejoin="round">
-          <Draw d="M470 210 H610 V330 H470 Z M500 210 V180 H580 V210" start={0} duration={50} />
-          <Draw d="M540 330 V470 M540 470 L230 650 M540 470 L540 650 M540 470 L850 650" start={50} duration={75} />
-          <Draw d="M120 650 H340 V930 H120 Z M120 650 Q230 590 340 650" start={120} duration={50} />
-          <Draw d="M430 650 H650 V930 H430 Z M430 650 Q540 590 650 650" start={160} duration={50} />
-          <Draw d="M740 650 H960 V930 H740 Z M740 650 Q850 590 960 650" start={200} duration={50} />
-          <Draw d="M160 730 H300 M470 730 H610 M780 730 H920" start={250} duration={35} width={6} />
-          <Draw d="M190 790 H270 M500 790 H580 M810 790 H890" start={280} duration={35} width={6} />
-          <Draw d="M220 850 H250 M530 850 H560 M840 850 H870" start={310} duration={25} width={6} />
-        </g>
-        <g fill={INK} fontFamily="Arial, sans-serif" fontSize="34" fontWeight="700" textAnchor="middle">
-          <text x="230" y="990">NEEDS</text>
-          <text x="540" y="990">DEBT</text>
-          <text x="850" y="990">SAVINGS</text>
-          <text x="540" y="155" fontSize="40">INCOME</text>
-        </g>
-        <g transform={`translate(${coinX} ${coinY})`}>
-          <circle cx="0" cy="0" r="42" fill={PAPER} stroke={INK} strokeWidth="9" />
-          <path d="M-12 -22 V22 M12 -22 V22 M-20 -10 H20 M-20 10 H20" stroke={INK} strokeWidth="6" fill="none" />
-        </g>
-      </svg>
-      <div style={{ position: "absolute", bottom: 125, left: 80, right: 80, textAlign: "center", fontSize: 31, color: INK, fontWeight: 600 }}>
-        Start with essentials. Make a realistic debt plan. Protect a little savings.
-      </div>
-    </AbsoluteFill>
-  );
-};
+const SceneThree: React.FC=()=>{const f=useCurrentFrame();const coin=interpolate(f,[30,230],[160,800],clamp);const pulse=1+Math.sin(f/10)*.035;return <AbsoluteFill style={{background:C.paper}}><Grain/><Heading kicker="STEP 02" title="GIVE EVERY SHILLING A JOB" sub="Plan before the money disappears."/><svg viewBox="0 0 1080 1250" style={{position:"absolute",top:470,width:"100%",height:1250}}><g><rect x="390" y="70" width="300" height="150" rx="35" fill={C.brown}/><text x="540" y="160" textAnchor="middle" fontSize="43" fontWeight="900" fill={C.paper}>INCOME</text><path d="M540 220 V390 M540 390 L190 570 M540 390 V570 M540 390 L890 570" fill="none" stroke={C.brown} strokeWidth="15" strokeLinecap="round"/>{[190,540,890].map((x,i)=><g key={i} transform={`translate(${x} 730) scale(${pulse})`}><rect x="-130" y="-130" width="260" height="340" rx="35" fill={[C.cream,C.sand,C.white][i]} stroke={C.brown} strokeWidth="9"/><circle cy="-45" r="53" fill={C.paper} stroke={C.brown} strokeWidth="8"/><text y="-30" textAnchor="middle" fontSize="48" fontWeight="900" fill={C.brown}>{["✓","↘","＋"][i]}</text><text y="95" textAnchor="middle" fontSize="31" fontWeight="900" fill={C.ink}>{["NEEDS","DEBT","SAVINGS"][i]}</text></g>)}<g transform={`translate(540 ${coin})`}><circle r="40" fill={C.caramel} stroke={C.ink} strokeWidth="7"/><text y="13" textAnchor="middle" fontSize="36" fontWeight="900" fill={C.paper}>1</text></g></g></svg><div style={{position:"absolute",bottom:175,left:85,right:85,textAlign:"center",fontSize:33,color:C.ink,fontWeight:700}}>Cover essentials, make a realistic debt plan, then protect savings.</div></AbsoluteFill>};
 
-const SceneFour: React.FC = () => {
-  const frame = useCurrentFrame();
-  const coins = [0, 1, 2, 3, 4, 5, 6].map((n) => ({
-    x: 400 + (n % 3) * 105,
-    y: 250 + Math.floor(n / 3) * 95,
-    opacity: interpolate(frame, [70 + n * 35, 100 + n * 35], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
-  }));
-  return (
-    <AbsoluteFill style={{ backgroundColor: PAPER }}>
-      <SceneTitle title="SMALL SAVINGS STILL COUNT" subtitle="Consistency matters more than starting big." />
-      <svg viewBox="0 0 1080 1200" style={{ position: "absolute", top: 420, width: "100%", height: 1200 }}>
-        <g fill="none" stroke={INK} strokeWidth="10" strokeLinecap="round" strokeLinejoin="round">
-          <Draw d="M390 300 H690 L650 880 Q540 960 430 880 Z" start={0} duration={55} />
-          <Draw d="M470 300 V250 H610 V300" start={45} duration={30} />
-          <Draw d="M440 500 Q540 550 640 500 M450 650 Q540 700 630 650" start={100} duration={55} width={6} />
-          <Draw d="M460 890 H620 M490 930 H590" start={145} duration={30} width={7} />
-        </g>
-        {coins.map((coin, index) => (
-          <g key={index} opacity={coin.opacity}>
-            <circle cx={coin.x} cy={coin.y} r="37" fill={PAPER} stroke={INK} strokeWidth="8" />
-            <path d={`M${coin.x - 12} ${coin.y - 17} V${coin.y + 17} M${coin.x + 12} ${coin.y - 17} V${coin.y + 17}`} stroke={INK} strokeWidth="5" />
-          </g>
-        ))}
-        <g fill={INK} fontFamily="Arial, sans-serif" fontWeight="700" textAnchor="middle">
-          <text x="540" y="1030" fontSize="40">EMERGENCY FUND</text>
-          <text x="540" y="1080" fontSize="27">Build it one decision at a time</text>
-        </g>
-      </svg>
-      <div style={{ position: "absolute", bottom: 125, left: 80, right: 80, textAlign: "center", fontSize: 31, color: INK, fontWeight: 600 }}>
-        Save an amount you can repeat, then increase it when you can.
-      </div>
-    </AbsoluteFill>
-  );
-};
+const SceneFour: React.FC=()=>{const f=useCurrentFrame();const fill=interpolate(f,[20,760],[0,1],clamp);return <AbsoluteFill style={{background:C.paper}}><Grain/><Heading kicker="STEP 03" title="SMALL SAVINGS STILL COUNT" sub="A small repeatable habit can build a buffer."/><svg viewBox="0 0 1080 1250" style={{position:"absolute",top:465,width:"100%",height:1250}}><g><path d="M340 260 H740 L690 890 Q540 1010 390 890Z" fill={C.cream} stroke={C.brown} strokeWidth="12"/><path d="M420 260 V205 H660 V260" fill="none" stroke={C.brown} strokeWidth="16" strokeLinecap="round"/><path d={`M400 ${850-fill*350} Q540 ${800-fill*350} 680 ${850-fill*350} L670 880 Q540 950 410 880Z`} fill={C.sand} stroke="none"/>{Array.from({length:9},(_,i)=>{const x=420+(i%3)*115,y=470+Math.floor(i/3)*110;const drop=interpolate(f,[i*55+20,i*55+90],[y-230,y],clamp);return <g key={i} transform={`translate(${x} ${drop}) rotate(${f*2+i*17})`}><ellipse rx="35" ry="24" fill={C.caramel} stroke={C.brown} strokeWidth="6"/><ellipse rx="22" ry="14" fill="none" stroke={C.cream} strokeWidth="4"/></g>})}<text x="540" y="1080" textAnchor="middle" fontSize="39" fontWeight="900" fill={C.ink}>EMERGENCY FUND</text></g><Character x={170} y={550} scale={.38} worried={false}/></svg><div style={{position:"absolute",bottom:165,left:90,right:90,textAlign:"center",fontSize:33,color:C.ink,fontWeight:700}}>Start with an amount you can repeat. Build gradually.</div></AbsoluteFill>};
 
-const SceneFive: React.FC = () => {
-  const frame = useCurrentFrame();
-  const progress = interpolate(frame, [50, 650], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  return (
-    <AbsoluteFill style={{ backgroundColor: PAPER }}>
-      <SceneTitle title="PROGRESS IS BUILT, NOT WISHED FOR" subtitle="A plan gives your next decision a direction." />
-      <div style={{ position: "absolute", top: 410, left: 75, width: 930 }}>
-        <FinancialStoryVector startFrame={0} />
-      </div>
-      <svg viewBox="0 0 1080 1200" style={{ position: "absolute", top: 430, width: "100%", height: 1200 }}>
-        <g fill="none" stroke={INK} strokeWidth="10" strokeLinecap="round" strokeLinejoin="round">
-          <Draw d="M120 940 H960 M160 940 V260" start={0} duration={45} />
-          <path d="M200 850 L360 760 L520 700 L680 510 L850 360" stroke={INK} strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1-progress} />
-          <Draw d="M790 360 H850 V420" start={250} duration={25} width={8} />
-        </g>
-        <g fill={INK} fontFamily="Arial, sans-serif" fontSize="30" fontWeight="700">
-          <text x="180" y="1010">TODAY</text>
-          <text x="790" y="1010">OVER TIME</text>
-        </g>
-      </svg>
-      <div style={{ position: "absolute", bottom: 125, left: 80, right: 80, textAlign: "center", fontSize: 31, color: INK, fontWeight: 600 }}>
-        You do not need to solve everything today. Make the next money decision count.
-      </div>
-    </AbsoluteFill>
-  );
-};
+const SceneFive: React.FC=()=>{const f=useCurrentFrame();const p=interpolate(f,[20,820],[0,1],clamp);const smile=f>360;return <AbsoluteFill style={{background:C.paper}}><Grain/><Heading kicker="THE LONG GAME" title="PROGRESS IS BUILT" sub="A plan gives your next decision direction."/><svg viewBox="0 0 1080 1250" style={{position:"absolute",top:460,width:"100%",height:1250}}><g><path d="M140 900 H950 M170 900 V250" stroke={C.brown} strokeWidth="12" fill="none" strokeLinecap="round"/><path d="M210 820 C340 800 350 700 470 680 S620 560 700 520 S830 340 900 300" fill="none" stroke={C.caramel} strokeWidth="24" strokeLinecap="round" pathLength="1" strokeDasharray="1" strokeDashoffset={1-p}/>{[210,470,700,900].map((x,i)=><circle key={i} cx={x} cy={[820,680,520,300][i]} r="20" fill={C.brown}/>) }<text x="180" y="970" fontSize="30" fontWeight="800" fill={C.ink}>TODAY</text><text x="780" y="970" fontSize="30" fontWeight="800" fill={C.ink}>OVER TIME</text><Character x={540} y={760} scale={.42} worried={!smile}/></g></svg><div style={{position:"absolute",bottom:165,left:85,right:85,textAlign:"center",fontSize:33,color:C.ink,fontWeight:700}}>You do not have to solve everything today. Make the next decision count.</div></AbsoluteFill>};
 
-const Disclaimer: React.FC = () => (
-  <AbsoluteFill style={{ backgroundColor: PAPER, justifyContent: "center", alignItems: "center", padding: 100, color: INK, fontFamily: "Arial, sans-serif", textAlign: "center" }}>
-    <div style={{ fontSize: 54, fontWeight: 800, marginBottom: 35 }}>THE FINANCE CAMPUS</div>
-    <div style={{ fontSize: 34, lineHeight: 1.4, maxWidth: 850 }}>
-      Educational content only. This is not personalized financial, investment, tax or legal advice. Consult a qualified professional about your circumstances.
-    </div>
-    <div style={{ marginTop: 55, fontSize: 25 }}>VISUAL SAMPLE — NOT FOR PUBLICATION</div>
-  </AbsoluteFill>
-);
+const Disclaimer:React.FC=()=> <AbsoluteFill style={{background:C.ink,justifyContent:"center",alignItems:"center",padding:110,textAlign:"center",fontFamily:"Arial,sans-serif",color:C.paper}}><div style={{fontSize:55,fontWeight:900,letterSpacing:3}}>THE FINANCE CAMPUS</div><div style={{fontSize:34,lineHeight:1.45,marginTop:50}}>Educational content only. This is not personalized financial, investment, tax or legal advice. Consult a qualified professional about your circumstances.</div><div style={{fontSize:24,marginTop:65,color:C.sand,letterSpacing:3}}>VISUAL STYLE SAMPLE · NOT FOR PUBLICATION</div></AbsoluteFill>;
 
-export const MonochromeFinanceStory: React.FC = () => (
-  <AbsoluteFill style={{ backgroundColor: PAPER }}>
-    <Sequence from={0} durationInFrames={900}><SceneOne /></Sequence>
-    <Sequence from={900} durationInFrames={900}><SceneTwo /></Sequence>
-    <Sequence from={1800} durationInFrames={900}><SceneThree /></Sequence>
-    <Sequence from={2700} durationInFrames={900}><SceneFour /></Sequence>
-    <Sequence from={3600} durationInFrames={720}><SceneFive /></Sequence>
-    <Sequence from={4320} durationInFrames={180}><Disclaimer /></Sequence>
-  </AbsoluteFill>
-);
+export const MonochromeFinanceStory:React.FC=()=> <AbsoluteFill style={{background:C.paper}}><Sequence from={0} durationInFrames={900}><SceneOne/></Sequence><Sequence from={900} durationInFrames={900}><SceneTwo/></Sequence><Sequence from={1800} durationInFrames={900}><SceneThree/></Sequence><Sequence from={2700} durationInFrames={900}><SceneFour/></Sequence><Sequence from={3600} durationInFrames={720}><SceneFive/></Sequence><Sequence from={4320} durationInFrames={180}><Disclaimer/></Sequence></AbsoluteFill>;
