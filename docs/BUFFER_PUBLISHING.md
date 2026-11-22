@@ -25,6 +25,14 @@ The publisher fails closed unless all of the following are true:
 
 The CLI defaults to dry-run. Actual scheduling requires `--live` and `BUFFER_PUBLISH_ENABLED=true`. Do not set that variable until the owner approves the final sample and end-to-end checks have passed.
 
+## Integration status and remaining prerequisites
+
+The first guarded Buffer adapter and its GitHub Actions workflow are in the repository. The workflow supports dry-run validation and can be called by a future production workflow after it uploads a `finance-campus-production-package` artifact. It is not yet connected to a production-render workflow.
+
+The current renderer does not yet generate the required branded thumbnail artifact or upload final MP4s to a durable public media host. It also does not yet embed a dedicated branded thumbnail frame in the video. Consequently, the publisher correctly rejects today's production manifests; no live post can be scheduled yet.
+
+Before end-to-end scheduling, wire the branded thumbnail and media-hosting stages into the production package, then connect the production workflow to this reusable workflow. A successful dry run is not proof that Buffer has published anything.
+
 ## Buffer API requirements
 
 Create a personal API key in Buffer settings and store it only in GitHub Actions Secrets as `BUFFER_API_KEY`. Configure these repository secrets:
@@ -69,6 +77,12 @@ A separate branded thumbnail image is required in `artifacts.thumbnail`. Buffer'
 - A durable ledger at `production/buffer-publishing-ledger.json` stores Buffer post IDs and prevents repeat scheduling.
 - The adapter also checks existing Buffer posts to recover from a lost local ledger update.
 - Buffer's `scheduled` state means queued, not published. Only a Buffer `sent` state plus a verified public platform URL can update the project's publication ledger to publicly accessible.
+
+## GitHub Actions workflow
+
+The workflow `.github/workflows/buffer-scheduling.yml` can be started manually with the completed production workflow run ID and artifact name, or called from a future production workflow using `workflow_call`. The artifact must contain `production-manifest.json`, `post-metadata.json`, the MP4 and the branded thumbnail at the package root/manifest paths. The reusable caller must pass Buffer secrets (for example, with `secrets: inherit`).
+
+The workflow defaults to `dry_run`. Select `schedule` only after the owner has approved the visual standard, the media host has been configured and the live-publishing lock has been intentionally enabled.
 
 ## Local validation
 
