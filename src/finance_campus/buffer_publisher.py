@@ -504,11 +504,16 @@ def schedule_package(
                 package["thumbnail_offset_ms"] if platform == "tiktok" else None
             ),
         )
+        public_media = manifest.get("public_media") or {}
         record = {
             "buffer_post_id": post["id"],
             "status": post.get("status", "scheduled"),
             "due_at": post.get("dueAt"),
             "recovered_existing_post": False,
+            "video_id": video_key,
+            "title": manifest.get("title"),
+            "platform": platform,
+            "thumbnail_url": public_media.get("thumbnail_url"),
         }
         ledger["posts"][ledger_key] = record
         _save_ledger(ledger_path, ledger)
