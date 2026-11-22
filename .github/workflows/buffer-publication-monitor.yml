@@ -38,12 +38,11 @@ jobs:
       - name: Reconcile Buffer posts and verify public destination URLs
         run: python -m finance_campus.buffer_publisher --monitor
 
-      - name: Prepare downloads for newly verified published thumbnails
-        id: thumbnails
+      - name: Show individual thumbnail download links for verified publications
         run: |
           python - <<'PY'
           import json
-          import re
+          import os
           import urllib.request
           from datetime import datetime, timezone
           from pathlib import Path
@@ -51,57 +50,51 @@ jobs:
 
           ledger_path = Path("production/buffer-publishing-ledger.json")
           ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
-          output = Path("published-thumbnails")
-          output.mkdir(exist_ok=True)
-          prepared = 0
-
+          rows = []
           for key, record in ledger.get("posts", {}).items():
               if record.get("status") != "publicly_accessible_verified":
                   continue
-              if record.get("thumbnail_artifact_created_at"):
+              if record.get("thumbnail_download_link_shown_at"):
                   continue
               url = record.get("thumbnail_url")
               if not isinstance(url, str):
-                  print(f"Skipping {key}: no hosted thumbnail URL was recorded.")
                   continue
               parsed = urlparse(url)
               if (parsed.scheme != "https" or parsed.hostname != "github.com"
                       or "/releases/download/" not in parsed.path
                       or not parsed.path.lower().endswith((".jpg", ".jpeg", ".png"))):
                   raise SystemExit(f"Refusing untrusted thumbnail URL for {key}: {url}")
-
               request = urllib.request.Request(
-                  url, headers={"User-Agent": "The-Finance-Campus-thumbnail-archive/1.0"}
+                  url, headers={"User-Agent": "The-Finance-Campus-thumbnail-link-check/1.0"}
               )
               with urllib.request.urlopen(request, timeout=30) as response:
                   content_type = response.headers.get("Content-Type", "").split(";", 1)[0].lower()
-                  data = response.read()
-              if content_type not in {"image/jpeg", "image/png"} or len(data) < 1024:
-                  raise SystemExit(f"Thumbnail failed type/size validation for {key}")
-              safe = re.sub(r"[^A-Za-z0-9._-]+", "-", str(record.get("video_id") or key)).strip("-")
-              platform = re.sub(r"[^A-Za-z0-9_-]+", "-", str(record.get("platform") or "platform"))
-              suffix = ".png" if content_type == "image/png" else ".jpg"
-              (output / f"{safe}-{platform}{suffix}").write_bytes(data)
-              record["thumbnail_artifact_created_at"] = datetime.now(timezone.utc).isoformat()
-              prepared += 1
+                  if content_type not in {"image/jpeg", "image/png"}:
+                      raise SystemExit(f"Thumbnail is not a JPEG/PNG image for {key}")
+                  if int(response.headers.get("Content-Length") or "0") == 0:
+                      raise SystemExit(f"Thumbnail is empty for {key}")
+              title = str(record.get("title") or record.get("video_id") or key)
+              platform = str(record.get("platform") or "platform")
+              rows.append((title, platform, url))
+              record["thumbnail_download_link_shown_at"] = datetime.now(timezone.utc).isoformat()
 
-          ledger_path.write_text(json.dumps(ledger, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-          print(f"Prepared {prepared} newly verified thumbnail(s).")
-          with open(__import__("os").environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
-              out.write(f"count={prepared}\n")
+          summary = Path(os.environ["GITHUB_STEP_SUMMARY"])
+          if rows:
+              with summary.open("a", encoding="utf-8") as out:
+                  out.write("## Your published thumbnails\\n\\n")
+                  out.write("Tap an individual image link to download that thumbnail to this device.\\n\\n")
+                  for title, platform, url in rows:
+                      safe_title = title.replace("|", "\\\\|").replace("\\n", " ")
+                      out.write(f"- **{safe_title}** ({platform}) — [Download thumbnail]({url})\\n")
+          else:
+              print("No newly verified thumbnails need a download link.")
+
+          ledger_path.write_text(json.dumps(ledger, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+          print(f"Added {len(rows)} individual thumbnail download link(s) to the Actions run summary.")
           PY
-
-      - name: Make published thumbnails downloadable on phone and laptop
-        if: steps.thumbnails.outputs.count != '0'
-        uses: actions/upload-artifact@v4
-        with:
-          name: finance-campus-published-thumbnails-${{ github.run_number }}
-          path: published-thumbnails/*
-          if-no-files-found: error
-          retention-days: 90
 
       - name: Persist publication and thumbnail download records
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore: reconcile publication and thumbnail downloads"
+          commit_message: "chore: reconcile publication and thumbnail links"
           file_pattern: production/buffer-publishing-ledger.json
