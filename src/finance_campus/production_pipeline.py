@@ -15,6 +15,7 @@ from finance_campus.narration import synthesize_storyboard
 from finance_campus.post_metadata import generate_post_metadata
 from finance_campus.quality_gates import validate_video_package
 from finance_campus.research_pipeline import is_approved_research_url
+from finance_campus.related_videos import attach_related_video
 from finance_campus.script_pipeline import prepare_script
 from finance_campus.script_quality import validate_script
 from finance_campus.storyboard import validate_storyboard
@@ -109,6 +110,7 @@ def produce_video_from_script(
     Publishing is intentionally outside this function and remains disabled until
     separate platform authorization and end-to-end publication checks are approved.
     """
+    related_video = attach_related_video(script)
     report = validate_script(script)
     if not report.passed:
         raise ValueError("Script rejected: " + "; ".join(report.errors))
@@ -291,6 +293,7 @@ def produce_video_from_script(
         "voice": voice,
         "video_format": video_format,
         "sources": sources,
+        "related_video": related_video,
         "narration": narration,
         "captions": caption_report,
         "media": media,
