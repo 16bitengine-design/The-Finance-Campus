@@ -317,7 +317,10 @@ def schedule_package(
         raise ValueError("A stable video_id or title is required")
     results: list[dict[str, Any]] = []
 
-    if live:\n        verify_public_video_url(package["video_url"])\n\n    channels = client.list_channels(organization_id)\n    channel_by_id = {item.get("id"): item for item in channels if isinstance(item, dict)}
+    if live:
+        verify_public_video_url(package["video_url"])
+
+    channels = client.list_channels(organization_id)\n    channel_by_id = {item.get("id"): item for item in channels if isinstance(item, dict)}
     for platform, channel_id in destinations:
         channel = channel_by_id.get(channel_id)
         if not channel:
