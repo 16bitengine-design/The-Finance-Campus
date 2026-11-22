@@ -158,3 +158,29 @@ def test_only_approved_https_publisher_domains_are_accepted():
     assert not is_approved_research_url("https://example.org/guide")
     assert not is_approved_research_url("https://user:pass@consumerfinance.gov/guide")
     assert not is_approved_research_url("https://consumerfinance.gov:8443/guide")
+
+
+
+def test_refresh_report_tracks_remaining_catalogue_and_canonical_path(tmp_path):
+    path = tmp_path / "production" / "topic-library.json"
+    result = refresh_topics(path, target=5, fetcher=fake_fetch)
+    assert result["library_path"] == str(path)
+    assert result["blueprint_catalogue_count"] == 66
+    assert result["unused_blueprints_remaining"] == 61
+    assert result["estimated_weeks_of_catalogue_cover_at_20_per_week"] == 3.0
+    assert result["catalogue_exhaustion_warning"] is None
+
+
+def test_reachable_pdf_without_extractable_text_is_not_counted_as_researched(tmp_path):
+    def pdf_without_text(url):
+        return {
+            "status": 200,
+            "final_url": url,
+            "title": "Official PDF",
+            "text": "",
+        }
+
+    result = refresh_topics(tmp_path / "topics.json", target=1, fetcher=pdf_without_text)
+    assert result["added_count"] == 0
+    assert result["target_met"] is False
+    assert "no extractable text" in result["rejected"][0]["reason"]
