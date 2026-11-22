@@ -15,7 +15,10 @@ from finance_campus.config import (
     validate_settings,
 )
 from finance_campus.layered_animation import iter_layered_frames, validate_layered_scene
-from finance_campus.multi_character_compositor import iter_multi_character_frames, validate_multi_character_scene
+from finance_campus.multi_character_compositor import (
+    iter_multi_character_frames,
+    validate_multi_character_scene,
+)
 from finance_campus.narration import synthesize_storyboard
 from finance_campus.production_pipeline import produce_video_from_script
 from finance_campus.research_pipeline import refresh_topics
@@ -109,7 +112,7 @@ def main() -> int:
         try:
             package = _read_json(args.script_path)
             if not isinstance(package, dict) or not isinstance(package.get("scene"), dict) or not isinstance(package.get("character_specs"), dict):
-                raise ValueError("package must contain scene and character_specs objects")
+                raise TypeError("package must contain scene and character_specs objects")
             errors = validate_multi_character_scene(package["scene"], package["character_specs"])
             if errors:
                 for error in errors:
