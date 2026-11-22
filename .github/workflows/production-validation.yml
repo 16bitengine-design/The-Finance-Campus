@@ -1,0 +1,210 @@
+name: Production validation and visual samples
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'renderer/remotion/src/scenes/ProgressiveNarratedSample.tsx'
+      - 'renderer/remotion/src/Root.tsx'
+      - 'examples/sample-video-pay-yourself-first.json'
+      - '.github/workflows/production-validation.yml'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Choose the end-to-end Kokoro test or progressive visual sample
+        required: true
+        default: kokoro
+        type: choice
+        options:
+          - kokoro
+          - progressive_sample
+      script_path:
+        description: Structured script JSON for the Kokoro production test
+        required: true
+        default: examples/sample-video-pay-yourself-first.json
+        type: string
+      voice:
+        description: Kokoro English voice
+        required: true
+        type: choice
+        default: af_heart
+        options: [af_heart, am_michael, bf_emma, bm_george]
+      format:
+        description: Video format for the Kokoro production test
+        required: true
+        default: short
+        type: choice
+        options: [short, long]
+
+permissions:
+  contents: read
+
+jobs:
+  produce:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'kokoro' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install FFmpeg and Kokoro phonemizer
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg espeak-ng
+      - name: Install CPU-only PyTorch
+        run: python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - name: Install project and Kokoro
+        run: python -m pip install -e ".[dev,tts]"
+      - name: Produce the complete narrated video with real Kokoro
+        env:
+          SCRIPT_PATH: ${{ inputs.script_path }}
+          VIDEO_FORMAT: ${{ inputs.format }}
+          KOKORO_VOICE: ${{ inputs.voice }}
+        run: |
+          python -m finance_campus.cli produce-video \
+            "$SCRIPT_PATH" artifacts/kokoro \
+            --format "$VIDEO_FORMAT" \
+            --voice "$KOKORO_VOICE" --device cpu \
+            --fps 30 --draw-fps 24 --transition-seconds 0.25
+      - name: Verify quality-approved production manifest and media
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("artifacts/kokoro")
+          manifest = json.loads((root / "production-manifest.json").read_text(encoding="utf-8"))
+          assert manifest["status"] == "awaiting_visual_review", manifest["quality_errors"]
+          assert manifest["technical_quality_approved"] is True
+          assert manifest["human_visual_review_required"] is True
+          stages = manifest["stages"]
+          metadata = json.loads((root / "post-metadata.json").read_text(encoding="utf-8"))
+          assert metadata["validation"]["youtube_disclaimer_present"] is True
+          assert metadata["validation"]["tiktok_disclaimer_present"] is True
+          assert metadata["validation"]["platform_copy_is_distinct"] is True
+          required = (
+              "script_validated",
+              "script_approved",
+              "storyboard_generated",
+              "kokoro_narration_generated",
+              "captions_generated",
+              "video_rendered",
+              "media_streams_verified",
+              "final_video_qc_passed",
+              "visual_review_sheet_generated",
+              "human_visual_review_required",
+              "audio_video_duration_aligned",
+              "quality_gate_passed",
+          )
+          assert all(stages.get(stage) is True for stage in required), stages
+          assert stages["uploaded"] is False
+          assert stages["publicly_accessible"] is False
+          for name in ("approved_script.json", "storyboard.json", "narration.wav",
+                       "captions.srt", "finance-campus-video.mp4", "description.txt",
+                       "visual-review-contact-sheet.jpg", "post-metadata.json", "tiktok-caption.txt"):
+              path = root / name
+              assert path.is_file() and path.stat().st_size > 0, f"Missing artifact: {path}"
+          print(json.dumps({"status": manifest["status"], "voice": manifest["voice"],
+                            "media": manifest["media"], "stages": stages}, indent=2))
+          PY
+          ffprobe -v error -show_entries stream=codec_type,width,height,sample_rate,channels -of json artifacts/kokoro/finance-campus-video.mp4
+          ffmpeg -hide_banner -v error -i artifacts/kokoro/finance-campus-video.mp4 -f null -
+      - name: Upload production artifacts for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: finance-campus-kokoro-production
+          path: artifacts/kokoro/
+          if-no-files-found: error
+
+
+  render:
+    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'progressive_sample') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install FFmpeg and Kokoro phonemizer
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg espeak-ng
+      - name: Install CPU-only PyTorch
+        run: python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - name: Install Finance Campus and Kokoro
+        run: python -m pip install -e ".[dev,tts]"
+      - name: Generate real Kokoro narration and validated captions
+        run: |
+          python -m finance_campus.cli produce-video \
+            examples/sample-video-pay-yourself-first.json artifacts/source \
+            --format short --voice "${{ inputs.voice || 'af_heart' }}" --device cpu \
+            --fps 30 --draw-fps 24 --transition-seconds 0.25
+      - name: Prepare synchronized audio and caption cues
+        run: |
+          mkdir -p renderer/remotion/public renderer/remotion/out
+          cp artifacts/source/narration.wav renderer/remotion/public/sample-narration.wav
+          python - <<'PY'
+          import json, re
+          from pathlib import Path
+          srt = Path("artifacts/source/captions.srt").read_text(encoding="utf-8")
+          cues = []
+          blocks = re.split(r"\n\s*\n", srt.strip())
+          def seconds(stamp):
+              h,m,rest=stamp.split(":")
+              sec,ms=rest.split(",")
+              return int(h)*3600+int(m)*60+int(sec)+int(ms)/1000
+          for block in blocks:
+              lines=block.strip().splitlines()
+              if len(lines)<3 or "-->" not in lines[1]:
+                  continue
+              start,end=(part.strip() for part in lines[1].split("-->"))
+              cues.append({"start":seconds(start),"end":seconds(end),"text":" ".join(lines[2:])})
+          if not cues:
+              raise SystemExit("No real Kokoro caption timings were produced")
+          duration=json.loads(Path("artifacts/source/production-manifest.json").read_text())["media"]["duration_seconds"]
+          props={"cues":cues,"duration":duration}
+          Path("renderer/remotion/sample-props.json").write_text(json.dumps(props),encoding="utf-8")
+          print(f"Prepared {len(cues)} genuine narration caption cues; duration={duration:.2f}s")
+          PY
+      - name: Install Remotion renderer
+        working-directory: renderer/remotion
+        run: npm install --no-audit --no-fund
+      - name: Type-check progressive composition
+        working-directory: renderer/remotion
+        run: npm run typecheck
+      - name: Render 150-second progressive narrated sample
+        working-directory: renderer/remotion
+        run: npx remotion render src/index.ts FinanceCampusProgressiveNarratedSample out/finance-campus-progressive-narrated-sample.mp4 --codec=h264 --crf=20 --props=sample-props.json
+      - name: Verify final sample contains video and Kokoro audio
+        run: |
+          ffprobe -v error -show_entries stream=codec_type,width,height,sample_rate,channels:format=duration -of json renderer/remotion/out/finance-campus-progressive-narrated-sample.mp4 > artifacts/source/progressive-sample-probe.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("artifacts/source/progressive-sample-probe.json").read_text())
+          v=next((s for s in p["streams"] if s["codec_type"]=="video"),None)
+          a=next((s for s in p["streams"] if s["codec_type"]=="audio"),None)
+          duration=float(p["format"]["duration"])
+          assert v and (v["width"],v["height"])==(1080,1920),v
+          assert a and int(a.get("sample_rate",0))>0,a
+          assert duration>=150,duration
+          print(json.dumps({"video":v,"audio":a,"duration_seconds":duration},indent=2))
+          PY
+          ffmpeg -hide_banner -v error -i renderer/remotion/out/finance-campus-progressive-narrated-sample.mp4 -f null -
+      - name: Upload narrated sample and review materials
+        uses: actions/upload-artifact@v4
+        with:
+          name: finance-campus-progressive-narrated-sample
+          path: |
+            renderer/remotion/out/finance-campus-progressive-narrated-sample.mp4
+            artifacts/source/captions.srt
+            artifacts/source/production-manifest.json
+            artifacts/source/progressive-sample-probe.json
+          if-no-files-found: error
