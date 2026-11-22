@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import math
+from itertools import pairwise
 from collections.abc import Iterator
 from typing import Any
 
@@ -89,7 +90,7 @@ def _sample_track(keyframes: list[dict[str, Any]], at: float) -> dict[str, float
     if at >= keyframes[-1]["at"]:
         frame = keyframes[-1]
         return {field: float(frame.get(field, {"scale": 1, "opacity": 1}.get(field, 0))) for field in fields}
-    for first, second in zip(keyframes, keyframes[1:]):
+    for first, second in pairwise(keyframes):
         if first["at"] <= at <= second["at"]:
             amount = (at - first["at"]) / (second["at"] - first["at"])
             return {
