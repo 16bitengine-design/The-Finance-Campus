@@ -135,10 +135,9 @@ Never paste API keys into source files, workflow YAML, logs, issue comments or c
 - YouTube metadata: https://developers.buffer.com/types/YoutubePostMetadataInput.html
 
 
-## Downloading published thumbnails to your devices
 
-The publication monitor now creates a downloadable GitHub Actions artifact for each thumbnail only after Buffer reports the post as sent and the public YouTube/TikTok URL has been independently verified. The thumbnail URL is carried into the publishing ledger when the post is scheduled, but no download is packaged while the post is merely queued or pending verification.
+## Downloading published thumbnails
 
-Each artifact contains the branded thumbnail image files and is retained for 90 days. Open the repository's **Actions** tab, select the latest successful **Buffer publication monitor** run, scroll to **Artifacts**, and download `finance-campus-published-thumbnails-...`. On Android, the ZIP can be opened from the Downloads folder; on a laptop, extract it like any other ZIP file. This is a tap-to-download workflow: GitHub Actions cannot silently write files into a phone or laptop's local storage.
+After Buffer reports a post as sent and its public YouTube/TikTok URL is independently verified, the publication monitor adds a direct link to that post's individual branded JPG/PNG thumbnail in the GitHub Actions run summary. No ZIP file or video file is provided. Open the latest successful **Buffer publication monitor** run, find **Your published thumbnails**, and tap **Download thumbnail** beside the relevant post. The image opens/downloads directly and can be saved to an Android phone or laptop.
 
-No Google Drive API, Google account authorization, or additional paid service is required. This download feature does not enable or approve publishing; it only packages thumbnails for posts already verified as publicly available.
+GitHub Actions cannot silently save files into a device's local storage; the user taps the individual link. No Google Drive API or Google account authorization is required. The monitor does not enable or approve publishing.
