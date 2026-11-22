@@ -44,7 +44,7 @@ Research sources supply evidence and factual grounding only. Topic titles, edito
 ## Canonical files
 
 - Topic library: `production/topic-library.json`
-- Daily workflow: `.github/workflows/weekly-topic-refresh.yml`
+- Daily workflow: `.github/workflows/daily-topic-replenishment.yml`
 - Source and duplicate logic: `src/finance_campus/research_pipeline.py`
 - Curated evergreen blueprint catalogue: `src/finance_campus/mindset_topics.py`
 - Tests: `tests/test_topics.py`, `tests/test_research_pipeline.py`
