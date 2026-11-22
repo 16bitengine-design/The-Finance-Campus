@@ -226,6 +226,7 @@ def refresh_topics(
             "category": blueprint["category"],
             "target_audience": ["global adults", "young adults", "households", "entrepreneurs"],
             "geographic_relevance": blueprint["geo"],
+            "related_concepts": blueprint.get("related_concepts", blueprint.get("keywords", [])),
             "research_sources": [source_record],
             "sources": [source_meta["url"]],
             "research_status": "source_checked_needs_claim_review",
