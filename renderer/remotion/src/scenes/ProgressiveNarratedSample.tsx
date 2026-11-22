@@ -52,12 +52,12 @@ const Caption:React.FC<{cues:Cue[]}> = ({cues})=>{
 };
 const Story:React.FC<{cues:Cue[];duration:number}> = ({cues,duration})=>{
  const f=useCurrentFrame();const sec=f/30;
- const phase=sec<30?0:sec<60?1:sec<90?2:sec<120?3:4;
- const phaseStart=phase*30;const local=sec-phaseStart;const worried=phase<3;
- const wallet=ease(f,phaseStart*30+25,phaseStart*30+65);
- const paid=ease(f,phaseStart*30+130,phaseStart*30+185);
- const saving=ease(f,phaseStart*30+100,phaseStart*30+155);
- const chart=ease(f,phaseStart*30+80,phaseStart*30+780);
+ const phaseDuration=duration/5;const phase=Math.min(4,Math.floor(sec/phaseDuration));
+ const phaseStart=phase*phaseDuration;const phaseFrames=phaseDuration*30;const phaseFrameStart=phaseStart*30;const worried=phase<3;
+ const wallet=ease(f,phaseFrameStart+phaseFrames*.08,phaseFrameStart+phaseFrames*.22);
+ const paid=ease(f,phaseFrameStart+phaseFrames*.43,phaseFrameStart+phaseFrames*.62);
+ const saving=ease(f,phaseFrameStart+phaseFrames*.33,phaseFrameStart+phaseFrames*.52);
+ const chart=ease(f,phaseFrameStart+phaseFrames*.26,phaseFrameStart+phaseFrames*.92);
  const title=["THE MONEY ARRIVES","THEN THE BILLS COME","MAKE A PLAN BEFORE SPENDING","MOVE SAVINGS FIRST","BUILD THE HABIT"][phase];
  const subtitle=["Your income deserves a plan","Watch where your money goes","Give every shilling a purpose","Small deposits still matter","Progress is built one decision at a time"][phase];
  return <AbsoluteFill style={{background:P.paper,fontFamily:"Arial"}}>
@@ -66,25 +66,25 @@ const Story:React.FC<{cues:Cue[];duration:number}> = ({cues,duration})=>{
  <rect width="1080" height="1920" fill="url(#warm)"/>
  <g transform="translate(0 360)"><Room/>
  {phase===0&&<g>
- <Person worried={false} action={0}/>
+ <Person worried={false} action={phaseFrameStart+phaseFrames*.12}/>
  <g opacity={wallet}><rect x="600" y="650" width="240" height="130" rx="22" fill={P.brown}/><text x="720" y="705" textAnchor="middle" fontSize="22" fill={P.cream} fontWeight="800">SALARY RECEIVED</text><text x="720" y="752" textAnchor="middle" fontSize="35" fill={P.white} fontWeight="900">+ INCOME</text></g>
- <g>{[0,1,2,3].map(i=><g key={i} transform={`translate(${540+i*75} ${610-i*42})`}><Bill x={0} y={0} delay={65+i*38} label="INCOME"/></g>)}</g>
+ <g>{[0,1,2,3].map(i=><g key={i} transform={`translate(${540+i*75} ${610-i*42})`}><Bill x={0} y={0} delay={phaseFrameStart+phaseFrames*(.2+i*.12)} label="INCOME"/></g>)}</g>
  </g>}
- {phase===1&&<g><Person worried={true} action={20}/>
- <Bill x={540} y={510} delay={8} label="RENT"/><Bill x={760} y={650} delay={48} label="POWER"/><Bill x={330} y={690} delay={90} label="FOOD"/>
+ {phase===1&&<g><Person worried={true} action={phaseFrameStart+phaseFrames*.12}/>
+ <Bill x={540} y={510} delay={phaseFrameStart+phaseFrames*.06} label="RENT"/><Bill x={760} y={650} delay={phaseFrameStart+phaseFrames*.28} label="POWER"/><Bill x={330} y={690} delay={phaseFrameStart+phaseFrames*.5} label="FOOD"/>
  <g opacity={paid}><path d="M470 600Q650 530 860 620" fill="none" stroke={P.caramel} strokeWidth="12" strokeDasharray="20 18"/><text x="660" y="555" fontSize="28" fontWeight="900" fill={P.ink}>PAYMENT LEAVES</text></g>
  </g>}
- {phase===2&&<g><Person worried={false} action={10}/>
- {[0,1,2].map(i=><g key={i} transform={`translate(${220+i*320} 650)`}><rect x="-125" y="-105" width="250" height="235" rx="25" fill={[P.cream,P.sand,P.white][i]} stroke={P.brown} strokeWidth="8"/><text y="-55" textAnchor="middle" fontSize="26" fontWeight="900" fill={P.ink}>{["NEEDS","OBLIGATIONS","FUTURE YOU"][i]}</text><Bill x={0} y={30} delay={35+i*42} label="ALLOCATE"/></g>)}
+ {phase===2&&<g><Person worried={false} action={phaseFrameStart+phaseFrames*.12}/>
+ {[0,1,2].map(i=><g key={i} transform={`translate(${220+i*320} 650)`}><rect x="-125" y="-105" width="250" height="235" rx="25" fill={[P.cream,P.sand,P.white][i]} stroke={P.brown} strokeWidth="8"/><text y="-55" textAnchor="middle" fontSize="26" fontWeight="900" fill={P.ink}>{["NEEDS","OBLIGATIONS","FUTURE YOU"][i]}</text><Bill x={0} y={30} delay={phaseFrameStart+phaseFrames*(.18+i*.2)} label="ALLOCATE"/></g>)}
  <path d="M540 410V510M220 510H860M220 510V545M540 510V545M860 510V545" fill="none" stroke={P.brown} strokeWidth="12" strokeLinecap="round"/>
  </g>}
- {phase===3&&<g><Person worried={false} action={8}/>
+ {phase===3&&<g><Person worried={false} action={phaseFrameStart+phaseFrames*.12}/>
  <path d="M600 600H850L820 930Q725 1010 630 930Z" fill={P.cream} stroke={P.brown} strokeWidth="12"/>
  <path d="M650 600V550H800V600" fill="none" stroke={P.brown} strokeWidth="14"/>
- {Array.from({length:12},(_,i)=><Coin key={i} x={650+(i%4)*48} y={720+Math.floor(i/4)*58} delay={30+i*25} index={i}/>)}
+ {Array.from({length:12},(_,i)=><Coin key={i} x={650+(i%4)*48} y={720+Math.floor(i/4)*58} delay={phaseFrameStart+phaseFrames*(.12+i*.075)} index={i}/>)}
  <text x="720" y="1060" textAnchor="middle" fontSize="30" fontWeight="900" fill={P.ink}>SAVINGS BUFFER</text>
  </g>}
- {phase===4&&<g><Person worried={false} action={5}/>
+ {phase===4&&<g><Person worried={false} action={phaseFrameStart+phaseFrames*.12}/>
  <path d="M240 950V500M240 950H900" stroke={P.brown} strokeWidth="12" fill="none"/>
  <path d="M280 880L410 810L540 750L670 620L820 500" stroke={P.caramel} strokeWidth="22" fill="none" strokeLinecap="round" strokeDasharray="1" pathLength="1" strokeDashoffset={1-chart}/>
  {[0,1,2,3,4].map(i=><circle key={i} cx={280+i*135} cy={[880,810,750,620,500][i]} r="17" fill={P.brown} opacity={chart}/>)}
