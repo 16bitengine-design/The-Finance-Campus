@@ -441,6 +441,7 @@ def main() -> int:
 
     try:
         api_key = os.environ.get("BUFFER_API_KEY", "")
+        client = BufferClient(api_key)
         if args.list_account:
             organizations = client.list_organizations()
             result = []
@@ -462,7 +463,6 @@ def main() -> int:
             raise ValueError("BUFFER_ORGANIZATION_ID and BUFFER_YOUTUBE_CHANNEL_ID are required")
         if args.live and os.environ.get("BUFFER_PUBLISH_ENABLED", "").casefold() != "true":
             raise ValueError("Live scheduling is locked; set BUFFER_PUBLISH_ENABLED=true only after approval")
-        client = BufferClient(api_key)
         result = schedule_package(
             args.package_dir,
             client=client,
