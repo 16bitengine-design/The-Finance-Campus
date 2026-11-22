@@ -235,7 +235,7 @@ def monitor_publications(
     ledger_path: str | Path,
 ) -> dict[str, Any]:
     """Reconcile Buffer post states and verify public destination URLs for sent posts."""
-    from datetime import datetime, timezone
+    from datetime import UTC, datetime
 
     ledger = _load_ledger(ledger_path)
     indexed: dict[str, dict[str, Any]] = {}
@@ -246,7 +246,7 @@ def monitor_publications(
                 indexed[str(post_id)] = post
 
     results: list[dict[str, Any]] = []
-    checked_at = datetime.now(timezone.utc).isoformat()
+    checked_at = datetime.now(UTC).isoformat()
     for ledger_key, record in ledger["posts"].items():
         post_id = record.get("buffer_post_id")
         if not post_id:
