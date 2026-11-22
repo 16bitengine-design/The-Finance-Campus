@@ -64,6 +64,21 @@ class BufferClient:
             raise BufferAPIError("; ".join(messages) or "Buffer GraphQL request failed")
         return data.get("data") or {}
 
+    def list_organizations(self) -> list[dict[str, Any]]:
+        query = """
+        query FinanceCampusOrganizations {
+          account {
+            organizations { id name }
+          }
+        }
+        """
+        result = self.execute(query)
+        account = result.get("account") or {}
+        organizations = account.get("organizations")
+        if not isinstance(organizations, list):
+            raise BufferAPIError("Buffer did not return an organization list")
+        return organizations
+
     def list_channels(self, organization_id: str) -> list[dict[str, Any]]:
         query = f"""
         query FinanceCampusChannels {{
@@ -71,6 +86,9 @@ class BufferClient:
             id
             name
             service
+            isDisconnected
+            isQueuePaused
+            isLocked
           }}
         }}
         """
@@ -328,6 +346,12 @@ def schedule_package(
         channel = channel_by_id.get(channel_id)
         if not channel:
             raise ValueError(f"Configured Buffer {platform} channel was not found")
+        if channel.get("isDisconnected") is True:
+            raise ValueError(f"Configured Buffer {platform} channel is disconnected")
+        if channel.get("isQueuePaused") is True:
+            raise ValueError(f"Configured Buffer {platform} queue is paused")
+        if channel.get("isLocked") is True:
+            raise ValueError(f"Configured Buffer {platform} channel is locked")
         if str(channel.get("service", "")).casefold() != platform:
             raise ValueError(
                 f"Configured {platform} channel points to Buffer service "
@@ -403,13 +427,34 @@ def schedule_package(
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate or schedule a Finance Campus package in Buffer")
-    parser.add_argument("package_dir", help="Directory containing production manifest and post metadata")
+    parser.add_argument(
+        "package_dir", nargs="?",
+        help="Directory containing production manifest and post metadata",
+    )
+    parser.add_argument(
+        "--list-account", action="store_true",
+        help="List Buffer organizations and connected channel IDs",
+    )
     parser.add_argument("--live", action="store_true", help="Actually create scheduled Buffer posts")
     parser.add_argument("--ledger", default="production/buffer-publishing-ledger.json")
     args = parser.parse_args()
 
     try:
         api_key = os.environ.get("BUFFER_API_KEY", "")
+        if args.list_account:
+            organizations = client.list_organizations()
+            result = []
+            for organization in organizations:
+                org_id = organization.get("id")
+                channels = client.list_channels(org_id) if org_id else []
+                result.append({
+                    "organization": organization,
+                    "channels": channels,
+                })
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0
+        if not args.package_dir:
+            parser.error("package_dir is required unless --list-account is used")
         organization_id = os.environ.get("BUFFER_ORGANIZATION_ID", "")
         youtube_channel_id = os.environ.get("BUFFER_YOUTUBE_CHANNEL_ID", "")
         tiktok_channel_id = os.environ.get("BUFFER_TIKTOK_CHANNEL_ID")
