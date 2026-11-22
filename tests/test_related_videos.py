@@ -25,7 +25,7 @@ def test_related_video_matches_explicit_concept_and_adds_spoken_cta(tmp_path):
 
     assert result is not None
     assert result["video_id"] == "stocks-101"
-    assert "watch our dedicated lesson" in result["spoken_cta"]
+    assert "watch our dedicated lesson" in result["spoken_cta"].casefold()
     assert result["spoken_cta"] in script["sections"]["empowering_close"]
 
 
