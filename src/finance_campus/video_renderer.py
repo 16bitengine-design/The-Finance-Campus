@@ -374,13 +374,13 @@ def _draw_element(
                 eye_y = y + head
                 eye_r = max(2, width)
                 draw.ellipse((cx-head//3-eye_r, eye_y-eye_r, cx-head//3+eye_r, eye_y+eye_r), fill=(0, 0, 0))
-                draw.ellipse((cx+head//3-eye_r, eye_y-eye_r, cx+head//3+eye_r, eye_y+eye_r), fill=(35, 31, 30))
+                draw.ellipse((cx+head//3-eye_r, eye_y-eye_r, cx+head//3+eye_r, eye_y+eye_r), fill=(0, 0, 0))
                 if expression in {"worried", "overwhelmed"}:
                     draw.arc((cx-head//3, y+int(head*1.45), cx+head//3, y+int(head*1.95)),
                              start=200, end=340, fill=(0, 0, 0), width=max(2, width))
                 else:
                     draw.arc((cx-head//3, y+int(head*1.35), cx+head//3, y+int(head*1.85)),
-                             start=15, end=165, fill=(90, 42, 42), width=max(2, width))
+                             start=15, end=165, fill=(0, 0, 0), width=max(2, width))
             ellipse((cx-head, y, cx+head, y+2*head))
             # Facial details are deliberately separate pen strokes.
             eye_y, eye_r = y + head, max(2, width)
