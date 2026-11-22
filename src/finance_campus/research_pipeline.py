@@ -191,16 +191,18 @@ def refresh_topics(
             page_text = str(source_result.get("text", "")).casefold()
             matched = []
             required_matches = 0
-            if page_text:
-                matched = [word for word in blueprint["keywords"] if word.casefold() in page_text]
-                required_matches = min(2, len(blueprint["keywords"]))
-                if len(matched) < required_matches:
-                    raise ValueError(
-                        f"Source page matched {len(matched)} topic keywords; "
-                        f"at least {required_matches} are required"
-                    )
-            elif not source_meta["url"].casefold().endswith(".pdf"):
-                raise ValueError("Source page has no extracted text for relevance checking")
+            if not page_text:
+                raise ValueError(
+                    "Source returned no extractable text; reachability alone is not enough "
+                    "to count a topic as researched"
+                )
+            matched = [word for word in blueprint["keywords"] if word.casefold() in page_text]
+            required_matches = min(2, len(blueprint["keywords"]))
+            if len(matched) < required_matches:
+                raise ValueError(
+                    f"Source page matched {len(matched)} topic keywords; "
+                    f"at least {required_matches} are required"
+                )
             source_record = {
                 "url": source_meta["url"],
                 "final_url": final_url,
@@ -211,7 +213,7 @@ def refresh_topics(
                 "http_status": 200,
                 "checked_at": timestamp,
                 "page_title": source_result.get("title", ""),
-                "verification": ("reachable_pdf_needs_text_review" if not page_text and source_meta["url"].casefold().endswith(".pdf") else "reachable_and_keyword_checked"),
+                "verification": "reachable_and_keyword_checked",
                 "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support.",
             }
         except (OSError, ValueError, TimeoutError, urllib.error.URLError) as exc:  # Fail closed.
@@ -226,7 +228,7 @@ def refresh_topics(
             "geographic_relevance": blueprint["geo"],
             "research_sources": [source_record],
             "sources": [source_meta["url"]],
-            "research_status": ("source_reachable_needs_manual_review" if not page_text and source_meta["url"].casefold().endswith(".pdf") else "source_checked_needs_claim_review"),
+            "research_status": "source_checked_needs_claim_review",
             "research_checked_at": timestamp,
             "production_status": "not_started",
             "publication_status": "not_published",
@@ -247,10 +249,30 @@ def refresh_topics(
             known.add(topic_id)
 
     save_topics(library_path, topics)
+    existing_ids = {str(item.get("id")) for item in topics}
+    existing_titles = {
+        re.sub(r"[^a-z0-9]+", " ", str(item.get("title", "")).casefold()).strip()
+        for item in topics
+    }
+    unused_blueprints = [
+        item for item in MINDSET_TOPIC_BLUEPRINTS
+        if "TFC-" + hashlib.sha1(item["slug"].encode()).hexdigest()[:10].upper() not in existing_ids
+        and re.sub(r"[^a-z0-9]+", " ", item["title"].casefold()).strip() not in existing_titles
+    ]
     return {
+        "generated_at": timestamp,
         "target": target,
         "added_count": len(added),
         "library_count": len(topics),
+        "library_path": str(library_path),
+        "blueprint_catalogue_count": len(MINDSET_TOPIC_BLUEPRINTS),
+        "unused_blueprints_remaining": len(unused_blueprints),
+        "estimated_weeks_of_catalogue_cover_at_20_per_week": round(len(unused_blueprints) / 20, 1),
+        "catalogue_exhaustion_warning": (
+            "The curated blueprint reserve is below one full weekly batch. "
+            "Add and research more distinct blueprints before the next refresh."
+            if len(unused_blueprints) < 20 else None
+        ),
         "added": added,
         "rejected": rejected,
         "discovery_method": "evergreen_money_mindset_blueprints",
