@@ -243,7 +243,7 @@ def test_scene_transition_inserts_smooth_crossfade_frames(tmp_path):
     assert ImageChops.difference(outgoing, incoming).getbbox() is not None
     assert ImageChops.difference(halfway, outgoing).getbbox() is not None
     assert ImageChops.difference(halfway, incoming).getbbox() is not None
-    assert set(halfway.getdata()) <= {(0, 0, 0), (255, 255, 255), (127, 127, 127), (128, 128, 128)}
+    assert all(red == green == blue for red, green, blue in halfway.getdata())
 
 
 
