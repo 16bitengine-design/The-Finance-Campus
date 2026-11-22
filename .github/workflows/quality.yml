@@ -24,6 +24,20 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Install project and test dependencies
         run: python -m pip install -e ".[dev]"
+      - name: Validate GitHub Actions workflow YAML
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+
+          paths = sorted(Path(".github/workflows").glob("*.yml"))
+          if not paths:
+              raise SystemExit("No GitHub Actions workflows found")
+          for path in paths:
+              yaml.safe_load(path.read_text(encoding="utf-8"))
+              print(f"Valid YAML: {path}")
+          print(f"Validated {len(paths)} workflow files.")
+          PY
       - name: Run tests
         run: python -m pytest -q
       - name: Check formatting and lint
