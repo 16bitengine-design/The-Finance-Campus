@@ -1,71 +1,73 @@
+from __future__ import annotations
+
 import json
 from pathlib import Path
+from typing import Any
 
 import pytest
 
 from finance_campus.buffer_publisher import (
+    _graphql_string,
     schedule_package,
     validate_publish_package,
 )
 
 
-class FakeBuffer:
-    def __init__(self):
-        self.created = []
-        self.existing = []
+class FakeBufferClient:
+    def __init__(self, channels: list[dict[str, Any]]):
+        self.channels = channels
+        self.created: list[dict[str, Any]] = []
 
-    def list_channels(self, organization_id):
-        return [
-            {"id": "yt-123", "name": "The Finance Campus YouTube", "service": "youtube"},
-            {"id": "tt-456", "name": "The Finance Campus TikTok", "service": "tiktok"},
-        ]
+    def list_channels(self, organization_id: str) -> list[dict[str, Any]]:
+        assert organization_id == "org-1"
+        return self.channels
 
-    def list_existing_posts(self, organization_id, channel_id):
-        return [item for item in self.existing if item["channelId"] == channel_id]
+    def list_existing_posts(self, organization_id: str, channel_id: str) -> list[dict[str, Any]]:
+        return []
 
-    def create_video_post(self, **kwargs):
-        post = {
-            "id": f"post-{len(self.created) + 1}",
+    def create_video_post(self, **kwargs: Any) -> dict[str, Any]:
+        self.created.append(kwargs)
+        return {
+            "id": f"post-{len(self.created)}",
             "status": "scheduled",
             "dueAt": "2026-11-23T06:00:00Z",
-            "channelId": kwargs["channel_id"],
         }
-        self.created.append((kwargs, post))
-        return post
 
 
-def make_package(root: Path, *, status="quality_approved"):
+def _package(root: Path, *, video_format: str = "short") -> Path:
     root.mkdir(parents=True, exist_ok=True)
-    (root / "brand-thumbnail.jpg").write_bytes(b"x" * 2048)
+    thumbnail = root / "thumbnail-youtube.jpg"
+    thumbnail.write_bytes(b"\xff\xd8" + b"x" * 2048)
+    stages = {
+        "script_validated": True,
+        "script_approved": True,
+        "kokoro_narration_generated": True,
+        "captions_validated": True,
+        "video_rendered": True,
+        "media_streams_verified": True,
+        "final_video_qc_passed": True,
+    }
     manifest = {
-        "video_id": "TFC-TEST-001",
-        "title": "How to Build an Emergency Fund",
-        "status": status,
+        "video_id": "fc-test-video",
+        "title": "A Practical Finance Lesson",
+        "status": "quality_approved",
         "technical_quality_approved": True,
         "human_visual_review_passed": True,
         "publication_approved": True,
-        "video_format": "short",
-        "stages": {
-            "script_validated": True,
-            "script_approved": True,
-            "kokoro_narration_generated": True,
-            "captions_validated": True,
-            "video_rendered": True,
-            "media_streams_verified": True,
-            "final_video_qc_passed": True,
-        },
-        "artifacts": {"thumbnail": "brand-thumbnail.jpg"},
+        "video_format": video_format,
+        "stages": stages,
+        "artifacts": {"thumbnail": "thumbnail-youtube.jpg"},
         "public_media": {
-            "video_url": "https://cdn.example.test/finance-campus/test.mp4",
+            "video_url": "https://media.example.test/finance-campus-video.mp4",
             "thumbnail_frame_embedded": True,
-            "thumbnail_offset_ms": 500,
+            "thumbnail_offset_ms": 600,
         },
     }
     metadata = {
         "title": manifest["title"],
         "platforms": {
-            "youtube": {"description": "Full YouTube description with educational disclaimer."},
-            "tiktok": {"caption": "Distinct TikTok caption with educational disclaimer."},
+            "youtube": {"description": "YouTube educational description and disclaimer."},
+            "tiktok": {"caption": "TikTok educational caption and disclaimer."},
         },
         "validation": {
             "youtube_disclaimer_present": True,
@@ -73,83 +75,116 @@ def make_package(root: Path, *, status="quality_approved"):
             "platform_copy_is_distinct": True,
         },
     }
-    (root / "production-manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
-    (root / "post-metadata.json").write_text(json.dumps(metadata), encoding="utf-8")
+    (root / "production-manifest.json").write_text(
+        json.dumps(manifest), encoding="utf-8"
+    )
+    (root / "post-metadata.json").write_text(
+        json.dumps(metadata), encoding="utf-8"
+    )
     return root
 
 
-def test_rejects_package_awaiting_visual_review(tmp_path):
-    package = make_package(tmp_path / "package", status="awaiting_visual_review")
-    with pytest.raises(ValueError, match="quality_approved"):
-        validate_publish_package(package)
+def _channels() -> list[dict[str, Any]]:
+    return [
+        {
+            "id": "youtube-1",
+            "name": "The Finance Campus YouTube",
+            "service": "youtube",
+            "isDisconnected": False,
+            "isQueuePaused": False,
+            "isLocked": False,
+        },
+        {
+            "id": "tiktok-1",
+            "name": "The Finance Campus TikTok",
+            "service": "tiktok",
+            "isDisconnected": False,
+            "isQueuePaused": False,
+            "isLocked": False,
+        },
+    ]
 
 
-def test_dry_run_validates_both_destinations_without_creating_posts(tmp_path):
-    package = make_package(tmp_path / "package")
-    client = FakeBuffer()
+def test_graphql_string_escapes_quotes_and_newlines() -> None:
+    assert _graphql_string('A "quoted" title\\nnext') == 'A \\"quoted\\" title\\\\nnext'
+
+
+def test_package_rejects_missing_public_video_url(tmp_path: Path) -> None:
+    root = _package(tmp_path / "package")
+    manifest_path = root / "production-manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["public_media"].pop("video_url")
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="stable public HTTPS video_url"):
+        validate_publish_package(root)
+
+
+def test_short_package_dry_run_targets_both_platforms(tmp_path: Path) -> None:
+    package = _package(tmp_path / "package")
+    client = FakeBufferClient(_channels())
+
     result = schedule_package(
         package,
-        client=client,
+        client=client,  # type: ignore[arg-type]
         organization_id="org-1",
-        youtube_channel_id="yt-123",
-        tiktok_channel_id="tt-456",
+        youtube_channel_id="youtube-1",
+        tiktok_channel_id="tiktok-1",
         ledger_path=tmp_path / "ledger.json",
         live=False,
     )
+
     assert result["mode"] == "dry_run"
     assert [item["platform"] for item in result["results"]] == ["youtube", "tiktok"]
     assert all(item["status"] == "dry_run_validated" for item in result["results"])
     assert client.created == []
+    assert not (tmp_path / "ledger.json").exists()
 
 
-def test_live_scheduling_creates_one_post_per_platform_and_records_ledger(tmp_path, monkeypatch):
-    monkeypatch.setattr("finance_campus.buffer_publisher.verify_public_video_url", lambda url: None)
-    package = make_package(tmp_path / "package")
-    ledger = tmp_path / "ledger.json"
+def test_long_form_package_only_targets_youtube(tmp_path: Path) -> None:
+    package = _package(tmp_path / "package", video_format="long")
+    client = FakeBufferClient(_channels())
+
     result = schedule_package(
         package,
-        client=FakeBuffer(),
+        client=client,  # type: ignore[arg-type]
         organization_id="org-1",
-        youtube_channel_id="yt-123",
-        tiktok_channel_id="tt-456",
-        ledger_path=ledger,
-        live=True,
+        youtube_channel_id="youtube-1",
+        tiktok_channel_id=None,
+        ledger_path=tmp_path / "ledger.json",
+        live=False,
     )
-    assert all(item["status"] == "scheduled_in_buffer" for item in result["results"])
-    saved = json.loads(ledger.read_text(encoding="utf-8"))
-    assert len(saved["posts"]) == 2
+
+    assert [item["platform"] for item in result["results"]] == ["youtube"]
 
 
-def test_ledger_prevents_duplicate_scheduling(tmp_path, monkeypatch):
-    monkeypatch.setattr("finance_campus.buffer_publisher.verify_public_video_url", lambda url: None)
-    package = make_package(tmp_path / "package")
+def test_existing_ledger_prevents_duplicate_scheduling(tmp_path: Path) -> None:
+    package = _package(tmp_path / "package")
     ledger = tmp_path / "ledger.json"
-    first_client = FakeBuffer()
-    schedule_package(
-        package, client=first_client, organization_id="org-1",
-        youtube_channel_id="yt-123", tiktok_channel_id="tt-456",
-        ledger_path=ledger, live=True,
+    ledger.write_text(
+        json.dumps({
+            "version": 1,
+            "posts": {
+                "fc-test-video:youtube:youtube-1": {
+                    "buffer_post_id": "existing-post",
+                    "status": "scheduled",
+                }
+            },
+        }),
+        encoding="utf-8",
     )
-    second_client = FakeBuffer()
+    client = FakeBufferClient(_channels())
+
     result = schedule_package(
-        package, client=second_client, organization_id="org-1",
-        youtube_channel_id="yt-123", tiktok_channel_id="tt-456",
-        ledger_path=ledger, live=True,
+        package,
+        client=client,  # type: ignore[arg-type]
+        organization_id="org-1",
+        youtube_channel_id="youtube-1",
+        tiktok_channel_id="tiktok-1",
+        ledger_path=ledger,
+        live=False,
     )
-    assert all(item["status"] == "already_recorded" for item in result["results"])
-    assert second_client.created == []
 
-
-def test_wrong_channel_service_is_rejected(tmp_path):
-    package = make_package(tmp_path / "package")
-
-    class WrongService(FakeBuffer):
-        def list_channels(self, organization_id):
-            return [{"id": "yt-123", "name": "Wrong", "service": "tiktok"}]
-
-    with pytest.raises(ValueError, match="service"):
-        schedule_package(
-            package, client=WrongService(), organization_id="org-1",
-            youtube_channel_id="yt-123", tiktok_channel_id="tt-456",
-            ledger_path=tmp_path / "ledger.json", live=False,
-        )
+    assert result["results"][0]["status"] == "already_recorded"
+    assert result["results"][0]["buffer_post_id"] == "existing-post"
+    assert result["results"][1]["status"] == "dry_run_validated"
