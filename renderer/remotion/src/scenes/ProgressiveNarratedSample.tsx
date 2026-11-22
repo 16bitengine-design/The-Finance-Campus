@@ -83,7 +83,7 @@ const Story:React.FC<{cues:Cue[];duration:number}> = ({cues,duration})=>{
  <g opacity={wallet}><rect x="600" y="650" width="240" height="130" rx="22" fill={P.brown}/><text x="720" y="705" textAnchor="middle" fontSize="22" fill={P.cream} fontWeight="800">SALARY RECEIVED</text><text x="720" y="752" textAnchor="middle" fontSize="35" fill={P.white} fontWeight="900">+ INCOME</text></g>
  <g><Bill x={560} y={570} delay={phaseFrameStart+phaseFrames*.20} label="INCOME"/><Bill x={805} y={570} delay={phaseFrameStart+phaseFrames*.34} label="INCOME"/><Bill x={560} y={830} delay={phaseFrameStart+phaseFrames*.48} label="INCOME"/><Bill x={805} y={830} delay={phaseFrameStart+phaseFrames*.62} label="INCOME"/></g><g transform="translate(685 385)"><rect x="-120" y="-48" width="240" height="92" rx="24" fill={P.brown} stroke={P.ink} strokeWidth="7"/><text y="8" textAnchor="middle" fontSize="27" fill={P.white} fontWeight="900">PAYDAY!</text></g>
  </g>}
- {phase===1&&<g><Person worried={true} action={phaseFrameStart+phaseFrames*.12}/>
+ {phase===1&&<g>
  <Bill x={560} y={520} delay={phaseFrameStart+phaseFrames*.06} label="RENT"/><Bill x={810} y={650} delay={phaseFrameStart+phaseFrames*.28} label="POWER"/><Bill x={560} y={850} delay={phaseFrameStart+phaseFrames*.5} label="FOOD"/>
  <g opacity={paid}><path d="M470 600Q650 530 860 620" fill="none" stroke={P.caramel} strokeWidth="12" strokeDasharray="20 18"/><text x="660" y="555" fontSize="28" fontWeight="900" fill={P.ink}>PAYMENT LEAVES</text></g>
  </g>}
@@ -91,7 +91,7 @@ const Story:React.FC<{cues:Cue[];duration:number}> = ({cues,duration})=>{
  {[0,1,2].map(i=><g key={i} transform={`translate(${530+i*185} 650)`}><rect x="-82" y="-105" width="164" height="235" rx="25" fill={[P.cream,P.sand,P.white][i]} stroke={P.brown} strokeWidth="8"/><text y="-55" textAnchor="middle" fontSize="20" fontWeight="900" fill={P.ink}>{["NEEDS","OBLIGATIONS","FUTURE YOU"][i]}</text><Bill x={0} y={30} delay={phaseFrameStart+phaseFrames*(.18+i*.2)} label="ALLOCATE"/></g>)}
  <path d="M710 410V510M530 510H900M530 510V545M715 510V545M900 510V545" fill="none" stroke={P.brown} strokeWidth="12" strokeLinecap="round"/>
  </g>}
- {phase===3&&<g><Person worried={false} action={phaseFrameStart+phaseFrames*.12}/>
+ {phase===3&&<g>
  <path d="M600 600H850L820 930Q725 1010 630 930Z" fill={P.cream} stroke={P.brown} strokeWidth="12"/>
  <path d="M650 600V550H800V600" fill="none" stroke={P.brown} strokeWidth="14"/>
  {Array.from({length:12},(_,i)=><Coin key={i} x={650+(i%4)*48} y={720+Math.floor(i/4)*58} delay={phaseFrameStart+phaseFrames*(.12+i*.075)} index={i}/>)}
