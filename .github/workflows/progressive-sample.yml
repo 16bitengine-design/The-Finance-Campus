@@ -41,7 +41,7 @@ jobs:
         run: |
           python -m finance_campus.cli produce-video \
             examples/sample-video-pay-yourself-first.json artifacts/source \
-            --format short --voice "${{ inputs.voice }}" --device cpu \
+            --format short --voice "${{ inputs.voice || 'af_heart' }}" --device cpu \
             --fps 30 --draw-fps 24 --transition-seconds 0.25
       - name: Prepare synchronized audio and caption cues
         run: |
@@ -52,7 +52,7 @@ jobs:
           from pathlib import Path
           srt = Path("artifacts/source/captions.srt").read_text(encoding="utf-8")
           cues = []
-          blocks = re.split(r"\\n\\s*\\n", srt.strip())
+          blocks = re.split(r"\n\s*\n", srt.strip())
           def seconds(stamp):
               h,m,rest=stamp.split(":")
               sec,ms=rest.split(",")
