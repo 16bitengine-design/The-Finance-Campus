@@ -15,7 +15,7 @@ export const RemotionRoot: React.FC = () => (
       fps={30}
       width={1080}
       height={1920}
-      defaultProps={{cues: [], duration: 150}}
+      defaultProps={{cues: [], duration: 150}}\n      calculateMetadata={({props}) => ({durationInFrames: Math.ceil(props.duration * 30)})}
     />
   </>
 );
