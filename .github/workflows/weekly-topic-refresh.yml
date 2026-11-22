@@ -1,14 +1,14 @@
-name: Weekly researched topic refresh
+name: Daily researched topic replenishment
 
 on:
   schedule:
-    - cron: "30 5 * * 1"
+    - cron: "30 5 * * *"
   workflow_dispatch:
     inputs:
       target:
-        description: "Number of new topics to attempt"
+        description: "Number of new topics to attempt each day"
         required: false
-        default: "20"
+        default: "3"
 
 permissions:
   contents: write
@@ -34,7 +34,7 @@ jobs:
       - name: Research and replenish canonical topic library
         id: refresh
         env:
-          TOPIC_TARGET: ${{ github.event.inputs.target || '20' }}
+          TOPIC_TARGET: ${{ github.event.inputs.target || '3' }}
         run: |
           mkdir -p production/reports
           set +e
@@ -47,7 +47,7 @@ jobs:
             exit 1
           fi
           if [ "$status" -eq 2 ]; then
-            echo "::warning::The weekly target was not fully met. Only source-checked, unique topics will be retained."
+            echo "::warning::The daily target was not fully met. Only source-checked, unique topics will be retained."
           fi
       - name: Validate canonical library and report
         run: |
