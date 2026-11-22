@@ -5,7 +5,7 @@ on:
     inputs:
       source_run_id:
         description: GitHub Actions run ID that contains the production package artifact
-        required: true
+        required: false
         type: string
       artifact_name:
         description: Name of the uploaded production package artifact
@@ -84,7 +84,7 @@ jobs:
         run: python -m finance_campus.buffer_publisher --list-account
 
       - name: Validate package and Buffer channels (dry run)
-        if: ${{ inputs.mode != 'schedule' }}
+        if: ${{ inputs.mode == 'dry_run' }}
         run: python -m finance_campus.buffer_publisher package
 
       - name: Schedule approved posts in Buffer
