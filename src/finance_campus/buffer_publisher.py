@@ -111,6 +111,9 @@ class BufferClient:
                 text
                 channelId
                 status
+                dueAt
+                sentAt
+                externalLink
                 assets {{ source }}
               }}
             }}
@@ -197,6 +200,99 @@ def verify_public_video_url(url: str, *, timeout: int = 20) -> None:
         raise ValueError(f"Buffer cannot fetch public video URL (HTTP {exc.code})") from exc
     except urllib.error.URLError as exc:
         raise ValueError(f"Buffer cannot reach public video URL: {exc}") from exc
+
+
+
+def verify_public_post_url(url: str, *, timeout: int = 20) -> bool:
+    """Verify a public YouTube/TikTok post URL without using authenticated APIs."""
+    from urllib.parse import urlparse
+
+    parsed = urlparse(url)
+    host = (parsed.hostname or "").casefold()
+    allowed_hosts = {
+        "youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be",
+        "tiktok.com", "www.tiktok.com", "vm.tiktok.com",
+    }
+    if parsed.scheme != "https" or host not in allowed_hosts:
+        return False
+    request = urllib.request.Request(
+        url,
+        headers={"Range": "bytes=0-0", "User-Agent": "Mozilla/5.0 The-Finance-Campus/1.0"},
+        method="GET",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            return 200 <= getattr(response, "status", 200) < 400
+    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError):
+        return False
+
+
+def monitor_publications(
+    *,
+    client: BufferClient,
+    organization_id: str,
+    channel_ids: list[str],
+    ledger_path: str | Path,
+) -> dict[str, Any]:
+    """Reconcile Buffer post states and verify public destination URLs for sent posts."""
+    from datetime import datetime, timezone
+
+    ledger = _load_ledger(ledger_path)
+    indexed: dict[str, dict[str, Any]] = {}
+    for channel_id in channel_ids:
+        for post in client.list_existing_posts(organization_id, channel_id):
+            post_id = post.get("id")
+            if post_id:
+                indexed[str(post_id)] = post
+
+    results: list[dict[str, Any]] = []
+    checked_at = datetime.now(timezone.utc).isoformat()
+    for ledger_key, record in ledger["posts"].items():
+        post_id = record.get("buffer_post_id")
+        if not post_id:
+            continue
+        post = indexed.get(str(post_id))
+        if not post:
+            results.append({"ledger_key": ledger_key, "status": "not_returned_by_buffer"})
+            continue
+        buffer_status = str(post.get("status", "unknown")).casefold()
+        record["buffer_status"] = buffer_status
+        record["last_checked_at"] = checked_at
+        if buffer_status == "sent":
+            external_url = post.get("externalLink")
+            record["sent_at"] = post.get("sentAt")
+            record["external_url"] = external_url
+            if isinstance(external_url, str) and verify_public_post_url(external_url):
+                record["status"] = "publicly_accessible_verified"
+                record["public_availability_verified"] = True
+                results.append({
+                    "ledger_key": ledger_key,
+                    "status": "publicly_accessible_verified",
+                    "external_url": external_url,
+                })
+            else:
+                record["status"] = "sent_awaiting_public_verification"
+                record["public_availability_verified"] = False
+                results.append({
+                    "ledger_key": ledger_key,
+                    "status": "sent_awaiting_public_verification",
+                })
+        elif buffer_status == "error":
+            record["status"] = "failed"
+            record["public_availability_verified"] = False
+            results.append({"ledger_key": ledger_key, "status": "failed"})
+        else:
+            record["status"] = buffer_status
+            results.append({"ledger_key": ledger_key, "status": buffer_status})
+
+    _save_ledger(ledger_path, ledger)
+    return {
+        "mode": "monitor",
+        "checked_at": checked_at,
+        "tracked_posts": len(ledger["posts"]),
+        "results": results,
+        "ledger_path": str(ledger_path),
+    }
 
 
 def _graphql_string(value: str) -> str:
@@ -437,6 +533,7 @@ def main() -> int:
         help="List Buffer organizations and connected channel IDs",
     )
     parser.add_argument("--live", action="store_true", help="Actually create scheduled Buffer posts")
+    parser.add_argument("--monitor", action="store_true", help="Reconcile Buffer post states and verify public post URLs")
     parser.add_argument("--ledger", default="production/buffer-publishing-ledger.json")
     args = parser.parse_args()
 
@@ -453,6 +550,24 @@ def main() -> int:
                     "organization": organization,
                     "channels": channels,
                 })
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0
+        if args.monitor:
+            organization_id = os.environ.get("BUFFER_ORGANIZATION_ID", "")
+            channel_ids = [
+                value for value in (
+                    os.environ.get("BUFFER_YOUTUBE_CHANNEL_ID", ""),
+                    os.environ.get("BUFFER_TIKTOK_CHANNEL_ID", ""),
+                ) if value
+            ]
+            if not organization_id or not channel_ids:
+                raise ValueError("BUFFER_ORGANIZATION_ID and at least one Buffer channel ID are required")
+            result = monitor_publications(
+                client=client,
+                organization_id=organization_id,
+                channel_ids=channel_ids,
+                ledger_path=args.ledger,
+            )
             print(json.dumps(result, ensure_ascii=False, indent=2))
             return 0
         if not args.package_dir:
