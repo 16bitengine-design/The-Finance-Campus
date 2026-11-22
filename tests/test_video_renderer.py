@@ -457,6 +457,7 @@ def test_character_render_uses_substantial_filled_illustration_not_only_wirefram
     }
     _draw_element(ImageDraw.Draw(image), character, 1.0, image.size)
     counts = Counter(image.getdata())
+    # Regression guard: the full figure must retain solid ink mass at mobile size.
     # Monochrome character art uses black ink, white paper and substantial
     # filled silhouettes rather than coloured skin/clothing fills.
     assert counts[(0, 0, 0)] > 12000
