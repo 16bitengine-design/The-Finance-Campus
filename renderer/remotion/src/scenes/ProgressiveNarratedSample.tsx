@@ -93,7 +93,6 @@ const Story:React.FC<{cues:Cue[];duration:number}> = ({cues,duration})=>{
  </g>
  </svg>
  <Caption cues={cues}/>
- <div style={{position:"absolute",top:300,left:65,right:65,height:7,background:P.sand,borderRadius:8}}><div style={{height:7,width:`${Math.min(100,sec/duration*100)}%`,background:P.brown,borderRadius:8}}/></div>
  {sec>=duration-8&&<AbsoluteFill style={{background:P.ink,justifyContent:"center",alignItems:"center",padding:90,textAlign:"center",color:P.paper,fontFamily:"Arial"}}><div style={{fontSize:48,fontWeight:900,letterSpacing:3}}>THE FINANCE CAMPUS</div><div style={{fontSize:31,lineHeight:1.45,marginTop:42}}>Educational content only. This is not personalized financial, investment, tax or legal advice. Consult a qualified professional about your circumstances.</div><div style={{fontSize:22,color:P.sand,marginTop:45,letterSpacing:3}}>SAMPLE · NOT FOR PUBLICATION</div></AbsoluteFill>}
  <Audio src={staticFile("sample-narration.wav")}/>
  </AbsoluteFill>
