@@ -35,13 +35,19 @@ Before end-to-end scheduling, wire the branded thumbnail and media-hosting stage
 
 ## Buffer API requirements
 
-Create a personal API key in Buffer settings and store it only in GitHub Actions Secrets as `BUFFER_API_KEY`. Configure these repository secrets:
+Create a personal API key in Buffer Settings → API and store it only in GitHub Actions Secrets as `BUFFER_API_KEY`.
+
+Then run the **Buffer scheduling** GitHub Actions workflow with mode `discover`. It will print your Buffer organization and connected channel IDs without creating any posts. Copy the correct organization ID and the YouTube/TikTok channel IDs into the matching repository secrets below.
+
+Configure these repository secrets:
 
 - `BUFFER_API_KEY`
 - `BUFFER_ORGANIZATION_ID`
 - `BUFFER_YOUTUBE_CHANNEL_ID`
 - `BUFFER_TIKTOK_CHANNEL_ID`
 - `BUFFER_PUBLISH_ENABLED` — keep unset or false until launch is approved.
+
+After configuring the IDs, run the workflow in `dry_run` mode with a valid approved package. Only enable the publishing flag after the visual sample, thumbnail handling, public media hosting and end-to-end scheduling checks are approved.
 
 Channel IDs must be retrieved from the authenticated Buffer account; never guess them. The publisher checks that the configured IDs belong to the expected YouTube and TikTok services.
 
@@ -82,7 +88,7 @@ A separate branded thumbnail image is required in `artifacts.thumbnail`. Buffer'
 
 The workflow `.github/workflows/buffer-scheduling.yml` can be started manually with the completed production workflow run ID and artifact name, or called from a future production workflow using `workflow_call`. The artifact must contain `production-manifest.json`, `post-metadata.json`, the MP4 and the branded thumbnail at the package root/manifest paths. The reusable caller must pass Buffer secrets (for example, with `secrets: inherit`).
 
-The workflow defaults to `dry_run`. Select `schedule` only after the owner has approved the visual standard, the media host has been configured and the live-publishing lock has been intentionally enabled.
+The workflow offers `discover`, `dry_run` and `schedule` modes. It defaults to `dry_run`. Use `discover` to retrieve organization/channel IDs. Select `schedule` only after the owner has approved the visual standard, the media host has been configured and the live-publishing lock has been intentionally enabled.
 
 ## Local validation
 
