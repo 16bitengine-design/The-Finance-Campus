@@ -37,7 +37,7 @@ const Person:React.FC<{worried:boolean;action:number}> = ({worried,action})=>{
  <path d="M-5 182l-8 20h15" fill="none" stroke={P.brown} strokeWidth="5"/>
  </g>
 };
-const Room:React.FC=()=> {const f=useCurrentFrame();const reveal=ease(f,0,54);return <g opacity={reveal} transform={`translate(${(1-reveal)*-70} 0)`}
+const Room:React.FC=()=> {const f=useCurrentFrame();const reveal=ease(f,0,54);return <g opacity={reveal} transform={`translate(${(1-reveal)*-70} 0)`}>
  <path d="M80 90H1000V1110H80Z" fill={P.cream} stroke={P.brown} strokeWidth="8"/>
  <path d="M120 130H460V410H120Z" fill={P.paper} stroke={P.brown} strokeWidth="8"/>
  <path d="M290 130V410M120 270H460" stroke={P.sand} strokeWidth="8"/>
