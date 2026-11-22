@@ -120,7 +120,7 @@ jobs:
         env:
           SCRIPT_DURATION: ${{ inputs.duration || 'short' }}
         run: |
-          mkdir -p production/script-candidates
+          mkdir -p production/script-candidates production/reports
           python -m finance_campus.cli generate-pending-scripts production/topic-library.json production/script-candidates --duration "$SCRIPT_DURATION" | tee production/reports/script-generation-report.json
       - name: Commit new script candidates and report
         run: |
