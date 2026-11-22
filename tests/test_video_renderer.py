@@ -220,7 +220,7 @@ def test_scene_transition_inserts_smooth_crossfade_frames(tmp_path):
                 "narration": "The next illustration.",
                 "duration_seconds": 1,
                 "elements": [
-                    {"type": "circle", "cx": 500, "cy": 281, "r": 90, "color": "gold",
+                    {"type": "circle", "cx": 500, "cy": 281, "r": 62, "color": "gold",
                      "start_seconds": 0, "draw_seconds": 0.1},
                 ],
             },
@@ -233,12 +233,17 @@ def test_scene_transition_inserts_smooth_crossfade_frames(tmp_path):
     frames = sorted((tmp_path / ".crossfade_frames").glob("frame_*.png"))
     # Four frames per scene plus two cross-dissolve frames.
     assert len(frames) == 10
-    outgoing = Image.open(frames[3]).convert("RGB").getpixel((637, 960))
-    halfway = Image.open(frames[5]).convert("RGB").getpixel((637, 960))
-    incoming = Image.open(frames[7]).convert("RGB").getpixel((637, 960))
-    assert outgoing != incoming
-    assert halfway != outgoing
-    assert halfway != incoming
+    from PIL import ImageChops
+
+    outgoing = Image.open(frames[3]).convert("RGB")
+    halfway = Image.open(frames[5]).convert("RGB")
+    incoming = Image.open(frames[7]).convert("RGB")
+    # The selected centre pixel can be black in both scenes; compare whole
+    # frames so the assertion measures the dissolve rather than one coordinate.
+    assert ImageChops.difference(outgoing, incoming).getbbox() is not None
+    assert ImageChops.difference(halfway, outgoing).getbbox() is not None
+    assert ImageChops.difference(halfway, incoming).getbbox() is not None
+    assert all(red == green == blue for red, green, blue in halfway.getdata())
 
 
 
@@ -452,12 +457,12 @@ def test_character_render_uses_substantial_filled_illustration_not_only_wirefram
     }
     _draw_element(ImageDraw.Draw(image), character, 1.0, image.size)
     counts = Counter(image.getdata())
-    # Skin, hair, clothing and trousers should create real filled colour areas.
-    assert counts[(193, 132, 94)] + counts[(224, 174, 137)] > 150
-    assert counts[(22, 74, 137)] > 500
-    assert counts[(48, 57, 72)] > 300
-    # The character should occupy a meaningful silhouette, not a few thin lines.
-    non_white = sum(count for rgb, count in counts.items() if rgb != (255, 255, 255))
+    # Regression guard: the full figure must retain solid ink mass at mobile size.
+    # Monochrome character art uses black ink, white paper and substantial
+    # filled silhouettes rather than coloured skin/clothing fills.
+    assert counts[(0, 0, 0)] > 8500
+    assert set(counts) <= {(0, 0, 0), (255, 255, 255)}
+    non_white = counts[(0, 0, 0)]
     assert non_white > 12000
 
 
@@ -471,7 +476,11 @@ def test_filled_rect_reveals_a_soft_tinted_surface_before_its_outline_finishes()
          "color": "navy", "fill": True},
         0.5, image.size, image.size,
     )
-    assert image.getpixel((80, 55)) == (222, 231, 242)
+    # Filled surfaces remain white paper; black cross-hatching provides
+    # monochrome depth without introducing tinted colour fills.
+    assert set(image.getdata()) <= {(0, 0, 0), (255, 255, 255)}
+    assert image.getpixel((80, 55)) in {(0, 0, 0), (255, 255, 255)}
+    assert sum(1 for pixel in image.getdata() if pixel == (0, 0, 0)) > 100
 
 
 def test_svg_preserves_filled_room_surfaces_and_full_portrait_canvas():

@@ -1,6 +1,16 @@
 name: Production validation and visual samples
 
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/finance_campus/**'
+      - 'tests/test_video_renderer.py'
+      - 'tests/test_video_renderer_monochrome.py'
+      - 'tests/test_narrative_animation_timeline.py'
+      - 'examples/sample-video-pay-yourself-first.json'
+      - 'pyproject.toml'
+      - '.github/workflows/production-validation.yml'
   push:
     branches: [main]
     paths:
@@ -41,7 +51,7 @@ permissions:
 
 jobs:
   produce:
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'kokoro' }}
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'kokoro') }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -62,9 +72,9 @@ jobs:
         run: python -m pip install -e ".[dev,tts]"
       - name: Produce the complete narrated video with real Kokoro
         env:
-          SCRIPT_PATH: ${{ inputs.script_path }}
-          VIDEO_FORMAT: ${{ inputs.format }}
-          KOKORO_VOICE: ${{ inputs.voice }}
+          SCRIPT_PATH: ${{ inputs.script_path || 'examples/sample-video-pay-yourself-first.json' }}
+          VIDEO_FORMAT: ${{ inputs.format || 'short' }}
+          KOKORO_VOICE: ${{ inputs.voice || 'af_heart' }}
         run: |
           python -m finance_campus.cli produce-video \
             "$SCRIPT_PATH" artifacts/kokoro \

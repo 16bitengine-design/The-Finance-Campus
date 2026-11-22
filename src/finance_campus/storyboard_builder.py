@@ -330,6 +330,46 @@ def _scene_elements(text: str, section: str, title: str, width: int, height: int
                 item["motion"][coordinate] = round(item["motion"][coordinate] + shift_y)
         if item["type"] in {"coin", "money_note", "savings_jar"}:
             item["color"] = accent
+    # Add a supporting cast only when the narration describes a relationship
+    # or interaction that benefits from another participant. Each actor is an
+    # independent person element, so the renderer animates them on the same clock.
+    normalized_story = text.casefold()
+    cast_rules = (
+        (("parent", "child", "family", "household"), "family-member", "listening", "calm"),
+        (("borrower", "lender", "repayment", "loan officer"), "lender", "explaining", "thinking"),
+        (("customer", "supplier", "business owner"), "customer", "engaging", "calm"),
+        (("scammer", "victim", "phishing", "fraudster"), "victim", "reacting", "worried"),
+        (("adviser", "advisor", "investor"), "adviser", "explaining", "calm"),
+        (("bank representative", "bank staff", "banker"), "bank-representative", "assisting", "calm"),
+    )
+    added_roles: set[str] = set()
+    for terms, role, pose, expression in cast_rules:
+        if any(term in normalized_story for term in terms) and role not in added_roles:
+            supporting = _element(
+                "person", width * .67, height * .28, width * .22, height * .36,
+                "black", 1.25,
+            )
+            supporting.update({
+                "character_id": role,
+                "character_role": role,
+                "pose": pose if pose in {"thinking", "reaching", "determined", "celebrating", "worried", "overwhelmed"} else "neutral",
+                "expression": expression,
+                "motion": {
+                    "from_x": round(width * 1.02),
+                    "from_y": round(height * .28),
+                    "to_x": round(width * .67),
+                    "to_y": round(height * .28),
+                    "start_seconds": 1.1,
+                    "end_seconds": 2.0,
+                    "easing": "ease_out",
+                },
+            })
+            elements.append(supporting)
+            added_roles.add(role)
+            # Keep scenes readable on mobile; one secondary participant is
+            # enough for these two-person story patterns.
+            break
+
     elements.sort(key=lambda item: float(item.get("start_seconds", 0)))
     return elements
 

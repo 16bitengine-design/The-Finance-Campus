@@ -201,6 +201,51 @@ def _caption_lines(text: str, width: int = 36) -> str:
     return "\n".join(lines)
 
 
+def _retime_scene_animation(scene: dict[str, Any], speech_duration: float) -> None:
+    """Spread authored story beats across the spoken scene instead of front-loading them.
+
+    Storyboard coordinates are authored on a short 4.65-second beat grid. Once
+    Kokoro supplies the real scene duration, scale every visual/action clock to
+    that duration. This preserves beat order and relative pacing while preventing
+    long narration from playing over a completed static drawing.
+    """
+    if not math.isfinite(speech_duration) or speech_duration <= 0:
+        raise ValueError("speech_duration must be positive and finite")
+    authored_end = max(
+        (
+            float(element.get("start_seconds", 0.0))
+            + float(element.get("draw_seconds", 0.85))
+            for element in scene.get("elements", [])
+        ),
+        default=4.65,
+    )
+    authored_end = max(4.65, authored_end)
+    target_end = max(1.0, speech_duration * 0.88)
+    scale = target_end / authored_end
+
+    for element in scene.get("elements", []):
+        if "start_seconds" in element:
+            element["start_seconds"] = round(float(element["start_seconds"]) * scale, 3)
+        if "draw_seconds" in element:
+            element["draw_seconds"] = round(
+                min(max(float(element["draw_seconds"]) * scale, 0.18), target_end * 0.28),
+                3,
+            )
+        for key in ("motion", "walk_cycle", "open_animation", "interaction_animation"):
+            animation = element.get(key)
+            if not isinstance(animation, dict):
+                continue
+            for field in ("start_seconds", "end_seconds"):
+                if field in animation:
+                    animation[field] = round(float(animation[field]) * scale, 3)
+            if (
+                "start_seconds" in animation
+                and "end_seconds" in animation
+                and animation["end_seconds"] <= animation["start_seconds"]
+            ):
+                animation["end_seconds"] = round(animation["start_seconds"] + 0.18, 3)
+
+
 def synthesize_storyboard(
     storyboard: dict[str, Any],
     output_dir: str | Path,
@@ -286,6 +331,12 @@ def synthesize_storyboard(
         if not math.isfinite(minimum_duration) or minimum_duration < 0:
             raise ValueError(f"Scene {scene['id']} has invalid minimum_duration_seconds")
         visual_duration = math.ceil(max(speech_duration + tail_gap, minimum_duration) * draw_fps) / draw_fps
+        _retime_scene_animation(scene_copy, speech_duration)
+        scene_copy["animation_timing"] = {
+            "mode": "kokoro-duration-scaled-story-beats",
+            "speech_duration_seconds": round(speech_duration, 3),
+            "visual_action_window_seconds": round(min(speech_duration * 0.88, visual_duration), 3),
+        }
         actual_tail = max(0.0, visual_duration - speech_duration)
         audio_parts.append(speech)
         if actual_tail:
