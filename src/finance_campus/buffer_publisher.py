@@ -468,7 +468,8 @@ def schedule_package(
         # Detect a prior successful API write if the runner lost its ledger update.
         duplicate = next((
             post for post in client.list_existing_posts(organization_id, channel_id)
-            if post.get("text") == text
+            if post.get("status") in {"scheduled", "sending", "sent"}
+            and post.get("text") == text
             and any(asset.get("source") == package["video_url"] for asset in post.get("assets", []))
         ), None)
         if duplicate:
