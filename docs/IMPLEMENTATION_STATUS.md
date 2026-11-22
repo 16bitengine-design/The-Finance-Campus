@@ -1,58 +1,68 @@
 # Implementation status and release boundaries
 
-Last reviewed: 2026-11-17
+Last reviewed: 2026-11-22
 
-This document distinguishes working repository capabilities from intended architecture. A workflow file or configuration flag is not proof that an external integration has been tested.
+This document distinguishes code that exists from integrations that have been exercised successfully. A workflow file, configuration flag or successful unit test is not proof that a live external integration works.
 
-## Working and repository-tested
+## Consolidated GitHub Actions layout
 
-| Capability | Current status | Evidence / limitation |
+The repository now has four main workflows:
+
+| Workflow | Responsibility | Triggers / modes |
 |---|---|---|
-| Brand, disclaimer and operating configuration | Implemented | CLI validation checks all three configurations. |
-| Mindset-first topic catalogue | Implemented | 66 unique evergreen blueprints are present in `src/finance_campus/mindset_topics.py`. |
-| Weekly topic refresh | Implemented | `.github/workflows/weekly-topic-refresh.yml`; live publisher reachability and mapped-keyword checks run during refresh. |
-| Source-domain safeguards | Implemented | Production accepts HTTPS sources only from the explicit publisher allowlist; redirects in topic refresh must remain on the approved publisher domain. |
-| Script candidate drafting | Implemented, deterministic | `script_generator.py` creates structured candidates from topic briefs. It does not use an LLM and does not claim factual verification. |
-| Candidate script workflow | Implemented | Repository workflow generates candidates after a successful topic refresh or manual dispatch. |
-| Script structure and editorial phrase checks | Implemented | This is not semantic fact-checking. |
-| Script duration telemetry | Implemented | Word count and estimated narration duration use a 145 words/minute planning assumption. Long-form candidates that fall short are visibly marked under target. |
-| Storyboard and whiteboard rendering | Implemented, deterministic | Narration maps to a limited reusable illustration vocabulary. Character poses, prop-directed interactions, eased reaching gestures and a basic time-based walking gait are rendered per frame. Full object handling (gripping, lifting, opening, exchanging) and semantic illustration generation remain future work. |
-| Kokoro integration | Implemented in code | The dedicated manual CPU smoke workflow is available. A successful run and human review of its actual artifacts are still required before calling the full Kokoro path production-validated. |
-| MP4 technical QC | Implemented | FFmpeg/ffprobe, dimensions, encoding, stream, decode and audio-level checks. |
-| Caption timing and visual review evidence | Implemented | SRT validation and contact-sheet extraction are available. A contact sheet is not semantic visual approval. |
-| Automated quality CI | Passing on the latest reviewed commits | Quality workflow tests, lint and illustrated sample render/artifact upload have passed. |
+| `.github/workflows/daily-topic-replenishment.yml` | Topic research/replenishment and script-candidate generation | Daily topic refresh at 08:30 EAT; manual `refresh_topics` or `generate_scripts` |
+| `.github/workflows/production-validation.yml` | Real Kokoro end-to-end test and progressive Remotion sample | Manual `kokoro` or `progressive_sample`; progressive sample also runs when its source files change |
+| `.github/workflows/quality.yml` | Unit tests, lint, renderer and Remotion quality checks | Push and pull request to main |
+| `.github/workflows/buffer-operations.yml` | Public media hosting, Buffer discovery, dry-run, scheduling and publication monitoring | Manual `host_media`, `discover`, `dry_run`, `schedule`, `monitor`; monitor also runs every 30 minutes when enabled |
 
-## Not yet operational
+The workflows share responsibilities without merging unrelated Python modules into oversized files. Topic refresh never starts video production. Publishing modes remain separately gated.
 
-| Capability | Why it is not considered operational |
-|---|---|
-| Claim-level financial fact-checking | Source URL reachability and keyword matches do not prove that a source supports each claim. |
-| AI-assisted research synthesis | Current script drafting is deterministic and does not retrieve/compare source passages for each claim. |
-| Fully semantic visual QC | The system cannot yet reliably determine whether every illustration accurately explains the narration or whether the full video is aesthetically acceptable. Human visual review remains mandatory. |
-| Scheduled daily video production | No complete daily production schedule is active. |
-| YouTube upload and public verification | No tested upload adapter, account authorization, upload ledger or public-availability verifier is implemented. |
-| TikTok upload and public verification | No tested Content Posting API adapter, app approval/authorization flow or public-availability verifier is implemented. |
-| Duplicate-safe publishing and recovery | No persistent publication state machine or verified retry/reconciliation process is implemented. |
-| Operational notifications and monitoring | No tested failure notification integration is configured. |
+## Implemented in the repository
+
+| Capability | Current status | Important limitation |
+|---|---|---|
+| Brand, disclaimer and operating configuration | Implemented | Configuration validation does not replace editorial review. |
+| Topic catalogue and duplicate protection | Implemented | Topic candidates still require claim-level review. |
+| Daily topic refresh | Workflow implemented | A configured schedule is not proof every refresh run succeeds or reaches its target. |
+| Script-candidate generation | Implemented, deterministic | It is not an LLM and does not perform semantic fact-checking. |
+| Storyboard and whiteboard rendering | Implemented | Visual quality and narrative-to-illustration relevance still require human review. |
+| Kokoro TTS integration | Implemented in code | The real-model CPU test must pass and its output must be reviewed before the narration pipeline is considered production-validated. |
+| MP4 technical QC and captions | Implemented | Technical checks cannot establish whether visuals are educationally effective. |
+| Automated quality workflow | Configured | The latest Actions run must be checked for a verified pass; workflow presence alone is not evidence. |
+| Buffer publisher and duplicate-prevention ledger | Implemented in code | A real connected Buffer account and end-to-end tests are still required. |
+| GitHub Releases media hosting | Guarded workflow implemented | Requires a production artifact, public repository and explicit human visual approval; not yet proven end to end. |
+| Buffer publication monitor | Implemented in code and workflow | It remains gated by `BUFFER_MONITOR_ENABLED=true`; live Buffer read access and public URL verification must be tested. |
+| Individual thumbnail download links | Implemented in monitor workflow | Links are exposed only after a post is publicly verified and a valid public release thumbnail URL is present. |
+
+## Not yet production-operational
+
+- Claim-by-claim financial fact-checking that proves each script claim is supported by a cited passage.
+- Fully semantic visual QC that confirms illustrations accurately explain narration and that the video meets the desired aesthetic standard.
+- Fully unattended daily video production with reliable topic selection, recovery and resource controls.
+- A verified live Buffer scheduling and public publishing run.
+- A complete end-to-end thumbnail hosting and download demonstration.
+- Reliable operational notifications for failures and recovery actions.
 
 ## Release controls
 
-- YouTube and TikTok remain disabled.
-- `production.publishing_enabled` must remain false.
-- Automatic publishing and automatic public-verification settings must remain false until the adapters, authorization, idempotency, quota handling, and public verification tests pass.
-- Human visual review remains required until semantic visual quality controls are demonstrated to be reliable.
+- Do not enable live publishing until the visual standard is approved and the full production, hosting, scheduling and public-verification path has passed.
+- Keep `BUFFER_PUBLISH_ENABLED` unset or false until explicitly approved.
+- Keep the repository Actions variable `BUFFER_MONITOR_ENABLED` disabled until Buffer credentials are configured and monitor behavior is tested.
+- Public media hosting requires an explicit `approve_public_hosting` selection after human visual review.
+- A Buffer `sent` state alone is not proof of publication; only an approved destination URL that passes anonymous public retrieval is recorded as verified.
+- Human visual review remains mandatory until semantic visual quality controls are demonstrated to be reliable.
 - No paid service or paid API may be introduced without explicit approval.
 - Kokoro remains the only approved narration engine.
-- Topic refresh and script-candidate generation do not start rendering or publishing.
+- Topic refresh and script-candidate generation must not trigger rendering or publishing.
 
 ## Next engineering sequence
 
-1. Complete and review the real Kokoro CPU end-to-end smoke test.
-2. Improve storyboard semantics and expand the original illustration library.
-3. Add explicit claim-review evidence and stronger research records.
-4. Implement a durable local/repository production ledger and resumable stage tracking.
-5. Implement platform adapters, authorization validation, duplicate protection and public verification.
-6. Add quota-aware schedules, bounded retries, monitoring and failure notifications.
-7. Validate complete production runs and only then consider enabling unattended publishing.
+1. Validate the four consolidated workflows with GitHub Actions and resolve any workflow or test failures.
+2. Complete and review the real Kokoro CPU end-to-end test.
+3. Improve storyboard semantics, character interactions and the original illustration library.
+4. Add explicit claim-review evidence and stronger source-support checks.
+5. Run Buffer discovery and dry-run only after the account secrets are configured.
+6. Test public media hosting and individual thumbnail links using an approved, reviewed sample.
+7. Verify live scheduling and public destination checks before considering unattended publishing.
 
-A feature is promoted from planned to operational only after tests exercise the real integration and the evidence is retained.
+A capability is promoted from implemented to production-operational only after the relevant real integration has been exercised successfully and evidence is retained.
