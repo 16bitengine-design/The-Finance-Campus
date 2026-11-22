@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image, ImageChops
 
 from finance_campus.multi_character_compositor import (
     render_multi_character_frame,
@@ -39,8 +39,11 @@ def test_multi_character_scene_validates_and_composites_in_z_order():
     frame = render_multi_character_frame(scene, specs, 0)
     assert frame.mode == "RGBA"
     assert frame.size == (240, 240)
-    # Both figures occupy the same area; the higher-z figure is composited last.
-    assert frame.getpixel((120, 90))[:3] == (245, 184, 23)
+    # The combined frame must match a front-only render at overlapping pixels.
+    front_only = {**scene, "characters": [scene["characters"][0]]}
+    front_frame = render_multi_character_frame(front_only, specs, 0)
+    difference = ImageChops.difference(frame, front_frame)
+    assert difference.getbbox() is None
 
 
 def test_character_tracks_interpolate_position_and_opacity():
