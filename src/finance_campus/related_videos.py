@@ -98,9 +98,8 @@ def find_related_video(
         "matched_concepts": matched,
         "status": "publicly_accessible_verified",
         "spoken_cta": (
-            f"Want to understand {item['title'].casefold()} better? "
-            f"Watch our dedicated lesson, {item['title']}. "
-            "You'll find the link in the description."
+            f"For a deeper explanation, watch our dedicated lesson, "
+            f"{item['title']}. You'll find the link in the description."
         ),
     }
 
