@@ -46,7 +46,7 @@ def load_published_video_library(path: str | Path) -> list[dict[str, Any]]:
         return []
     payload = json.loads(source.read_text(encoding="utf-8"))
     if not isinstance(payload, list):
-        raise ValueError("Published-video library must be a JSON array")
+        raise TypeError("Published-video library must be a JSON array")
     accepted: list[dict[str, Any]] = []
     seen: set[str] = set()
     for item in payload:
