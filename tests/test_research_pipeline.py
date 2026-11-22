@@ -167,7 +167,7 @@ def test_refresh_report_tracks_remaining_catalogue_and_canonical_path(tmp_path):
     assert result["library_path"] == str(path)
     assert result["blueprint_catalogue_count"] == 66
     assert result["unused_blueprints_remaining"] == 61
-    assert result["estimated_weeks_of_catalogue_cover_at_20_per_week"] == 3.0
+    assert result["estimated_weeks_of_catalogue_cover_at_21_per_week"] == 2.9
     assert result["catalogue_exhaustion_warning"] is None
 
 
