@@ -260,6 +260,13 @@ jobs:
       BUFFER_TIKTOK_CHANNEL_ID: ${{ secrets.BUFFER_TIKTOK_CHANNEL_ID }}
       BUFFER_PUBLISH_ENABLED: ${{ secrets.BUFFER_PUBLISH_ENABLED }}
     steps:
+      - name: Require source production run ID for package modes
+        if: ${{ inputs.mode == 'dry_run' || inputs.mode == 'schedule' }}
+        run: |
+          if [ -z "${{ inputs.source_run_id }}" ]; then
+            echo "::error::Provide the successful production workflow run ID containing the package artifact."
+            exit 1
+          fi
       - name: Check out repository
         uses: actions/checkout@v4
 
@@ -269,7 +276,7 @@ jobs:
         with:
           name: ${{ inputs.artifact_name || 'finance-campus-production-package' }}
           path: package
-          run-id: ${{ inputs.source_run_id || github.run_id }}
+          run-id: ${{ inputs.source_run_id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
 
