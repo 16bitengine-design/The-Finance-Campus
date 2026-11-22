@@ -269,9 +269,9 @@ def refresh_topics(
         "unused_blueprints_remaining": len(unused_blueprints),
         "estimated_weeks_of_catalogue_cover_at_21_per_week": round(len(unused_blueprints) / 21, 1),
         "catalogue_exhaustion_warning": (
-            The curated blueprint reserve is below one full week of daily replenishment. 
+            "The curated blueprint reserve is below one full week of daily replenishment. "
             "Add and research more distinct blueprints before the next refresh."
-            if len(unused_blueprints) < 20 else None
+            if len(unused_blueprints) < 21 else None
         ),
         "added": added,
         "rejected": rejected,
