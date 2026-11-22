@@ -46,3 +46,18 @@ def test_long_form_metadata_targets_youtube_only():
     result = generate_post_metadata(sample_script(), config, video_format="long")
     assert set(result["platforms"]) == {"youtube"}
     assert result["validation"]["tiktok_disclaimer_present"] is None
+
+
+def test_metadata_includes_verified_related_video_link_in_youtube_description():
+    config = load_yaml("config/disclaimer.yaml")
+    script = sample_script()
+    script["related_video"] = {
+        "title": "What Are Stocks and How Do They Work?",
+        "url": "https://www.youtube.com/watch?v=abc123xyz89",
+        "status": "publicly_accessible_verified",
+    }
+    result = generate_post_metadata(script, config)
+    youtube = result["platforms"]["youtube"]["description"]
+    tiktok = result["platforms"]["tiktok"]["caption"]
+    assert "https://www.youtube.com/watch?v=abc123xyz89" in youtube
+    assert "What Are Stocks and How Do They Work?" in tiktok
