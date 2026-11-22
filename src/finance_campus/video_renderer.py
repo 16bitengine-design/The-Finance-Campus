@@ -17,12 +17,15 @@ from PIL import Image, ImageDraw, ImageFont
 
 from finance_campus.storyboard import ILLUSTRATION_TYPES, validate_storyboard
 
+# The production renderer follows the documented black-and-white art direction.
+# Semantic storyboard colours remain accepted for backwards compatibility, but
+# they resolve to ink on white paper rather than introducing coloured fills.
 PALETTE = {
-    "navy": (16, 43, 85),
-    "green": (22, 140, 67),
-    "gold": (245, 184, 23),
+    "navy": (0, 0, 0),
+    "green": (0, 0, 0),
+    "gold": (0, 0, 0),
     "white": (255, 255, 255),
-    "black": (23, 32, 42),
+    "black": (0, 0, 0),
 }
 
 
@@ -151,9 +154,11 @@ def _draw_pen_hand(
     # Keep the drawing hand subordinate to the artwork. The previous palm
     # was almost 100 px wide at 1080p and read as a floating brown circle.
     unit = max(2, round(6 * scale))
-    skin = (224, 176, 137)
-    skin_shadow = (168, 119, 91)
-    dark = (70, 76, 84)
+    # White hand with black contour keeps the drawing hand inside the
+    # monochrome visual system while remaining clearly visible on the paper.
+    skin = (255, 255, 255)
+    skin_shadow = (0, 0, 0)
+    dark = (0, 0, 0)
     # Slim marker barrel, nib, cap and a compact gripping hand.
     draw.line((x - unit * 3, y + unit * 3, x + unit, y - unit),
               fill=dark, width=max(2, unit // 2))
@@ -251,9 +256,7 @@ def _draw_element(
         radius = max(1, round(element["r"] * min(sx, sy)))
         path = _ellipse_path((cx-radius, cy-radius, cx+radius, cy+radius))
         if element.get("fill") and progress >= 0.32:
-            tint = {"navy": (222, 231, 242), "green": (222, 239, 227),
-                    "gold": (255, 246, 211), "white": (255, 255, 255),
-                    "black": (230, 232, 235)}[element.get("color", "navy")]
+            tint = (255, 255, 255)
             draw.ellipse((cx-radius, cy-radius, cx+radius, cy+radius), fill=tint)
         _draw_progressive_strokes(draw, [path], progress, color, width)
         _draw_active_hand(draw, [path], progress, color, min(sx, sy))
@@ -284,13 +287,13 @@ def _draw_element(
             # strokes below then reveal the defining contours and details.
             # This avoids the hollow wireframe/stick-figure appearance.
             if progress >= 0.38:
-                skin = (193, 132, 94)
-                skin_shadow = (143, 91, 67)
-                hair = (42, 35, 32)
-                shirt = (22, 74, 137) if element.get("wardrobe", "blue") == "blue" else (22, 140, 67)
-                shirt_light = (48, 111, 177) if shirt[2] > shirt[1] else (55, 164, 96)
-                trousers = (48, 57, 72)
-                shoe = (35, 39, 46)
+                skin = (255, 255, 255)
+                skin_shadow = (0, 0, 0)
+                hair = (0, 0, 0)
+                shirt = (255, 255, 255)
+                shirt_light = (255, 255, 255)
+                trousers = (0, 0, 0)
+                shoe = (0, 0, 0)
                 pose = element.get("pose", "neutral")
                 expression = element.get("expression", "calm")
                 head_box = (cx-head, y, cx+head, y+2*head)
@@ -370,11 +373,11 @@ def _draw_element(
                 # Facial features are filled shapes for clarity at mobile size.
                 eye_y = y + head
                 eye_r = max(2, width)
-                draw.ellipse((cx-head//3-eye_r, eye_y-eye_r, cx-head//3+eye_r, eye_y+eye_r), fill=(35, 31, 30))
+                draw.ellipse((cx-head//3-eye_r, eye_y-eye_r, cx-head//3+eye_r, eye_y+eye_r), fill=(0, 0, 0))
                 draw.ellipse((cx+head//3-eye_r, eye_y-eye_r, cx+head//3+eye_r, eye_y+eye_r), fill=(35, 31, 30))
                 if expression in {"worried", "overwhelmed"}:
                     draw.arc((cx-head//3, y+int(head*1.45), cx+head//3, y+int(head*1.95)),
-                             start=200, end=340, fill=(90, 42, 42), width=max(2, width))
+                             start=200, end=340, fill=(0, 0, 0), width=max(2, width))
                 else:
                     draw.arc((cx-head//3, y+int(head*1.35), cx+head//3, y+int(head*1.85)),
                              start=15, end=165, fill=(90, 42, 42), width=max(2, width))
@@ -407,7 +410,7 @@ def _draw_element(
             # A faint shirt fill gives the character visual weight while the
             # navy outline is still revealed progressively like marker ink.
             if progress >= .62:
-                draw.polygon(torso, fill=(246, 249, 252))
+                draw.polygon(torso, fill=(255, 255, 255))
             path(*torso, torso[0])
             path((cx-w//12, shoulder+width), (cx, shoulder+width*4), (cx+w//12, shoulder+width))
             path((cx, shoulder+width*4), (cx, waist-h//14))
@@ -597,9 +600,7 @@ def _draw_element(
         if w > 0 and h > 0:
             points = [(x,y), (x+w,y), (x+w,y+h), (x,y+h), (x,y)]
             if element.get("fill") and progress >= 0.32:
-                tint = {"navy": (222, 231, 242), "green": (222, 239, 227),
-                        "gold": (255, 246, 211), "white": (255, 255, 255),
-                        "black": (230, 232, 235)}[element.get("color", "navy")]
+                tint = (255, 255, 255)
                 draw.rounded_rectangle((x, y, x+w, y+h), radius=max(2, width*2), fill=tint)
             _draw_progressive_strokes(draw, [points], progress, color, width)
             _draw_active_hand(draw, [points], progress, color, min(sx, sy))
