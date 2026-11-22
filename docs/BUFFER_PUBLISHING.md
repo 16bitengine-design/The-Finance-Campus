@@ -27,11 +27,18 @@ The CLI defaults to dry-run. Actual scheduling requires `--live` and `BUFFER_PUB
 
 ## Integration status and remaining prerequisites
 
-The first guarded Buffer adapter and its GitHub Actions workflow are in the repository. The workflow supports dry-run validation and can be called by a future production workflow after it uploads a `finance-campus-production-package` artifact. It is not yet connected to a production-render workflow.
+The guarded Buffer adapter and scheduling workflow are implemented for both YouTube and TikTok. The production workflow is not yet connected to scheduling, and no Buffer account has been connected or live post tested.
 
-The current renderer does not yet generate the required branded thumbnail artifact or upload final MP4s to a durable public media host. It also does not yet embed a dedicated branded thumbnail frame in the video. Consequently, the publisher correctly rejects today's production manifests; no live post can be scheduled yet.
+A separate workflow, `.github/workflows/buffer-media-hosting.yml`, now provides a guarded GitHub Releases media-hosting stage. It downloads a production artifact, requires an explicit manual approval for public hosting, checks technical QC and visual-review evidence, creates a unique public GitHub Release, verifies the public assets, writes their stable URLs into the manifest, and uploads a hosted package artifact for a later Buffer dry-run.
 
-Before end-to-end scheduling, wire the branded thumbnail and media-hosting stages into the production package, then connect the production workflow to this reusable workflow. A successful dry run is not proof that Buffer has published anything.
+The media-hosting workflow is intentionally not a publishing approval. It marks human visual review as passed only after the explicit `approve_public_hosting` selection. It does not set `publication_approved`; the Buffer publisher therefore remains blocked from live scheduling until a separate publishing approval is explicitly recorded.
+
+The current production renderer does not yet generate the required branded thumbnail artifact or embed the TikTok cover frame. It also does not yet emit a production-package artifact in the exact structure required by the hosting workflow. Consequently, the new hosting workflow is a guarded component, not yet an end-to-end tested path. It must reject packages missing those assets or approval evidence.
+
+The stable video URL format is:
+`https://github.com/OWNER/REPOSITORY/releases/download/RELEASE_TAG/finance-campus-video.mp4`
+
+GitHub Releases are suitable only while the repository is public and the asset size remains within GitHub's release-asset limits. The workflow checks repository visibility and anonymous URL retrieval before recording the URLs. GitHub Actions artifacts remain temporary and are used only to pass packages between jobs, never as public Buffer media URLs.
 
 ## Buffer API requirements
 
@@ -55,23 +62,26 @@ Buffer's current API supports `addToQueue` and exact UTC scheduling. The initial
 
 ## Media hosting and thumbnails
 
-Buffer's API has no native media-upload endpoint. Each video asset must use a direct, publicly accessible, stable HTTPS URL that remains available until the scheduled post is published. GitHub Actions artifacts are temporary and private; they are not valid Buffer media URLs.
+Buffer's API has no native media-upload endpoint. The approved media-hosting workflow uses GitHub Releases to host the MP4 and the separate branded YouTube thumbnail as public release assets. It verifies that the repository is public and that both asset URLs can be fetched without authentication. GitHub Actions artifacts are temporary/private and must never be used as Buffer media URLs.
 
-The production manifest must include:
-
+The hosted production manifest receives:
 ```json
 {
   "public_media": {
-    "video_url": "https://public-host.example/video.mp4",
-    "thumbnail_frame_embedded": true,
-    "thumbnail_offset_ms": 500
+    "video_url": "https://github.com/OWNER/REPOSITORY/releases/download/RELEASE_TAG/finance-campus-video.mp4",
+    "thumbnail_url": "https://github.com/OWNER/REPOSITORY/releases/download/RELEASE_TAG/thumbnail-youtube.jpg",
+    "hosting_provider": "github_releases",
+    "release_tag": "RELEASE_TAG",
+    "publicly_accessible": true
   }
 }
 ```
 
-The publisher validates that these fields exist but does not upload media to a hosting provider. A durable public media host and its credentials must be configured before live scheduling can work.
+**YouTube thumbnail:** The project owner will upload `thumbnail-youtube.jpg` manually in YouTube Studio. No YouTube Data API OAuth integration is required for thumbnail uploads.
 
-A separate branded thumbnail image is required in `artifacts.thumbnail`. Buffer's current video-post API cannot upload a custom YouTube video thumbnail. For TikTok, Buffer can select a frame from the video using `metadata.thumbnailOffset`; therefore the branded cover design must also appear as a frame inside the video, and the offset must point to it. A future YouTube thumbnail setter can use the YouTube Data API after Buffer publishes the video; this requires a separate authorized YouTube integration and must not be represented as already implemented.
+**TikTok cover:** Buffer can select a frame from the video using `metadata.thumbnailOffset`. The production renderer must embed the same branded cover artwork into the video and set `thumbnail_frame_embedded=true` plus a correct `thumbnail_offset_ms`. This renderer feature is not yet implemented, so short-form packages are not ready for live Buffer scheduling.
+
+The hosting workflow does not approve publication. It records public media URLs and human visual review, but leaves `publication_approved` unset. The Buffer publisher fails closed until that separate approval is supplied.
 
 ## Post behavior
 
