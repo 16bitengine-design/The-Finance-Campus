@@ -6,6 +6,7 @@ on:
     paths:
       - 'renderer/remotion/src/scenes/ProgressiveNarratedSample.tsx'
       - 'renderer/remotion/src/Root.tsx'
+      - 'examples/sample-video-pay-yourself-first.json'
       - '.github/workflows/progressive-sample.yml'
   workflow_dispatch:
     inputs:
