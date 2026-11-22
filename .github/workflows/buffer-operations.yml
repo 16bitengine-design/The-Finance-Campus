@@ -1,0 +1,388 @@
+name: Buffer operations
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Select media hosting, Buffer discovery, dry-run, scheduling or publication monitoring
+        required: true
+        default: dry_run
+        type: choice
+        options:
+          - host_media
+          - discover
+          - dry_run
+          - schedule
+          - monitor
+      source_run_id:
+        description: Successful production run ID containing the package artifact (required for hosting/scheduling)
+        required: false
+        type: string
+      artifact_name:
+        description: Production artifact name
+        required: true
+        default: finance-campus-production-package
+        type: string
+      approval:
+        description: Explicit human approval after visual review (required for public media hosting)
+        required: true
+        default: not_approved
+        type: choice
+        options:
+          - not_approved
+          - approve_public_hosting
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: finance-campus-buffer-operations
+  cancel-in-progress: false
+
+jobs:
+  host-approved-media:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'host_media' && inputs.approval == 'approve_public_hosting' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Require source production run ID
+        if: ${{ inputs.source_run_id == '' }}
+        run: |
+          echo '::error::Provide the successful production run ID containing the reviewed artifact.'
+          exit 1
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download production package
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: package
+          run-id: ${{ inputs.source_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+
+      - name: Validate approval and locate media
+        id: validate
+        env:
+          PACKAGE_DIR: package
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["PACKAGE_DIR"])
+          manifests = list(root.rglob("production-manifest.json"))
+          if len(manifests) != 1:
+              raise SystemExit(f"Expected exactly one production-manifest.json; found {len(manifests)}")
+          manifest_path = manifests[0]
+          package_root = manifest_path.parent
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+          if manifest.get("technical_quality_approved") is not True:
+              raise SystemExit("Technical quality approval is missing")
+          stages = manifest.get("stages") or {}
+          for stage in ("script_validated", "kokoro_narration_generated", "captions_validated",
+                        "video_rendered", "media_streams_verified", "final_video_qc_passed",
+                        "quality_gate_passed", "visual_review_sheet_generated"):
+              if stages.get(stage) is not True:
+                  raise SystemExit(f"Required stage did not pass: {stage}")
+
+          artifacts = manifest.get("artifacts") or {}
+          def locate(key, fallback_names):
+              raw = artifacts.get(key)
+              candidates = []
+              if isinstance(raw, str):
+                  candidates.extend([package_root / Path(raw).name, root / Path(raw).name])
+              candidates.extend(package_root / name for name in fallback_names)
+              for candidate in candidates:
+                  if candidate.is_file() and candidate.stat().st_size > 1024:
+                      return candidate.resolve()
+              raise SystemExit(f"Required media artifact is missing: {key}")
+
+          video = locate("video", ["finance-campus-video.mp4", "video.mp4"])
+          thumbnail = locate("thumbnail", ["thumbnail-youtube.jpg", "thumbnail.jpg"])
+          visual_review = locate("visual_review_contact_sheet", ["visual-review-contact-sheet.jpg"])
+          video_format = manifest.get("video_format")
+          if video_format not in {"short", "long"}:
+              raise SystemExit("Unsupported or missing video_format")
+          video_id = str(manifest.get("video_id") or "").strip()
+          if not video_id:
+              raise SystemExit("A stable manifest.video_id is required before public hosting")
+          title = str(manifest.get("title") or "").strip()
+          if not title:
+              raise SystemExit("Manifest title is required")
+
+          # Stable, URL-safe tag with a content identity supplied by production.
+          safe_id = "".join(ch.lower() if ch.isalnum() or ch in "-_" else "-" for ch in video_id)
+          safe_id = "-".join(part for part in safe_id.split("-") if part)[:60]
+          if not safe_id:
+              raise SystemExit("video_id cannot produce a safe release tag")
+
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"tag=finance-campus-media-{safe_id}\n")
+              output.write(f"video={video}\n")
+              output.write(f"thumbnail={thumbnail}\n")
+              output.write(f"title={title.replace(chr(10), ' ')[:180]}\n")
+              output.write(f"video_id={video_id}\n")
+          PY
+
+      - name: Create public GitHub Release and host approved media
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ steps.validate.outputs.tag }}
+          VIDEO_PATH: ${{ steps.validate.outputs.video }}
+          THUMBNAIL_PATH: ${{ steps.validate.outputs.thumbnail }}
+          VIDEO_TITLE: ${{ steps.validate.outputs.title }}
+          VIDEO_ID: ${{ steps.validate.outputs.video_id }}
+        run: |
+          if gh release view "$RELEASE_TAG" --repo "$GH_REPO" >/dev/null 2>&1; then
+            echo "Release $RELEASE_TAG already exists; refusing to overwrite media."
+            exit 1
+          fi
+          gh release create "$RELEASE_TAG" "$VIDEO_PATH#finance-campus-video.mp4" "$THUMBNAIL_PATH#thumbnail-youtube.jpg" \
+            --repo "$GH_REPO" \
+            --title "The Finance Campus media: $VIDEO_TITLE" \
+            --notes "Approved media package for video ID: $VIDEO_ID. Public assets are provided for Buffer scheduling. YouTube thumbnail is supplied separately for manual upload in YouTube Studio."
+
+      - name: Verify public release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ steps.validate.outputs.tag }}
+        run: |
+          gh release view "$RELEASE_TAG" --repo "$GH_REPO" --json assets,isDraft,isPrerelease > release.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path("release.json").read_text(encoding="utf-8"))
+          if data.get("isDraft") or data.get("isPrerelease"):
+              raise SystemExit("Media release is not a public stable release")
+          assets = {item.get("name"): item for item in data.get("assets", [])}
+          for name in ("finance-campus-video.mp4", "thumbnail-youtube.jpg"):
+              asset = assets.get(name)
+              if not asset or not asset.get("url") or not asset.get("size"):
+                  raise SystemExit(f"Release asset verification failed: {name}")
+          print("Release assets exist and are attached to a non-draft, non-prerelease release.")
+          PY
+
+
+      - name: Confirm repository is public and verify public media URLs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ steps.validate.outputs.tag }}
+        run: |
+          visibility="$(gh repo view "$GH_REPO" --json visibility --jq .visibility)"
+          if [ "$visibility" != "PUBLIC" ]; then
+            echo "GitHub Releases media hosting requires a public repository; current visibility is $visibility."
+            exit 1
+          fi
+          video_url="https://github.com/$GH_REPO/releases/download/$RELEASE_TAG/finance-campus-video.mp4"
+          thumbnail_url="https://github.com/$GH_REPO/releases/download/$RELEASE_TAG/thumbnail-youtube.jpg"
+          curl --fail --location --silent --show-error --range 0-0 "$video_url" --output /dev/null
+          curl --fail --location --silent --show-error "$thumbnail_url" --output /dev/null
+          echo "Both public release assets can be fetched without authentication."
+
+      - name: Write stable public URLs into production manifest
+        env:
+          RELEASE_TAG: ${{ steps.validate.outputs.tag }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          matches = list(Path("package").rglob("production-manifest.json"))
+          if len(matches) != 1:
+              raise SystemExit("Could not uniquely locate production manifest after hosting")
+          path = matches[0]
+          manifest = json.loads(path.read_text(encoding="utf-8"))
+          tag = os.environ["RELEASE_TAG"]
+          repo = os.environ["GH_REPO"]
+          base = f"https://github.com/{repo}/releases/download/{tag}"
+          manifest["status"] = "quality_approved"
+          manifest["human_visual_review_passed"] = True
+          manifest["human_visual_review_required"] = False
+          manifest.setdefault("stages", {})["human_visual_review_passed"] = True
+          manifest["public_media"] = {
+              **(manifest.get("public_media") or {}),
+              "video_url": f"{base}/finance-campus-video.mp4",
+              "thumbnail_url": f"{base}/thumbnail-youtube.jpg",
+              "hosting_provider": "github_releases",
+              "release_tag": tag,
+              "publicly_accessible": True
+          }
+          manifest.setdefault("stages", {})["media_hosted"] = True
+          manifest["stages"]["public_media_verified"] = True
+          manifest["stages"]["uploaded"] = True
+          manifest["stages"]["publicly_accessible"] = True
+          manifest.setdefault("artifacts", {})["thumbnail"] = "thumbnail-youtube.jpg"
+          path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          print("Recorded verified public media URLs in production manifest.")
+          PY
+
+      - name: Upload hosted package for Buffer scheduling dry-run
+        uses: actions/upload-artifact@v4
+        with:
+          name: finance-campus-hosted-package
+          path: |
+            package/**/production-manifest.json
+            package/**/post-metadata.json
+            package/**/*.mp4
+            package/**/*thumbnail*.jpg
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Record hosted media URL
+        env:
+          RELEASE_TAG: ${{ steps.validate.outputs.tag }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          echo "Public video URL: https://github.com/$GH_REPO/releases/download/$RELEASE_TAG/finance-campus-video.mp4"
+          echo "Public thumbnail URL: https://github.com/$GH_REPO/releases/download/$RELEASE_TAG/thumbnail-youtube.jpg"
+          echo "The URL must still pass the Buffer public-fetch probe before scheduling."
+
+  schedule:
+    if: ${{ github.event_name == 'workflow_dispatch' && (inputs.mode == 'discover' || inputs.mode == 'dry_run' || inputs.mode == 'schedule') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+      BUFFER_ORGANIZATION_ID: ${{ secrets.BUFFER_ORGANIZATION_ID }}
+      BUFFER_YOUTUBE_CHANNEL_ID: ${{ secrets.BUFFER_YOUTUBE_CHANNEL_ID }}
+      BUFFER_TIKTOK_CHANNEL_ID: ${{ secrets.BUFFER_TIKTOK_CHANNEL_ID }}
+      BUFFER_PUBLISH_ENABLED: ${{ secrets.BUFFER_PUBLISH_ENABLED }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download approved production package
+        if: ${{ inputs.mode != 'discover' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name || 'finance-campus-production-package' }}
+          path: package
+          run-id: ${{ inputs.source_run_id || github.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Finance Campus publisher
+        run: python -m pip install -e .
+
+      - name: Discover Buffer organizations and channels
+        if: ${{ inputs.mode == 'discover' }}
+        run: python -m finance_campus.buffer_publisher --list-account
+
+      - name: Validate package and Buffer channels (dry run)
+        if: ${{ inputs.mode == 'dry_run' }}
+        run: python -m finance_campus.buffer_publisher package
+
+      - name: Schedule approved posts in Buffer
+        if: ${{ inputs.mode == 'schedule' }}
+        run: python -m finance_campus.buffer_publisher package --live
+
+      - name: Persist duplicate-prevention ledger
+        if: ${{ inputs.mode == 'schedule' }}
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Record Buffer scheduled posts"
+          file_pattern: production/buffer-publishing-ledger.json
+
+  reconcile:
+    if: ${{ vars.BUFFER_MONITOR_ENABLED == 'true' && (github.event_name == 'schedule' || inputs.mode == 'monitor') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+      BUFFER_ORGANIZATION_ID: ${{ secrets.BUFFER_ORGANIZATION_ID }}
+      BUFFER_YOUTUBE_CHANNEL_ID: ${{ secrets.BUFFER_YOUTUBE_CHANNEL_ID }}
+      BUFFER_TIKTOK_CHANNEL_ID: ${{ secrets.BUFFER_TIKTOK_CHANNEL_ID }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Finance Campus publisher
+        run: python -m pip install -e .
+
+      - name: Reconcile Buffer posts and verify public destination URLs
+        run: python -m finance_campus.buffer_publisher --monitor
+
+      - name: Show individual thumbnail download links for verified publications
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import urllib.request
+          from datetime import datetime, timezone
+          from pathlib import Path
+          from urllib.parse import urlparse
+
+          ledger_path = Path("production/buffer-publishing-ledger.json")
+          ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+          rows = []
+          for key, record in ledger.get("posts", {}).items():
+              if record.get("status") != "publicly_accessible_verified":
+                  continue
+              if record.get("thumbnail_download_link_shown_at"):
+                  continue
+              url = record.get("thumbnail_url")
+              if not isinstance(url, str):
+                  continue
+              parsed = urlparse(url)
+              if (parsed.scheme != "https" or parsed.hostname != "github.com"
+                      or "/releases/download/" not in parsed.path
+                      or not parsed.path.lower().endswith((".jpg", ".jpeg", ".png"))):
+                  raise SystemExit(f"Refusing untrusted thumbnail URL for {key}: {url}")
+              request = urllib.request.Request(
+                  url, headers={"User-Agent": "The-Finance-Campus-thumbnail-link-check/1.0"}
+              )
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  content_type = response.headers.get("Content-Type", "").split(";", 1)[0].lower()
+                  if content_type not in {"image/jpeg", "image/png"}:
+                      raise SystemExit(f"Thumbnail is not a JPEG/PNG image for {key}")
+                  if int(response.headers.get("Content-Length") or "0") == 0:
+                      raise SystemExit(f"Thumbnail is empty for {key}")
+              title = str(record.get("title") or record.get("video_id") or key)
+              platform = str(record.get("platform") or "platform")
+              rows.append((title, platform, url))
+              record["thumbnail_download_link_shown_at"] = datetime.now(timezone.utc).isoformat()
+
+          summary = Path(os.environ["GITHUB_STEP_SUMMARY"])
+          if rows:
+              with summary.open("a", encoding="utf-8") as out:
+                  out.write("## Your published thumbnails\n\n")
+                  out.write("Tap an individual image link to download that thumbnail to this device.\n\n")
+                  for title, platform, url in rows:
+                      safe_title = title.replace("|", "\\|").replace("\n", " ")
+                      out.write(f"- **{safe_title}** ({platform}) — [Download thumbnail]({url})\n")
+          else:
+              print("No newly verified thumbnails need a download link.")
+
+          ledger_path.write_text(json.dumps(ledger, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          print(f"Added {len(rows)} individual thumbnail download link(s) to the Actions run summary.")
+          PY
+
+      - name: Persist publication and thumbnail download records
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: reconcile publication and thumbnail links"
+          file_pattern: production/buffer-publishing-ledger.json
