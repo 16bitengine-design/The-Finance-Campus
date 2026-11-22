@@ -7,7 +7,8 @@
     "studio": "remotion studio src/index.ts",
     "compositions": "remotion compositions src/index.ts",
     "render:demo": "remotion render src/index.ts FinanceCampusDemo out/finance-campus-demo.mp4",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "render:sample": "remotion render src/index.ts FinanceCampusMonochromeSample out/finance-campus-monochrome-sample.mp4 --codec=h264 --crf=23"
   },
   "dependencies": {
     "@remotion/cli": "^4.0.0",
