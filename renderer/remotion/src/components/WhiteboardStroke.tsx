@@ -12,7 +12,7 @@ type Props = {
 
 export const WhiteboardStroke: React.FC<Props> = ({
   d,
-  stroke = "#102B55",
+  stroke = "#111111",
   strokeWidth = 9,
   startFrame = 0,
   durationFrames = 45,
