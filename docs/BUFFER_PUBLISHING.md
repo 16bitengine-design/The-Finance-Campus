@@ -133,3 +133,12 @@ Never paste API keys into source files, workflow YAML, logs, issue comments or c
 - Create video post: https://developers.buffer.com/examples/create-video-post.html
 - Hosting media: https://developers.buffer.com/guides/hosting-media.html
 - YouTube metadata: https://developers.buffer.com/types/YoutubePostMetadataInput.html
+
+
+## Downloading published thumbnails to your devices
+
+The publication monitor now creates a downloadable GitHub Actions artifact for each thumbnail only after Buffer reports the post as sent and the public YouTube/TikTok URL has been independently verified. The thumbnail URL is carried into the publishing ledger when the post is scheduled, but no download is packaged while the post is merely queued or pending verification.
+
+Each artifact contains the branded thumbnail image files and is retained for 90 days. Open the repository's **Actions** tab, select the latest successful **Buffer publication monitor** run, scroll to **Artifacts**, and download `finance-campus-published-thumbnails-...`. On Android, the ZIP can be opened from the Downloads folder; on a laptop, extract it like any other ZIP file. This is a tap-to-download workflow: GitHub Actions cannot silently write files into a phone or laptop's local storage.
+
+No Google Drive API, Google account authorization, or additional paid service is required. This download feature does not enable or approve publishing; it only packages thumbnails for posts already verified as publicly available.
