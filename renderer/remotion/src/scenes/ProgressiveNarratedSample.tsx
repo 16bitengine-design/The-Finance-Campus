@@ -21,7 +21,7 @@ const Coin:React.FC<{x:number;y:number;delay:number;index:number}> = ({x,y,delay
 };
 const Person:React.FC<{worried:boolean;action:number}> = ({worried,action})=>{
  const f=useCurrentFrame();const bob=Math.sin(f/11)*3;const reach=ease(f,action,action+18);const enter=ease(f,Math.max(0,action-24),action+12);
- return <g opacity={enter} transform={`translate(0 ${bob+(1-enter)*90})`} stroke={P.ink} strokeWidth="9" strokeLinecap="round" strokeLinejoin="round">
+ return <g opacity={enter} transform={`translate(180 ${bob+(1-enter)*90})`} stroke={P.ink} strokeWidth="9" strokeLinecap="round" strokeLinejoin="round">
  <ellipse cx="0" cy="650" rx="170" ry="24" fill={P.brown} opacity=".12" stroke="none"/>
  <path d="M-88 270Q-135 300-120 470L-100 570Q0 605 100 570L120 460Q120 310 78 270Z" fill={P.brown}/>
  <path d="M-58 292Q0 320 58 292L48 530Q0 554-48 530Z" fill={P.cream} stroke="none"/>
@@ -61,7 +61,7 @@ const Story:React.FC<{cues:Cue[];duration:number}> = ({cues,duration})=>{
  const title=["THE MONEY ARRIVES","THEN THE BILLS COME","MAKE A PLAN BEFORE SPENDING","MOVE SAVINGS FIRST","BUILD THE HABIT"][phase];
  const subtitle=["Your income deserves a plan","Watch where your money goes","Give every shilling a purpose","Small deposits still matter","Progress is built one decision at a time"][phase];
  return <AbsoluteFill style={{background:P.paper,fontFamily:"Arial"}}>
- <svg viewBox="0 0 1080 1450" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}>
+ <svg viewBox="0 0 1080 1920" preserveAspectRatio="xMidYMid meet" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}>
  <defs><linearGradient id="warm" x1="0" x2="0" y1="0" y2="1"><stop stopColor={P.paper}/><stop offset="1" stopColor={P.cream}/></linearGradient></defs>
  <rect width="1080" height="1920" fill="url(#warm)"/>
  <g transform="translate(0 360)"><Room/>
@@ -92,11 +92,6 @@ const Story:React.FC<{cues:Cue[];duration:number}> = ({cues,duration})=>{
  </g>}
  </g>
  </svg>
- <div style={{position:"absolute",top:80,left:65,right:65,color:P.ink}}>
- <div style={{fontSize:23,letterSpacing:5,fontWeight:900,color:P.brown}}>THE FINANCE CAMPUS · MONEY HABITS</div>
- <div style={{fontSize:54,fontWeight:900,marginTop:18,lineHeight:1.05}}>{title}</div>
- <div style={{fontSize:27,fontWeight:700,color:P.brown,marginTop:15}}>{subtitle}</div>
- </div>
  <Caption cues={cues}/>
  <div style={{position:"absolute",top:300,left:65,right:65,height:7,background:P.sand,borderRadius:8}}><div style={{height:7,width:`${Math.min(100,sec/duration*100)}%`,background:P.brown,borderRadius:8}}/></div>
  {sec>=duration-8&&<AbsoluteFill style={{background:P.ink,justifyContent:"center",alignItems:"center",padding:90,textAlign:"center",color:P.paper,fontFamily:"Arial"}}><div style={{fontSize:48,fontWeight:900,letterSpacing:3}}>THE FINANCE CAMPUS</div><div style={{fontSize:31,lineHeight:1.45,marginTop:42}}>Educational content only. This is not personalized financial, investment, tax or legal advice. Consult a qualified professional about your circumstances.</div><div style={{fontSize:22,color:P.sand,marginTop:45,letterSpacing:3}}>SAMPLE · NOT FOR PUBLICATION</div></AbsoluteFill>}
