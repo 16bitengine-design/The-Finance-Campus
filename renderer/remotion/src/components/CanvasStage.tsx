@@ -17,9 +17,9 @@ export const CanvasStage: React.FC<Props> = ({ width, height }) => {
 
     context.clearRect(0, 0, width, height);
     const groundY = height * 0.78;
-    context.fillStyle = "#F5F8FC";
+    context.fillStyle = "#FFFFFF";
     context.fillRect(0, 0, width, height);
-    context.fillStyle = "#DCE8F3";
+    context.fillStyle = "#FFFFFF";
     context.fillRect(0, groundY, width, height - groundY);
 
     // Deterministic frame-based movement: safe for Remotion's out-of-order rendering.
@@ -30,14 +30,14 @@ export const CanvasStage: React.FC<Props> = ({ width, height }) => {
     context.save();
     context.translate(moneyX, moneyY);
     context.rotate(Math.sin(progress * Math.PI * 2) * 0.08);
-    context.fillStyle = "#168C43";
-    context.strokeStyle = "#0B6030";
+    context.fillStyle = "#FFFFFF";
+    context.strokeStyle = "#111111";
     context.lineWidth = 5;
     context.beginPath();
     context.roundRect(-58, -34, 116, 68, 12);
     context.fill();
     context.stroke();
-    context.fillStyle = "#FFFFFF";
+    context.fillStyle = "#111111";
     context.font = "bold 44px Arial";
     context.textAlign = "center";
     context.textBaseline = "middle";
