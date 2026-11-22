@@ -20,8 +20,8 @@ const Coin:React.FC<{x:number;y:number;delay:number;index:number}> = ({x,y,delay
  return <g opacity={p} transform={`translate(${x} ${drop}) rotate(${f*2+index*22})`}><ellipse rx="29" ry="22" fill={P.caramel} stroke={P.ink} strokeWidth="5"/><ellipse rx="17" ry="12" fill="none" stroke={P.cream} strokeWidth="3"/></g>
 };
 const Person:React.FC<{worried:boolean;action:number}> = ({worried,action})=>{
- const f=useCurrentFrame();const bob=Math.sin(f/11)*3;const reach=ease(f,action,action+18);
- return <g transform={`translate(0 ${bob})`} stroke={P.ink} strokeWidth="9" strokeLinecap="round" strokeLinejoin="round">
+ const f=useCurrentFrame();const bob=Math.sin(f/11)*3;const reach=ease(f,action,action+18);const enter=ease(f,Math.max(0,action-24),action+12);
+ return <g opacity={enter} transform={`translate(0 ${bob+(1-enter)*90})`} stroke={P.ink} strokeWidth="9" strokeLinecap="round" strokeLinejoin="round">
  <ellipse cx="0" cy="650" rx="170" ry="24" fill={P.brown} opacity=".12" stroke="none"/>
  <path d="M-88 270Q-135 300-120 470L-100 570Q0 605 100 570L120 460Q120 310 78 270Z" fill={P.brown}/>
  <path d="M-58 292Q0 320 58 292L48 530Q0 554-48 530Z" fill={P.cream} stroke="none"/>
@@ -37,7 +37,7 @@ const Person:React.FC<{worried:boolean;action:number}> = ({worried,action})=>{
  <path d="M-5 182l-8 20h15" fill="none" stroke={P.brown} strokeWidth="5"/>
  </g>
 };
-const Room:React.FC=()=> <g>
+const Room:React.FC=()=> {const f=useCurrentFrame();const reveal=ease(f,0,54);return <g opacity={reveal} transform={`translate(${(1-reveal)*-70} 0)`}
  <path d="M80 90H1000V1110H80Z" fill={P.cream} stroke={P.brown} strokeWidth="8"/>
  <path d="M120 130H460V410H120Z" fill={P.paper} stroke={P.brown} strokeWidth="8"/>
  <path d="M290 130V410M120 270H460" stroke={P.sand} strokeWidth="8"/>
@@ -45,7 +45,7 @@ const Room:React.FC=()=> <g>
  <path d="M160 850V1050M920 850V1050" stroke={P.brown} strokeWidth="25"/>
  <rect x="700" y="180" width="210" height="330" rx="12" fill={P.sand} stroke={P.brown} strokeWidth="8"/>
  <path d="M735 225H875M735 270H875M735 315H875" stroke={P.brown} strokeWidth="9"/>
- </g>;
+ </g>};
 const Caption:React.FC<{cues:Cue[]}> = ({cues})=>{
  const f=useCurrentFrame();const sec=f/30;const cue=cues.find(c=>sec>=c.start&&sec<c.end);
  return cue?<div style={{position:"absolute",bottom:115,left:65,right:65,textAlign:"center",fontFamily:"Arial",fontSize:31,fontWeight:800,lineHeight:1.25,color:P.white,textShadow:"0 3px 8px #30231E",background:"rgba(48,35,30,.88)",padding:"18px 24px",borderRadius:18}}>{cue.text}</div>:null;
