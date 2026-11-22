@@ -8,6 +8,7 @@ import pytest
 
 from finance_campus.buffer_publisher import (
     _graphql_string,
+    monitor_publications,
     schedule_package,
     validate_publish_package,
 )
@@ -188,3 +189,58 @@ def test_existing_ledger_prevents_duplicate_scheduling(tmp_path: Path) -> None:
     assert result["results"][0]["status"] == "already_recorded"
     assert result["results"][0]["buffer_post_id"] == "existing-post"
     assert result["results"][1]["status"] == "dry_run_validated"
+
+
+
+def test_monitor_marks_sent_post_only_after_public_url_verification(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import finance_campus.buffer_publisher as publisher
+
+    monkeypatch.setattr(publisher, "verify_public_post_url", lambda url: url.startswith("https://www.youtube.com/"))
+
+    ledger = tmp_path / "ledger.json"
+    ledger.write_text(
+        json.dumps({
+            "version": 1,
+            "posts": {
+                "fc-video:youtube:youtube-1": {
+                    "buffer_post_id": "sent-post",
+                    "status": "scheduled",
+                },
+                "fc-video:tiktok:tiktok-1": {
+                    "buffer_post_id": "queued-post",
+                    "status": "scheduled",
+                },
+            },
+        }),
+        encoding="utf-8",
+    )
+
+    class MonitorClient(FakeBufferClient):
+        def list_existing_posts(self, organization_id: str, channel_id: str) -> list[dict[str, Any]]:
+            if channel_id == "youtube-1":
+                return [{
+                    "id": "sent-post",
+                    "status": "sent",
+                    "sentAt": "2026-11-22T12:00:00Z",
+                    "externalLink": "https://www.youtube.com/watch?v=public123",
+                }]
+            return [{
+                "id": "queued-post",
+                "status": "scheduled",
+                "externalLink": None,
+            }]
+
+    result = monitor_publications(
+        client=MonitorClient(_channels()),  # type: ignore[arg-type]
+        organization_id="org-1",
+        channel_ids=["youtube-1", "tiktok-1"],
+        ledger_path=ledger,
+    )
+
+    saved = json.loads(ledger.read_text(encoding="utf-8"))
+    assert saved["posts"]["fc-video:youtube:youtube-1"]["status"] == "publicly_accessible_verified"
+    assert saved["posts"]["fc-video:youtube:youtube-1"]["public_availability_verified"] is True
+    assert saved["posts"]["fc-video:tiktok:tiktok-1"]["status"] == "scheduled"
+    assert result["tracked_posts"] == 2
