@@ -14,8 +14,8 @@ from finance_campus.final_video_qc import validate_final_video
 from finance_campus.narration import synthesize_storyboard
 from finance_campus.post_metadata import generate_post_metadata
 from finance_campus.quality_gates import validate_video_package
-from finance_campus.research_pipeline import is_approved_research_url
 from finance_campus.related_videos import attach_related_video
+from finance_campus.research_pipeline import is_approved_research_url
 from finance_campus.script_pipeline import prepare_script
 from finance_campus.script_quality import validate_script
 from finance_campus.storyboard import validate_storyboard
