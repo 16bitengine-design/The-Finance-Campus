@@ -1,4 +1,4 @@
-from PIL import Image, ImageChops
+from PIL import ImageChops
 
 from finance_campus.multi_character_compositor import (
     render_multi_character_frame,
