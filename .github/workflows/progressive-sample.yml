@@ -1,6 +1,12 @@
 name: Progressive narrated visual sample
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'renderer/remotion/src/scenes/ProgressiveNarratedSample.tsx'
+      - 'renderer/remotion/src/Root.tsx'
+      - '.github/workflows/progressive-sample.yml'
   workflow_dispatch:
     inputs:
       voice:
