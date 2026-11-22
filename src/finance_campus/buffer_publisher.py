@@ -383,7 +383,7 @@ def schedule_package(
             }
             ledger["posts"][ledger_key] = record
             _save_ledger(ledger_path, ledger)
-            results.append({"platform": platform, "status": "already_in_buffer", **record})
+            results.append({**record, "platform": platform, "status": "already_in_buffer"})
             continue
 
         if not live:
@@ -414,7 +414,7 @@ def schedule_package(
         }
         ledger["posts"][ledger_key] = record
         _save_ledger(ledger_path, ledger)
-        results.append({"platform": platform, "status": "scheduled_in_buffer", **record})
+        results.append({**record, "platform": platform, "status": "scheduled_in_buffer", "buffer_status": record["status"]})
 
     return {
         "video_id": video_key,
