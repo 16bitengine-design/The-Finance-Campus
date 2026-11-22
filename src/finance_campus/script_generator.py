@@ -104,6 +104,7 @@ def generate_script(topic: dict[str, Any], *, duration: str = "short") -> dict[s
         "id": f"{topic.get('id', 'TFC-UNASSIGNED')}-{duration.upper()}",
         "title": topic["title"],
         "category": topic["category"],
+        "related_concepts": topic.get("related_concepts", []),
         "geographic_relevance": topic.get("geographic_relevance", ["global"]),
         "target_audience": topic.get("target_audience", []),
         "format": duration,
