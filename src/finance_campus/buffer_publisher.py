@@ -473,11 +473,16 @@ def schedule_package(
             and any(asset.get("source") == package["video_url"] for asset in post.get("assets", []))
         ), None)
         if duplicate:
+            public_media = manifest.get("public_media") or {}
             record = {
                 "buffer_post_id": duplicate.get("id"),
                 "status": str(duplicate.get("status", "scheduled")),
                 "due_at": duplicate.get("dueAt"),
                 "recovered_existing_post": True,
+                "video_id": video_key,
+                "title": manifest.get("title"),
+                "platform": platform,
+                "thumbnail_url": public_media.get("thumbnail_url"),
             }
             ledger["posts"][ledger_key] = record
             _save_ledger(ledger_path, ledger)
