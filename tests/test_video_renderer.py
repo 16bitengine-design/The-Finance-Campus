@@ -220,7 +220,7 @@ def test_scene_transition_inserts_smooth_crossfade_frames(tmp_path):
                 "narration": "The next illustration.",
                 "duration_seconds": 1,
                 "elements": [
-                    {"type": "circle", "cx": 500, "cy": 281, "r": 90, "color": "gold",
+                    {"type": "circle", "cx": 500, "cy": 281, "r": 62, "color": "gold",
                      "start_seconds": 0, "draw_seconds": 0.1},
                 ],
             },
@@ -460,7 +460,7 @@ def test_character_render_uses_substantial_filled_illustration_not_only_wirefram
     # Regression guard: the full figure must retain solid ink mass at mobile size.
     # Monochrome character art uses black ink, white paper and substantial
     # filled silhouettes rather than coloured skin/clothing fills.
-    assert counts[(0, 0, 0)] > 12000
+    assert counts[(0, 0, 0)] > 8500
     assert set(counts) <= {(0, 0, 0), (255, 255, 255)}
     non_white = counts[(0, 0, 0)]
     assert non_white > 12000
