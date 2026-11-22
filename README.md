@@ -26,7 +26,7 @@ Every video must include a spoken disclaimer, a readable on-screen disclaimer, a
 - Structured script validator and atomic fail-closed approval handoff.
 - GitHub Actions test/lint workflow.
 
-The progressive whiteboard video renderer and Kokoro narration integration are implemented. The quality workflow has passed its illustrated sample render and artifact upload. The dedicated real-model Kokoro CPU smoke test still needs a successful run and artifact review before the full narration path is production-validated. Claim-level automated fact-checking, semantic visual QC, daily production scheduling, YouTube/TikTok upload adapters, publication verification, persistent publishing ledger, and operational notifications are not yet operational. Topic discovery is mindset-first and evergreen: it selects recurring money beliefs, habits, emotional triggers and everyday decisions rather than chasing financial headlines. Official financial education sources are used to check relevance and principles, not to turn press releases into videos. All topic candidates remain unapproved until editorial and claim-level review.
+The progressive whiteboard renderer, Kokoro narration integration, Buffer publishing adapter, publication ledger and GitHub automation workflows are implemented in code. Their live end-to-end operation still requires successful integration runs and artifact review. Claim-level financial fact-checking, semantic visual QC, unattended daily production, verified public publishing and operational notifications are not yet production-validated. Topic discovery is mindset-first and evergreen: it selects recurring money beliefs, habits, emotional triggers and everyday decisions rather than chasing financial headlines. Official financial education sources are used to check relevance and principles, not to turn press releases into videos. All topic candidates remain unapproved until editorial and claim-level review.
 
 
 
@@ -36,7 +36,7 @@ Scripts may include carefully verified ideas from classical financial books and 
 
 ## Mindset-first topic discovery
 
-The weekly repository workflow selects evergreen topics about money beliefs, everyday habits, emotional spending, comparison, avoidance, patience, debt behaviour, financial boundaries and resilience. The editorial agenda is not driven by news volume, market movements or the latest institutional press release.
+The daily repository workflow selects evergreen topics about money beliefs, everyday habits, emotional spending, comparison, avoidance, patience, debt behaviour, financial boundaries and resilience. The editorial agenda is not driven by news volume, market movements or the latest institutional press release.
 
 Authoritative sources are used as research checks for the underlying educational principles and relevant local rules. Statistics and technical details are included only when essential to the lesson. A source being reachable or containing mapped keywords does not prove every proposed claim; each candidate remains subject to editorial review and claim-level verification. Topic refresh does not generate, render or publish videos.
 
@@ -88,7 +88,7 @@ The synthesis step checks for empty/non-finite audio, silence, peak level and ou
 
 ### Real-model verification
 
-The manually triggered GitHub Actions workflow `Kokoro end-to-end production test` installs Kokoro and `espeak-ng`, downloads the actual model, synthesizes the sample storyboard on CPU, renders the MP4 with narration and captions, and uploads the resulting files for review. The normal lightweight test suite uses a mocked Kokoro pipeline so it does not download model weights on every commit.
+The manually triggered `Production validation and visual samples` workflow (mode `kokoro`) installs Kokoro and `espeak-ng`, downloads the actual model, synthesizes the sample storyboard on CPU, renders the MP4 with narration and captions, and uploads the resulting files for review. The normal lightweight test suite uses a mocked Kokoro pipeline so it does not download model weights on every commit.
 
 
 ## End-to-end narrated video production
@@ -121,7 +121,7 @@ For a YouTube long-form video, use --format long. Available voice IDs are af_hea
 
 A successful run writes approved_script.json, storyboard.json, storyboard_with_audio_timing.json, narration.wav, captions.srt, finance-campus-video.mp4, description.txt, and production-manifest.json. The manifest records generated, rendered, and quality-approved states separately from upload and public availability. Publishing remains disabled.
 
-The real-model Kokoro end-to-end production test remains a separate manual GitHub Actions workflow. It downloads the model and performs actual CPU synthesis; mocked unit tests do not count as proof of real voice quality.
+The real-model Kokoro end-to-end production test is available in the consolidated `production-validation.yml` workflow (mode `kokoro`). It downloads the model and performs actual CPU synthesis; mocked unit tests do not count as proof of real voice quality.
 
 ## Development status
 Publishing remains disabled until the production pipeline and platform integrations pass end-to-end quality checks.
@@ -142,7 +142,7 @@ The complete system is designed for zero monetary cost from ideation through pub
 
 Zero monetary cost does not mean unlimited free cloud compute or guaranteed platform API access. GitHub Actions and social-platform APIs have quotas, eligibility/review requirements, and terms that can change. The system must use quota guards and stop rather than silently incur charges if a zero-cost route is unavailable. Local/self-hosted execution is the fallback where practical.
 
-The actual rendering engine and Kokoro integration are still under end-to-end verification. First-generation topic research and script-candidate workflows are implemented but require a live run. Platform publishing remains disabled until all production and publication gates pass.
+The rendering engine and Kokoro integration remain under end-to-end verification. Topic refresh and script-candidate generation share `daily-topic-replenishment.yml` (scheduled topic refresh; manual script generation). Kokoro and progressive Remotion sample runs share `production-validation.yml`. Buffer media hosting, scheduling and monitoring share `buffer-operations.yml`. Platform publishing remains disabled until all production and publication gates pass.
 
 ## Publishing cadence target
 - Two distinct short videos are produced each day.
@@ -224,39 +224,25 @@ The renderer validates the requested audio stream and the final MP4 playback. Dr
 
 ## Automated topic research and script drafting
 
-The first zero-cost topic and script drafting modules are now implemented.
+The consolidated workflow `.github/workflows/daily-topic-replenishment.yml` manages both topic refresh and manual script-candidate generation.
 
-### Weekly topic refresh
+### Daily topic refresh
 
-GitHub Actions runs `.github/workflows/weekly-topic-refresh.yml` every Monday at 08:30 Africa/Kampala time. It can also be started manually from the Actions tab. The workflow:
-- checks a curated catalogue of authoritative sources, including the Consumer Financial Protection Bureau, Bank of Uganda and the U.S. SEC's Investor.gov;
-- creates distinct topic candidates from 20 editorially defined learning briefs;
+GitHub Actions runs the topic refresh daily at 08:30 Africa/Kampala time (05:30 UTC), targeting three new topics per run. The workflow:
+- checks a curated catalogue of authoritative financial education and regulatory sources;
+- creates distinct topic candidates from editorially defined learning briefs;
 - checks source reachability and mapped keyword relevance;
 - rejects unavailable or irrelevant source pages;
 - checks the persistent JSON library for duplicate IDs and normalized titles;
-- saves new topics with category, audience, geographic relevance, source metadata and research/production/publication states.
+- saves topic records with category, audience, geographic relevance, source metadata and research/production/publication states.
 
-The weekly target is 20 new topics. The workflow reports the actual number added; it does not invent replacements when sources are unavailable. Some sources, particularly PDFs, still need text extraction and manual relevance review. URL reachability and keyword presence are not proof that a source supports every claim. Topic records therefore remain marked for claim-level review.
+The workflow reports the actual number added; it does not invent replacements when sources are unavailable. URL reachability and keyword presence are not proof that a source supports every claim. Topic records remain subject to claim-level review. Topic refresh does not generate, render or publish videos.
 
-### Generate a script candidate
+### Generate script candidates
 
-After a topic has been added to `data/topics.json`, generate a short script candidate:
+Open the **Daily researched topic replenishment** workflow in GitHub Actions and manually select `generate_scripts`. Choose `short` or `long` for the candidate format. The workflow reads `production/topic-library.json`, creates candidates for unused topics in `production/script-candidates/`, and commits the report. This action does not start video production or publishing.
 
-```bash
-python -m finance_campus.cli generate-script data/topics.json production/script-candidates/emergency-fund.json --topic-id TFC-<TOPIC_ID> --duration short
-```
-
-Use `--duration long` for a 5–10 minute script candidate. Replace the example topic ID with an actual ID in the topic library.
-
-The current generator is a deterministic editorial-template engine, not an LLM. It builds the six required story sections from the researched editorial brief and includes source metadata. It does not call a paid API, does not invent numerical statistics, and does not mark its output production-approved. Generated candidates are deliberately rejected by the production script validator until claim-level source verification and editorial approval are completed.
-
-### Current limitations
-
-- Research currently uses a curated source catalogue and editorial topic blueprints; it is not yet an open-ended web discovery or news-monitoring agent.
-- Source checks verify HTTP reachability and keyword presence, not semantic claim support.
-- Script drafts are structured and ready for editorial refinement, but are not yet fully original long-form narrative writing.
-- No generated script is automatically sent to Kokoro or video production. Topic refresh and script drafting do not publish or produce videos.
-
+The current generator is a deterministic editorial-template engine, not an LLM. It does not call a paid API, does not invent numerical statistics, and does not mark its output production-approved. Generated candidates remain subject to claim-level source verification and editorial approval.
 
 ## Implementation and release status
 
