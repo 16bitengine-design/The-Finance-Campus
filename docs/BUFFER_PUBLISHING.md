@@ -29,7 +29,7 @@ The CLI defaults to dry-run. Actual scheduling requires `--live` and `BUFFER_PUB
 
 The guarded Buffer adapter and scheduling workflow are implemented for both YouTube and TikTok. The production workflow is not yet connected to scheduling, and no Buffer account has been connected or live post tested.
 
-A separate workflow, `.github/workflows/buffer-media-hosting.yml`, now provides a guarded GitHub Releases media-hosting stage. It downloads a production artifact, requires an explicit manual approval for public hosting, checks technical QC and visual-review evidence, creates a unique public GitHub Release, verifies the public assets, writes their stable URLs into the manifest, and uploads a hosted package artifact for a later Buffer dry-run.
+The consolidated workflow, `.github/workflows/buffer-operations.yml`, provides a guarded GitHub Releases media-hosting stage through its `host_media` mode. It downloads a production artifact, requires an explicit manual approval for public hosting, checks technical QC and visual-review evidence, creates a unique public GitHub Release, verifies the public assets, writes their stable URLs into the manifest, and uploads a hosted package artifact for a later Buffer dry-run.
 
 The media-hosting workflow is intentionally not a publishing approval. It marks human visual review as passed only after the explicit `approve_public_hosting` selection. It does not set `publication_approved`; the Buffer publisher therefore remains blocked from live scheduling until a separate publishing approval is explicitly recorded.
 
@@ -44,7 +44,7 @@ GitHub Releases are suitable only while the repository is public and the asset s
 
 Create a personal API key in Buffer Settings → API and store it only in GitHub Actions Secrets as `BUFFER_API_KEY`.
 
-Then run the **Buffer scheduling** GitHub Actions workflow with mode `discover`. It will print your Buffer organization and connected channel IDs without creating any posts. Copy the correct organization ID and the YouTube/TikTok channel IDs into the matching repository secrets below.
+Then run the **Buffer operations** GitHub Actions workflow with mode `discover`. It will print your Buffer organization and connected channel IDs without creating any posts. Copy the correct organization ID and the YouTube/TikTok channel IDs into the matching repository secrets below.
 
 Configure these repository secrets:
 
@@ -54,7 +54,7 @@ Configure these repository secrets:
 - `BUFFER_TIKTOK_CHANNEL_ID`
 - `BUFFER_PUBLISH_ENABLED` — keep unset or false until launch is approved.
 
-After configuring the IDs, run the workflow in `dry_run` mode with a valid approved package. Only enable the publishing flag after the visual sample, thumbnail handling, public media hosting and end-to-end scheduling checks are approved.
+After configuring the IDs, run the **Buffer operations** workflow in `dry_run` mode with a valid approved package and the production run ID containing its artifact. Only enable the publishing flag after the visual sample, thumbnail handling, public media hosting and end-to-end scheduling checks are approved.
 
 Channel IDs must be retrieved from the authenticated Buffer account; never guess them. The publisher checks that the configured IDs belong to the expected YouTube and TikTok services.
 
@@ -62,7 +62,7 @@ Buffer's current API supports `addToQueue` and exact UTC scheduling. The initial
 
 ## Media hosting and thumbnails
 
-Buffer's API has no native media-upload endpoint. The approved media-hosting workflow uses GitHub Releases to host the MP4 and the separate branded YouTube thumbnail as public release assets. It verifies that the repository is public and that both asset URLs can be fetched without authentication. GitHub Actions artifacts are temporary/private and must never be used as Buffer media URLs.
+Buffer's API has no native media-upload endpoint. The `host_media` mode in the consolidated Buffer operations workflow uses GitHub Releases to host the MP4 and the separate branded YouTube thumbnail as public release assets. It verifies that the repository is public and that both asset URLs can be fetched without authentication. GitHub Actions artifacts are temporary/private and must never be used as Buffer media URLs.
 
 The hosted production manifest receives:
 ```json
@@ -96,7 +96,7 @@ The hosting workflow does not approve publication. It records public media URLs 
 
 ## Publication monitoring
 
-The workflow `.github/workflows/buffer-publication-monitor.yml` is scheduled every 30 minutes and can also be dispatched manually. It remains dormant until the repository Actions variable `BUFFER_MONITOR_ENABLED` is set to `true` after Buffer is connected. It reads Buffer post states for tracked post IDs, records `scheduled`, `sending`, `sent` and `error`, and checks Buffer's `externalLink` for sent posts.
+The `buffer-operations.yml` workflow runs its monitor job every 30 minutes and also supports manual execution with mode `monitor`. It remains dormant until the repository Actions variable `BUFFER_MONITOR_ENABLED` is set to `true` after Buffer is connected. It reads Buffer post states for tracked post IDs, records `scheduled`, `sending`, `sent` and `error`, and checks Buffer's `externalLink` for sent posts.
 
 A post is marked `publicly_accessible_verified` only when Buffer reports `sent`, provides a destination URL on an approved YouTube or TikTok domain, and an unauthenticated HTTPS request can reach that URL. A Buffer `sent` state alone is not enough. If the destination URL is absent or cannot be verified, the ledger remains `sent_awaiting_public_verification`. Failed Buffer posts are recorded as `failed`.
 
@@ -104,11 +104,19 @@ Buffer's GraphQL Post object exposes `status`, `sentAt` and `externalLink`; the 
 
 The monitor requires a read-capable Buffer personal API key. If Buffer returns a permission error for post retrieval, monitoring must be treated as failed—not as evidence of publication.
 
-## GitHub Actions workflow
+## Consolidated GitHub Actions workflow
 
-The workflow `.github/workflows/buffer-scheduling.yml` can be started manually with the completed production workflow run ID and artifact name, or called from a future production workflow using `workflow_call`. The artifact must contain `production-manifest.json`, `post-metadata.json`, the MP4 and the branded thumbnail at the package root/manifest paths. The reusable caller must pass Buffer secrets (for example, with `secrets: inherit`).
+The repository now uses one workflow, `.github/workflows/buffer-operations.yml`, for media hosting, Buffer account discovery, dry-run validation, scheduling and publication monitoring. This removes the need to navigate three separate publishing workflows while preserving separate safety-gated jobs.
 
-The workflow offers `discover`, `dry_run` and `schedule` modes. It defaults to `dry_run`. Use `discover` to retrieve organization/channel IDs. Select `schedule` only after the owner has approved the visual standard, the media host has been configured and the live-publishing lock has been intentionally enabled.
+Its manual modes are:
+
+- `host_media`: requires the production run ID, the expected artifact name and the explicit `approve_public_hosting` choice after visual review. It hosts and verifies public GitHub Release assets; it does not approve publication.
+- `discover`: retrieves the Buffer organization and connected channel IDs without creating posts.
+- `dry_run`: requires the production run ID and validates the package and Buffer channels without scheduling posts.
+- `schedule`: requires the production run ID and all publisher safeguards, including the live-publishing lock.
+- `monitor`: checks tracked Buffer posts and public destination URLs. The same monitor job also runs every 30 minutes, but only when the repository variable `BUFFER_MONITOR_ENABLED=true`.
+
+For `host_media`, `dry_run` and `schedule`, provide the GitHub Actions run ID that contains the required artifact. The artifact must contain `production-manifest.json`, `post-metadata.json`, the MP4 and the branded thumbnail at the package root/manifest paths. The default manual mode is `dry_run`; live scheduling is not activated by this consolidation.
 
 ## Local validation
 
@@ -138,6 +146,6 @@ Never paste API keys into source files, workflow YAML, logs, issue comments or c
 
 ## Downloading published thumbnails
 
-After Buffer reports a post as sent and its public YouTube/TikTok URL is independently verified, the publication monitor adds a direct link to that post's individual branded JPG/PNG thumbnail in the GitHub Actions run summary. No ZIP file or video file is provided. Open the latest successful **Buffer publication monitor** run, find **Your published thumbnails**, and tap **Download thumbnail** beside the relevant post. The image opens/downloads directly and can be saved to an Android phone or laptop.
+After Buffer reports a post as sent and its public YouTube/TikTok URL is independently verified, the publication monitor adds a direct link to that post's individual branded JPG/PNG thumbnail in the GitHub Actions run summary. No ZIP file or video file is provided. Open the latest successful **Buffer operations** run, find **Your published thumbnails**, and tap **Download thumbnail** beside the relevant post. The image opens/downloads directly and can be saved to an Android phone or laptop.
 
 GitHub Actions cannot silently save files into a device's local storage; the user taps the individual link. No Google Drive API or Google account authorization is required. The monitor does not enable or approve publishing.
