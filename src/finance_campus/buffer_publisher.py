@@ -8,7 +8,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import re
 import sys
 import urllib.error
 import urllib.request
@@ -159,6 +158,29 @@ class BufferClient:
         return post
 
 
+def verify_public_video_url(url: str, *, timeout: int = 20) -> None:
+    """Confirm Buffer can fetch a direct public MP4 URL without credentials."""
+    request = urllib.request.Request(
+        url,
+        headers={"Range": "bytes=0-0", "User-Agent": "The-Finance-Campus/1.0"},
+        method="GET",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            status = getattr(response, "status", 200)
+            content_type = response.headers.get("Content-Type", "").split(";", 1)[0].strip().casefold()
+            if status not in {200, 206}:
+                raise ValueError(f"Public video host returned HTTP {status}")
+            if content_type not in {"video/mp4", "application/octet-stream", "binary/octet-stream"}:
+                raise ValueError(f"Public video URL has unexpected content type: {content_type or 'missing'}")
+            if response.headers.get("Content-Length") == "0":
+                raise ValueError("Public video URL points to an empty file")
+    except urllib.error.HTTPError as exc:
+        raise ValueError(f"Buffer cannot fetch public video URL (HTTP {exc.code})") from exc
+    except urllib.error.URLError as exc:
+        raise ValueError(f"Buffer cannot reach public video URL: {exc}") from exc
+
+
 def _graphql_string(value: str) -> str:
     return json.dumps(str(value), ensure_ascii=False)[1:-1]
 
@@ -295,8 +317,7 @@ def schedule_package(
         raise ValueError("A stable video_id or title is required")
     results: list[dict[str, Any]] = []
 
-    channels = client.list_channels(organization_id)
-    channel_by_id = {item.get("id"): item for item in channels if isinstance(item, dict)}
+    if live:\n        verify_public_video_url(package["video_url"])\n\n    channels = client.list_channels(organization_id)\n    channel_by_id = {item.get("id"): item for item in channels if isinstance(item, dict)}
     for platform, channel_id in destinations:
         channel = channel_by_id.get(channel_id)
         if not channel:
