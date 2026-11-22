@@ -206,7 +206,7 @@ def _graphql_string(value: str) -> str:
 def _load_json(path: str | Path) -> dict[str, Any]:
     payload = json.loads(Path(path).read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
-        raise ValueError(f"Expected a JSON object in {path}")
+        raise TypeError(f"Expected a JSON object in {path}")
     return payload
 
 
@@ -229,7 +229,7 @@ def validate_publish_package(package_dir: str | Path) -> dict[str, Any]:
 
     stages = manifest.get("stages")
     if not isinstance(stages, dict):
-        raise ValueError("Manifest stages are missing")
+        raise TypeError("Manifest stages must be an object")
     required_stages = (
         "script_validated", "script_approved", "kokoro_narration_generated",
         "captions_validated", "video_rendered", "media_streams_verified",
@@ -242,7 +242,7 @@ def validate_publish_package(package_dir: str | Path) -> dict[str, Any]:
     artifacts = manifest.get("artifacts") or {}
     thumbnail_path = artifacts.get("thumbnail")
     if not isinstance(thumbnail_path, str):
-        raise ValueError("A branded channel thumbnail is required in manifest artifacts.thumbnail")
+        raise TypeError("Manifest artifacts.thumbnail must be a file path")
     thumbnail = Path(thumbnail_path)
     if not thumbnail.is_absolute():
         thumbnail = root / thumbnail
@@ -259,9 +259,10 @@ def validate_publish_package(package_dir: str | Path) -> dict[str, Any]:
             "TikTok thumbnail-frame selection"
         )
     thumbnail_offset_ms = public_media.get("thumbnail_offset_ms")
-    if manifest["video_format"] == "short":
-        if not isinstance(thumbnail_offset_ms, int) or thumbnail_offset_ms < 0:
-            raise ValueError("Short-form packages require a valid thumbnail_offset_ms")
+    if manifest["video_format"] == "short" and (
+        not isinstance(thumbnail_offset_ms, int) or thumbnail_offset_ms < 0
+    ):
+        raise ValueError("Short-form packages require a valid thumbnail_offset_ms")
 
     platforms = metadata.get("platforms") or {}
     youtube = platforms.get("youtube") or {}
@@ -296,7 +297,7 @@ def _load_ledger(path: str | Path) -> dict[str, Any]:
         return {"version": 1, "posts": {}}
     payload = json.loads(target.read_text(encoding="utf-8"))
     if not isinstance(payload, dict) or not isinstance(payload.get("posts"), dict):
-        raise ValueError("Publishing ledger is malformed")
+        raise TypeError("Publishing ledger must contain an object with a posts object")
     return payload
 
 
