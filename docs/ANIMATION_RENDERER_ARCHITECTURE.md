@@ -83,17 +83,14 @@ canvas to fit the scene canvas after its declared scale and position; off-canvas
 placements are clipped by the output canvas.
 
 
-## Visual art direction — monochrome vector
+## Official visual art direction — cinematic 2D cartoon storytelling
 
-New Finance Campus artwork should use a consistent black-and-white vector system:
-white backgrounds, black outlines, expressive character drawing, detailed props
-and environments, selective cross-hatching, negative space and progressive SVG
-stroke reveals. Do not use coloured illustration fills or multicolour charts as
-the default. Build depth with line weight, hatching, overlap, scale and motion.
-Use vector paths for authored storytelling assets so they remain crisp at 1080p
-and can be animated stroke-by-stroke. Captions and typography remain subordinate
-to the illustrated action.
+The official visual identity is **minimalist 2D cinematic cartoon storytelling**. Use expressive rounded characters with bold dark outlines, readable eyes and brows, clear mouth shapes, distinctive hair and clothing silhouettes, and emotionally legible gestures. Characters may be single or multiple according to the story; every character must participate in the action rather than serve as decoration.
 
-The Remotion demo now includes an authored SVG household-bills scene and uses
-monochrome black linework. This is a direction-setting prototype, not yet a
-visually approved production sample.
+Use warm brown, beige, cream, charcoal and muted caramel as the core palette. Build illustrated interiors with architectural detail (arched windows, doors, furniture, counters, desks and practical lights), layered depth, soft shadows and cinematic framing. Keep environments specific to each story rather than reusing a blank generic backdrop.
+
+Narration drives the animation: expressions change, characters look at the relevant object, reach, pick up, hand over, receive, open, place or react to props. Money must visibly travel from a source to a destination. Bills must arrive; phones must be handled; savings containers must fill over time. Scene changes should preserve a prop, character movement or camera direction as a continuity anchor. A complete still illustration must never be displayed from the opening frame as a substitute for animation.
+
+Captions are supporting elements, not the primary visual. Use restrained on-screen text, cinematic transitions, consistent character identities and story-specific supporting objects. Avoid whiteboard-only, monochrome-only, emoji/icon-led, text-only or generic stock-like compositions as the default style.
+
+The Remotion renderer includes a direction-setting cinematic cartoon composition. It is a renderer prototype until it is connected to the Kokoro/Python production timeline, validated with real narration cues, rendered, inspected and approved. The legacy renderer is not silently declared production-ready by this style change.
