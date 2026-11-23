@@ -30,15 +30,15 @@ The included composition is an integration smoke-test, not an approved productio
 Remotion rendering is not yet connected to the Python production pipeline or Kokoro audio. The legacy renderer remains active until the hybrid renderer passes end-to-end tests and human visual review.
 
 
-## Visual art direction: monochrome vector
+## Official visual art direction: cinematic 2D cartoon storytelling
 
-The approved direction for new artwork is black-and-white vector illustration:
-white paper backgrounds, confident black linework, expressive drawn characters,
-detailed props and environments, and progressive SVG path reveals. Avoid coloured
-fills, gradients, coloured outlines, emoji-style icons, and text-only scenes.
-Use solid black, white negative space, line weight, cross-hatching and controlled
-shadows to create depth. Every scene should be designed around the narrated story.
+The official style is minimalist 2D cinematic cartoon storytelling, using expressive rounded characters, bold dark outlines, distinctive silhouettes, warm brown/beige/cream/charcoal tones, and detailed atmospheric illustrated environments. Multi-character scenes are encouraged when the narrative calls for them. Characters must perform the narrated action and physically interact with story props.
 
-The demo composition now uses authored SVG line art. The previous Canvas demo
-layer is retained only as a monochrome utility example; prefer SVG for authored
-story illustrations and use Canvas only when a specific procedural effect needs it.
+The `FinanceCampusCinematicCartoon` composition is the direction-setting prototype. Preview it with:
+
+```bash
+npm run studio
+npm run render:cinematic
+```
+
+A full-scene still at frame zero is not acceptable. Actions, expressions, prop movement and scene transitions must unfold over time and be aligned to the narration. The sample remains a visual prototype until the Python/Kokoro production pipeline is connected and the rendered result passes human review.
