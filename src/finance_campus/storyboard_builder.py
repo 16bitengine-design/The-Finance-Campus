@@ -354,6 +354,10 @@ def build_storyboard(
         narration = str(script["sections"][section]).strip()
         (visual_objects, visual_relationship, matched_terms) = _visual_types(narration, section)
         scenes.append({
+            "visual_style": "minimalist_2d_cinematic_cartoon_storytelling",
+            "palette": ["warm_brown", "beige", "cream", "charcoal", "muted_caramel"],
+            "character_performance_required": True,
+            "narration_synchronized_action_required": True,
             "id": section.replace("_", "-"),
             "narration": narration,
             "duration_seconds": 5.0,
@@ -398,6 +402,8 @@ def build_storyboard(
         "elements": disclaimer_elements,
     })
     return {
+        "visual_style": "minimalist_2d_cinematic_cartoon_storytelling",
+        "visual_palette": ["warm_brown", "beige", "cream", "charcoal", "muted_caramel"],
         "title": str(script["title"]).strip(),
         "canvas": {"width": width, "height": height},
         "scenes": scenes,
