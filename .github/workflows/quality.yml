@@ -147,11 +147,11 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Type-check animation compositions
         run: npm run typecheck
-      - name: Render 150-second monochrome vector sample
-        run: npm run render:sample
-      - name: Upload monochrome vector sample
+      - name: Render 150-second cinematic cartoon sample
+        run: npm run render:cinematic
+      - name: Upload cinematic cartoon sample
         uses: actions/upload-artifact@v4
         with:
-          name: finance-campus-monochrome-vector-sample
-          path: renderer/remotion/out/finance-campus-monochrome-sample.mp4
+          name: finance-campus-cinematic-cartoon-sample
+          path: renderer/remotion/out/finance-campus-cinematic-cartoon.mp4
           if-no-files-found: error
