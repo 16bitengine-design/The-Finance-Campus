@@ -32,6 +32,22 @@ audio:
   voice_profiles:
     - "male"
     - "female"
+visual_identity:
+  style: "minimalist_2d_cinematic_cartoon_storytelling"
+  reference_character_design: "rounded expressive faces, bold dark outlines, simple readable features"
+  palette: ["warm_brown", "beige", "cream", "charcoal", "muted_caramel"]
+  environments: "cinematic illustrated interiors with architectural depth, warm practical lighting and soft shadows"
+  characters:
+    allow_multiple_per_scene: true
+    require_story_specific_performance: true
+    require_prop_interaction: true
+    preserve_identity_and_clothing_between_scenes: true
+  animation:
+    synchronize_actions_to_narration: true
+    animate_faces_hands_and_body: true
+    animate_props_with_visible_origin_and_destination: true
+    prohibit_static_full_scene_reveal: true
+    require_scene_continuity: true
 production:
   minimum_video_duration_seconds: 150
   shorts_target_seconds: [150, 180]

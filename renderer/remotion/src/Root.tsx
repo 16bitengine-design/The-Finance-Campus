@@ -3,9 +3,11 @@ import { Composition } from "remotion";
 import { FinanceCampusDemo } from "./scenes/FinanceCampusDemo";
 import { MonochromeFinanceStory } from "./scenes/MonochromeFinanceStory";
 import { ProgressiveNarratedSample } from "./scenes/ProgressiveNarratedSample";
+import { CinematicCartoonStory } from "./scenes/CinematicCartoonStory";
 
 export const RemotionRoot: React.FC = () => (
   <>
+    <Composition id="FinanceCampusCinematicCartoon" component={CinematicCartoonStory} durationInFrames={4500} fps={30} width={1080} height={1920}/>
     <Composition id="FinanceCampusDemo" component={FinanceCampusDemo} durationInFrames={480} fps={30} width={1080} height={1920}/>
     <Composition id="FinanceCampusMonochromeSample" component={MonochromeFinanceStory} durationInFrames={4500} fps={30} width={1080} height={1920}/>
     <Composition
