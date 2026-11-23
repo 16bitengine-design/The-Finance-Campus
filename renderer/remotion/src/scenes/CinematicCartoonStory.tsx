@@ -54,7 +54,7 @@ const MoneyNote:React.FC<{x:number;y:number;delay:number;label:string}> = ({x,y,
 };
 
 const StoryScene:React.FC<{phase:number}> = ({phase})=>{
- const f=useCurrentFrame();const base=phase*900;const local=f-base;const reveal=p(local,0,48);
+ const f=useCurrentFrame();const base=0;const local=f;const reveal=p(local,0,48);
  const title=["THE PAYDAY CONVERSATION","WHEN THE BILLS ARRIVE","A CHOICE HAS CONSEQUENCES","A BETTER PLAN","SMALL STEPS, REAL PROGRESS"][phase];
  const captions=["A family has worked hard for this income.","But the bills are already waiting.","Every decision sends money somewhere.","They decide to protect a little for tomorrow.","The goal is progress, not perfection."][phase];
  const [x1,x2]=phase===0?[300,790]:phase===1?[300,790]:phase===2?[330,760]:phase===3?[320,760]:[300,790];
