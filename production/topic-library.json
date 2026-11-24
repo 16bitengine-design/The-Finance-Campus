@@ -172,5 +172,179 @@
       "method": "evergreen_money_mindset_blueprint",
       "candidate_only": true
     }
+  },
+  {
+    "id": "TFC-67F0412FF8",
+    "title": "Why waiting until you have more money to start saving can keep you waiting",
+    "category": "Saving and Emergency Funds",
+    "target_audience": [
+      "global adults",
+      "young adults",
+      "households",
+      "entrepreneurs"
+    ],
+    "geographic_relevance": [
+      "global",
+      "Uganda",
+      "East Africa"
+    ],
+    "related_concepts": [
+      "saving",
+      "emergency"
+    ],
+    "research_sources": [
+      {
+        "url": "https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/",
+        "final_url": "https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/",
+        "matched_keywords": [
+          "saving",
+          "emergency"
+        ],
+        "keyword_match_threshold": 2,
+        "publisher": "Consumer Financial Protection Bureau",
+        "domain": "consumerfinance.gov",
+        "http_status": 200,
+        "checked_at": "2026-11-24T16:08:24.988122+00:00",
+        "page_title": "",
+        "verification": "reachable_and_keyword_checked",
+        "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
+      }
+    ],
+    "sources": [
+      "https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/"
+    ],
+    "research_status": "source_checked_needs_claim_review",
+    "research_checked_at": "2026-11-24T16:08:24.988122+00:00",
+    "production_status": "not_started",
+    "publication_status": "not_published",
+    "editorial_brief": {
+      "problem": "People may postpone saving because the amount they can set aside today feels too small to matter.",
+      "stakes": "Repeated postponement can leave every unexpected cost competing with money needed for daily essentials.",
+      "explanation": "A saving habit is built through consistency and a realistic amount, not by waiting for a perfect income or a perfect month.",
+      "action": "Choose a small contribution that does not endanger essentials and repeat it on a schedule you can maintain."
+    },
+    "topic_slug": "pay-yourself-later-myth",
+    "content_focus": "money_mindset_and_behaviour",
+    "research_role": "verify_educational_principles_not_report_financial_news",
+    "discovery_metadata": {
+      "method": "evergreen_money_mindset_blueprint",
+      "candidate_only": true
+    }
+  },
+  {
+    "id": "TFC-493C9830E3",
+    "title": "The cost of avoiding your money problems",
+    "category": "Financial Psychology",
+    "target_audience": [
+      "global adults",
+      "young adults",
+      "households",
+      "entrepreneurs"
+    ],
+    "geographic_relevance": [
+      "global",
+      "Uganda",
+      "East Africa"
+    ],
+    "related_concepts": [
+      "financial",
+      "decisions"
+    ],
+    "research_sources": [
+      {
+        "url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+        "final_url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+        "matched_keywords": [
+          "financial",
+          "decisions"
+        ],
+        "keyword_match_threshold": 2,
+        "publisher": "Consumer Financial Protection Bureau",
+        "domain": "consumerfinance.gov",
+        "http_status": 200,
+        "checked_at": "2026-11-24T16:08:24.988122+00:00",
+        "page_title": "",
+        "verification": "reachable_and_keyword_checked",
+        "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
+      }
+    ],
+    "sources": [
+      "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/"
+    ],
+    "research_status": "source_checked_needs_claim_review",
+    "research_checked_at": "2026-11-24T16:08:24.988122+00:00",
+    "production_status": "not_started",
+    "publication_status": "not_published",
+    "editorial_brief": {
+      "problem": "Opening bills, checking balances or listing debts can feel frightening, so people sometimes avoid looking.",
+      "stakes": "Avoidance can allow due dates, fees and uncertainty to pile up, making the problem feel even larger.",
+      "explanation": "Knowing the situation does not solve everything, but it gives you a starting point for choosing what needs attention first.",
+      "action": "Set a ten-minute timer, gather the facts without judging yourself, and write down just the next issue to address."
+    },
+    "topic_slug": "money-avoidance",
+    "content_focus": "money_mindset_and_behaviour",
+    "research_role": "verify_educational_principles_not_report_financial_news",
+    "discovery_metadata": {
+      "method": "evergreen_money_mindset_blueprint",
+      "candidate_only": true
+    }
+  },
+  {
+    "id": "TFC-D1DC904837",
+    "title": "Small spending habits can quietly take control of your money",
+    "category": "Budgeting and Money Management",
+    "target_audience": [
+      "global adults",
+      "young adults",
+      "households",
+      "entrepreneurs"
+    ],
+    "geographic_relevance": [
+      "global",
+      "Uganda",
+      "East Africa"
+    ],
+    "related_concepts": [
+      "spending",
+      "budget"
+    ],
+    "research_sources": [
+      {
+        "url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+        "final_url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+        "matched_keywords": [
+          "spending",
+          "budget"
+        ],
+        "keyword_match_threshold": 2,
+        "publisher": "Consumer Financial Protection Bureau",
+        "domain": "consumerfinance.gov",
+        "http_status": 200,
+        "checked_at": "2026-11-24T16:08:24.988122+00:00",
+        "page_title": "",
+        "verification": "reachable_and_keyword_checked",
+        "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
+      }
+    ],
+    "sources": [
+      "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/"
+    ],
+    "research_status": "source_checked_needs_claim_review",
+    "research_checked_at": "2026-11-24T16:08:24.988122+00:00",
+    "production_status": "not_started",
+    "publication_status": "not_published",
+    "editorial_brief": {
+      "problem": "Frequent small purchases can feel harmless because each one seems affordable on its own.",
+      "stakes": "When repeated without awareness, they can crowd out priorities and leave a person wondering where the money went.",
+      "explanation": "A spending pattern matters more than any single small purchase. Tracking behaviour helps reveal which habits are worth changing.",
+      "action": "Record every small discretionary purchase for seven days and identify one pattern you want to change."
+    },
+    "topic_slug": "small-leaks-big-pressure",
+    "content_focus": "money_mindset_and_behaviour",
+    "research_role": "verify_educational_principles_not_report_financial_news",
+    "discovery_metadata": {
+      "method": "evergreen_money_mindset_blueprint",
+      "candidate_only": true
+    }
   }
 ]
