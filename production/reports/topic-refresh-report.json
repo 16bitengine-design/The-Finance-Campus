@@ -1,75 +1,17 @@
 {
-  "generated_at": "2026-11-24T16:08:24.988122+00:00",
+  "generated_at": "2026-11-25T15:55:39.693675+00:00",
   "target": 3,
   "added_count": 3,
-  "library_count": 6,
+  "library_count": 9,
   "library_path": "production/topic-library.json",
   "blueprint_catalogue_count": 66,
-  "unused_blueprints_remaining": 60,
-  "estimated_weeks_of_catalogue_cover_at_21_per_week": 2.9,
+  "unused_blueprints_remaining": 57,
+  "estimated_weeks_of_catalogue_cover_at_21_per_week": 2.7,
   "catalogue_exhaustion_warning": null,
   "added": [
     {
-      "id": "TFC-67F0412FF8",
-      "title": "Why waiting until you have more money to start saving can keep you waiting",
-      "category": "Saving and Emergency Funds",
-      "target_audience": [
-        "global adults",
-        "young adults",
-        "households",
-        "entrepreneurs"
-      ],
-      "geographic_relevance": [
-        "global",
-        "Uganda",
-        "East Africa"
-      ],
-      "related_concepts": [
-        "saving",
-        "emergency"
-      ],
-      "research_sources": [
-        {
-          "url": "https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/",
-          "final_url": "https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/",
-          "matched_keywords": [
-            "saving",
-            "emergency"
-          ],
-          "keyword_match_threshold": 2,
-          "publisher": "Consumer Financial Protection Bureau",
-          "domain": "consumerfinance.gov",
-          "http_status": 200,
-          "checked_at": "2026-11-24T16:08:24.988122+00:00",
-          "page_title": "",
-          "verification": "reachable_and_keyword_checked",
-          "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
-        }
-      ],
-      "sources": [
-        "https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/"
-      ],
-      "research_status": "source_checked_needs_claim_review",
-      "research_checked_at": "2026-11-24T16:08:24.988122+00:00",
-      "production_status": "not_started",
-      "publication_status": "not_published",
-      "editorial_brief": {
-        "problem": "People may postpone saving because the amount they can set aside today feels too small to matter.",
-        "stakes": "Repeated postponement can leave every unexpected cost competing with money needed for daily essentials.",
-        "explanation": "A saving habit is built through consistency and a realistic amount, not by waiting for a perfect income or a perfect month.",
-        "action": "Choose a small contribution that does not endanger essentials and repeat it on a schedule you can maintain."
-      },
-      "topic_slug": "pay-yourself-later-myth",
-      "content_focus": "money_mindset_and_behaviour",
-      "research_role": "verify_educational_principles_not_report_financial_news",
-      "discovery_metadata": {
-        "method": "evergreen_money_mindset_blueprint",
-        "candidate_only": true
-      }
-    },
-    {
-      "id": "TFC-493C9830E3",
-      "title": "The cost of avoiding your money problems",
+      "id": "TFC-B118956211",
+      "title": "How to say no when family and friends expect your money",
       "category": "Financial Psychology",
       "target_audience": [
         "global adults",
@@ -83,22 +25,22 @@
         "East Africa"
       ],
       "related_concepts": [
-        "financial",
-        "decisions"
+        "goals",
+        "financial"
       ],
       "research_sources": [
         {
           "url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
           "final_url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
           "matched_keywords": [
-            "financial",
-            "decisions"
+            "goals",
+            "financial"
           ],
           "keyword_match_threshold": 2,
           "publisher": "Consumer Financial Protection Bureau",
           "domain": "consumerfinance.gov",
           "http_status": 200,
-          "checked_at": "2026-11-24T16:08:24.988122+00:00",
+          "checked_at": "2026-11-25T15:55:39.693675+00:00",
           "page_title": "",
           "verification": "reachable_and_keyword_checked",
           "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
@@ -108,16 +50,16 @@
         "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/"
       ],
       "research_status": "source_checked_needs_claim_review",
-      "research_checked_at": "2026-11-24T16:08:24.988122+00:00",
+      "research_checked_at": "2026-11-25T15:55:39.693675+00:00",
       "production_status": "not_started",
       "publication_status": "not_published",
       "editorial_brief": {
-        "problem": "Opening bills, checking balances or listing debts can feel frightening, so people sometimes avoid looking.",
-        "stakes": "Avoidance can allow due dates, fees and uncertainty to pile up, making the problem feel even larger.",
-        "explanation": "Knowing the situation does not solve everything, but it gives you a starting point for choosing what needs attention first.",
-        "action": "Set a ten-minute timer, gather the facts without judging yourself, and write down just the next issue to address."
+        "problem": "Requests for help can be emotionally difficult, especially when they come from people you care about.",
+        "stakes": "Giving beyond your means can put rent, food, school costs or your own dependants at risk and create resentment.",
+        "explanation": "Generosity and financial boundaries can coexist. A clear limit helps you support others without making promises your finances cannot sustain.",
+        "action": "Decide what support you can genuinely afford before a request arrives, and practise explaining that limit respectfully."
       },
-      "topic_slug": "money-avoidance",
+      "topic_slug": "money-boundaries-family-pressure",
       "content_focus": "money_mindset_and_behaviour",
       "research_role": "verify_educational_principles_not_report_financial_news",
       "discovery_metadata": {
@@ -126,8 +68,66 @@
       }
     },
     {
-      "id": "TFC-D1DC904837",
-      "title": "Small spending habits can quietly take control of your money",
+      "id": "TFC-52A2D9AB44",
+      "title": "Why choosing comfort today can cost you choices tomorrow",
+      "category": "Financial Psychology",
+      "target_audience": [
+        "global adults",
+        "young adults",
+        "households",
+        "entrepreneurs"
+      ],
+      "geographic_relevance": [
+        "global",
+        "Uganda",
+        "East Africa"
+      ],
+      "related_concepts": [
+        "goals",
+        "saving"
+      ],
+      "research_sources": [
+        {
+          "url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+          "final_url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+          "matched_keywords": [
+            "goals",
+            "saving"
+          ],
+          "keyword_match_threshold": 2,
+          "publisher": "Consumer Financial Protection Bureau",
+          "domain": "consumerfinance.gov",
+          "http_status": 200,
+          "checked_at": "2026-11-25T15:55:39.693675+00:00",
+          "page_title": "",
+          "verification": "reachable_and_keyword_checked",
+          "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
+        }
+      ],
+      "sources": [
+        "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/"
+      ],
+      "research_status": "source_checked_needs_claim_review",
+      "research_checked_at": "2026-11-25T15:55:39.693675+00:00",
+      "production_status": "not_started",
+      "publication_status": "not_published",
+      "editorial_brief": {
+        "problem": "Immediate rewards can feel more real than a future goal that is months or years away.",
+        "stakes": "When every spare amount is spent immediately, longer-term goals may never receive consistent attention.",
+        "explanation": "Delayed gratification is the ability to balance today's wants with tomorrow's priorities. It is not about never enjoying money; it is about choosing intentionally.",
+        "action": "Pick one goal that matters to you and move a small amount toward it before spending on optional wants."
+      },
+      "topic_slug": "instant-gratification",
+      "content_focus": "money_mindset_and_behaviour",
+      "research_role": "verify_educational_principles_not_report_financial_news",
+      "discovery_metadata": {
+        "method": "evergreen_money_mindset_blueprint",
+        "candidate_only": true
+      }
+    },
+    {
+      "id": "TFC-2FBB79DC4C",
+      "title": "If you do not give your money a direction, it will find one",
       "category": "Budgeting and Money Management",
       "target_audience": [
         "global adults",
@@ -141,22 +141,22 @@
         "East Africa"
       ],
       "related_concepts": [
-        "spending",
-        "budget"
+        "budget",
+        "goals"
       ],
       "research_sources": [
         {
           "url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
           "final_url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
           "matched_keywords": [
-            "spending",
-            "budget"
+            "budget",
+            "goals"
           ],
           "keyword_match_threshold": 2,
           "publisher": "Consumer Financial Protection Bureau",
           "domain": "consumerfinance.gov",
           "http_status": 200,
-          "checked_at": "2026-11-24T16:08:24.988122+00:00",
+          "checked_at": "2026-11-25T15:55:39.693675+00:00",
           "page_title": "",
           "verification": "reachable_and_keyword_checked",
           "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
@@ -166,16 +166,16 @@
         "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/"
       ],
       "research_status": "source_checked_needs_claim_review",
-      "research_checked_at": "2026-11-24T16:08:24.988122+00:00",
+      "research_checked_at": "2026-11-25T15:55:39.693675+00:00",
       "production_status": "not_started",
       "publication_status": "not_published",
       "editorial_brief": {
-        "problem": "Frequent small purchases can feel harmless because each one seems affordable on its own.",
-        "stakes": "When repeated without awareness, they can crowd out priorities and leave a person wondering where the money went.",
-        "explanation": "A spending pattern matters more than any single small purchase. Tracking behaviour helps reveal which habits are worth changing.",
-        "action": "Record every small discretionary purchase for seven days and identify one pattern you want to change."
+        "problem": "Without a plan, spending decisions are often made one moment at a time.",
+        "stakes": "Urgent requests and tempting purchases can consume money before important obligations and goals are covered.",
+        "explanation": "A simple spending plan gives income a purpose before it is spent. It can be flexible and should reflect real circumstances.",
+        "action": "Before your next pay or business income arrives, write down the three most important jobs that money needs to do."
       },
-      "topic_slug": "small-leaks-big-pressure",
+      "topic_slug": "no-plan-no-direction",
       "content_focus": "money_mindset_and_behaviour",
       "research_role": "verify_educational_principles_not_report_financial_news",
       "discovery_metadata": {
@@ -187,6 +187,14 @@
   "rejected": [
     {
       "title": "Looking rich can keep you financially stuck",
+      "reason": "Source page returned too little readable text: https://bou.or.ug/financial_literacy"
+    },
+    {
+      "title": "When borrowing feels like relief but becomes another burden",
+      "reason": "Source page returned too little readable text: https://bou.or.ug/financial_literacy"
+    },
+    {
+      "title": "The dangerous cycle of borrowing to feel financially okay",
       "reason": "Source page returned too little readable text: https://bou.or.ug/financial_literacy"
     }
   ],

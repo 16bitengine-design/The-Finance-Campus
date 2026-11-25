@@ -346,5 +346,179 @@
       "method": "evergreen_money_mindset_blueprint",
       "candidate_only": true
     }
+  },
+  {
+    "id": "TFC-B118956211",
+    "title": "How to say no when family and friends expect your money",
+    "category": "Financial Psychology",
+    "target_audience": [
+      "global adults",
+      "young adults",
+      "households",
+      "entrepreneurs"
+    ],
+    "geographic_relevance": [
+      "global",
+      "Uganda",
+      "East Africa"
+    ],
+    "related_concepts": [
+      "goals",
+      "financial"
+    ],
+    "research_sources": [
+      {
+        "url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+        "final_url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+        "matched_keywords": [
+          "goals",
+          "financial"
+        ],
+        "keyword_match_threshold": 2,
+        "publisher": "Consumer Financial Protection Bureau",
+        "domain": "consumerfinance.gov",
+        "http_status": 200,
+        "checked_at": "2026-11-25T15:55:39.693675+00:00",
+        "page_title": "",
+        "verification": "reachable_and_keyword_checked",
+        "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
+      }
+    ],
+    "sources": [
+      "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/"
+    ],
+    "research_status": "source_checked_needs_claim_review",
+    "research_checked_at": "2026-11-25T15:55:39.693675+00:00",
+    "production_status": "not_started",
+    "publication_status": "not_published",
+    "editorial_brief": {
+      "problem": "Requests for help can be emotionally difficult, especially when they come from people you care about.",
+      "stakes": "Giving beyond your means can put rent, food, school costs or your own dependants at risk and create resentment.",
+      "explanation": "Generosity and financial boundaries can coexist. A clear limit helps you support others without making promises your finances cannot sustain.",
+      "action": "Decide what support you can genuinely afford before a request arrives, and practise explaining that limit respectfully."
+    },
+    "topic_slug": "money-boundaries-family-pressure",
+    "content_focus": "money_mindset_and_behaviour",
+    "research_role": "verify_educational_principles_not_report_financial_news",
+    "discovery_metadata": {
+      "method": "evergreen_money_mindset_blueprint",
+      "candidate_only": true
+    }
+  },
+  {
+    "id": "TFC-52A2D9AB44",
+    "title": "Why choosing comfort today can cost you choices tomorrow",
+    "category": "Financial Psychology",
+    "target_audience": [
+      "global adults",
+      "young adults",
+      "households",
+      "entrepreneurs"
+    ],
+    "geographic_relevance": [
+      "global",
+      "Uganda",
+      "East Africa"
+    ],
+    "related_concepts": [
+      "goals",
+      "saving"
+    ],
+    "research_sources": [
+      {
+        "url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+        "final_url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+        "matched_keywords": [
+          "goals",
+          "saving"
+        ],
+        "keyword_match_threshold": 2,
+        "publisher": "Consumer Financial Protection Bureau",
+        "domain": "consumerfinance.gov",
+        "http_status": 200,
+        "checked_at": "2026-11-25T15:55:39.693675+00:00",
+        "page_title": "",
+        "verification": "reachable_and_keyword_checked",
+        "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
+      }
+    ],
+    "sources": [
+      "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/"
+    ],
+    "research_status": "source_checked_needs_claim_review",
+    "research_checked_at": "2026-11-25T15:55:39.693675+00:00",
+    "production_status": "not_started",
+    "publication_status": "not_published",
+    "editorial_brief": {
+      "problem": "Immediate rewards can feel more real than a future goal that is months or years away.",
+      "stakes": "When every spare amount is spent immediately, longer-term goals may never receive consistent attention.",
+      "explanation": "Delayed gratification is the ability to balance today's wants with tomorrow's priorities. It is not about never enjoying money; it is about choosing intentionally.",
+      "action": "Pick one goal that matters to you and move a small amount toward it before spending on optional wants."
+    },
+    "topic_slug": "instant-gratification",
+    "content_focus": "money_mindset_and_behaviour",
+    "research_role": "verify_educational_principles_not_report_financial_news",
+    "discovery_metadata": {
+      "method": "evergreen_money_mindset_blueprint",
+      "candidate_only": true
+    }
+  },
+  {
+    "id": "TFC-2FBB79DC4C",
+    "title": "If you do not give your money a direction, it will find one",
+    "category": "Budgeting and Money Management",
+    "target_audience": [
+      "global adults",
+      "young adults",
+      "households",
+      "entrepreneurs"
+    ],
+    "geographic_relevance": [
+      "global",
+      "Uganda",
+      "East Africa"
+    ],
+    "related_concepts": [
+      "budget",
+      "goals"
+    ],
+    "research_sources": [
+      {
+        "url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+        "final_url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+        "matched_keywords": [
+          "budget",
+          "goals"
+        ],
+        "keyword_match_threshold": 2,
+        "publisher": "Consumer Financial Protection Bureau",
+        "domain": "consumerfinance.gov",
+        "http_status": 200,
+        "checked_at": "2026-11-25T15:55:39.693675+00:00",
+        "page_title": "",
+        "verification": "reachable_and_keyword_checked",
+        "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
+      }
+    ],
+    "sources": [
+      "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/"
+    ],
+    "research_status": "source_checked_needs_claim_review",
+    "research_checked_at": "2026-11-25T15:55:39.693675+00:00",
+    "production_status": "not_started",
+    "publication_status": "not_published",
+    "editorial_brief": {
+      "problem": "Without a plan, spending decisions are often made one moment at a time.",
+      "stakes": "Urgent requests and tempting purchases can consume money before important obligations and goals are covered.",
+      "explanation": "A simple spending plan gives income a purpose before it is spent. It can be flexible and should reflect real circumstances.",
+      "action": "Before your next pay or business income arrives, write down the three most important jobs that money needs to do."
+    },
+    "topic_slug": "no-plan-no-direction",
+    "content_focus": "money_mindset_and_behaviour",
+    "research_role": "verify_educational_principles_not_report_financial_news",
+    "discovery_metadata": {
+      "method": "evergreen_money_mindset_blueprint",
+      "candidate_only": true
+    }
   }
 ]
