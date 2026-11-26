@@ -520,5 +520,179 @@
       "method": "evergreen_money_mindset_blueprint",
       "candidate_only": true
     }
+  },
+  {
+    "id": "TFC-C993AB86AC",
+    "title": "Money shame makes it harder to make a fresh start",
+    "category": "Financial Psychology",
+    "target_audience": [
+      "global adults",
+      "young adults",
+      "households",
+      "entrepreneurs"
+    ],
+    "geographic_relevance": [
+      "global",
+      "Uganda",
+      "East Africa"
+    ],
+    "related_concepts": [
+      "financial",
+      "goals"
+    ],
+    "research_sources": [
+      {
+        "url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+        "final_url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+        "matched_keywords": [
+          "financial",
+          "goals"
+        ],
+        "keyword_match_threshold": 2,
+        "publisher": "Consumer Financial Protection Bureau",
+        "domain": "consumerfinance.gov",
+        "http_status": 200,
+        "checked_at": "2026-11-26T15:35:43.232868+00:00",
+        "page_title": "",
+        "verification": "reachable_and_keyword_checked",
+        "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
+      }
+    ],
+    "sources": [
+      "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/"
+    ],
+    "research_status": "source_checked_needs_claim_review",
+    "research_checked_at": "2026-11-26T15:35:43.232868+00:00",
+    "production_status": "not_started",
+    "publication_status": "not_published",
+    "editorial_brief": {
+      "problem": "People may hide money mistakes because they fear judgement from family, friends or themselves.",
+      "stakes": "Shame can delay asking questions, seeking support or taking the first practical step toward change.",
+      "explanation": "A financial mistake is information about a decision or circumstance, not a permanent identity. Honest review is more useful than self-punishment.",
+      "action": "Write down one money lesson from the past without insulting yourself, then choose one different action for next time."
+    },
+    "topic_slug": "shame-keeps-you-stuck",
+    "content_focus": "money_mindset_and_behaviour",
+    "research_role": "verify_educational_principles_not_report_financial_news",
+    "discovery_metadata": {
+      "method": "evergreen_money_mindset_blueprint",
+      "candidate_only": true
+    }
+  },
+  {
+    "id": "TFC-8CF071325F",
+    "title": "Why financial pressure can make tomorrow harder to think about",
+    "category": "Financial Psychology",
+    "target_audience": [
+      "global adults",
+      "young adults",
+      "households",
+      "entrepreneurs"
+    ],
+    "geographic_relevance": [
+      "global",
+      "Uganda",
+      "East Africa"
+    ],
+    "related_concepts": [
+      "financial",
+      "decisions"
+    ],
+    "research_sources": [
+      {
+        "url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+        "final_url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+        "matched_keywords": [
+          "financial",
+          "decisions"
+        ],
+        "keyword_match_threshold": 2,
+        "publisher": "Consumer Financial Protection Bureau",
+        "domain": "consumerfinance.gov",
+        "http_status": 200,
+        "checked_at": "2026-11-26T15:35:43.232868+00:00",
+        "page_title": "",
+        "verification": "reachable_and_keyword_checked",
+        "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
+      }
+    ],
+    "sources": [
+      "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/"
+    ],
+    "research_status": "source_checked_needs_claim_review",
+    "research_checked_at": "2026-11-26T15:35:43.232868+00:00",
+    "production_status": "not_started",
+    "publication_status": "not_published",
+    "editorial_brief": {
+      "problem": "When money is constantly tight, immediate needs can consume nearly all attention.",
+      "stakes": "Long-term planning may feel impossible, even when small protective steps could reduce future pressure.",
+      "explanation": "Scarcity and uncertainty can narrow the choices people feel able to consider. Advice must respect real constraints rather than blame people for them.",
+      "action": "Focus on one manageable decision within your control this week; do not measure yourself against someone with different resources."
+    },
+    "topic_slug": "scarcity-and-short-term-thinking",
+    "content_focus": "money_mindset_and_behaviour",
+    "research_role": "verify_educational_principles_not_report_financial_news",
+    "discovery_metadata": {
+      "method": "evergreen_money_mindset_blueprint",
+      "candidate_only": true
+    }
+  },
+  {
+    "id": "TFC-E2720060E3",
+    "title": "How to manage money when payday is never predictable",
+    "category": "Budgeting and Money Management",
+    "target_audience": [
+      "global adults",
+      "young adults",
+      "households",
+      "entrepreneurs"
+    ],
+    "geographic_relevance": [
+      "global",
+      "Uganda",
+      "East Africa"
+    ],
+    "related_concepts": [
+      "income",
+      "cash"
+    ],
+    "research_sources": [
+      {
+        "url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+        "final_url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+        "matched_keywords": [
+          "income",
+          "cash"
+        ],
+        "keyword_match_threshold": 2,
+        "publisher": "Consumer Financial Protection Bureau",
+        "domain": "consumerfinance.gov",
+        "http_status": 200,
+        "checked_at": "2026-11-26T15:35:43.232868+00:00",
+        "page_title": "",
+        "verification": "reachable_and_keyword_checked",
+        "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
+      }
+    ],
+    "sources": [
+      "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/"
+    ],
+    "research_status": "source_checked_needs_claim_review",
+    "research_checked_at": "2026-11-26T15:35:43.232868+00:00",
+    "production_status": "not_started",
+    "publication_status": "not_published",
+    "editorial_brief": {
+      "problem": "Freelancers, traders and casual workers may not know exactly when or how much money will arrive.",
+      "stakes": "A fixed monthly routine may fail when income changes, leading to avoidable shortages or rushed decisions.",
+      "explanation": "A flexible system can prioritise essentials, track upcoming obligations and make saving responsive to actual cash flow.",
+      "action": "Write down essential costs and due dates, then decide how each incoming payment will be divided before optional spending."
+    },
+    "topic_slug": "irregular-income-no-routine",
+    "content_focus": "money_mindset_and_behaviour",
+    "research_role": "verify_educational_principles_not_report_financial_news",
+    "discovery_metadata": {
+      "method": "evergreen_money_mindset_blueprint",
+      "candidate_only": true
+    }
   }
 ]
