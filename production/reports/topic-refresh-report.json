@@ -1,18 +1,134 @@
 {
-  "generated_at": "2026-11-26T15:35:43.232868+00:00",
+  "generated_at": "2026-11-27T15:26:46.964817+00:00",
   "target": 3,
   "added_count": 3,
-  "library_count": 12,
+  "library_count": 15,
   "library_path": "production/topic-library.json",
   "blueprint_catalogue_count": 66,
-  "unused_blueprints_remaining": 54,
-  "estimated_weeks_of_catalogue_cover_at_21_per_week": 2.6,
+  "unused_blueprints_remaining": 51,
+  "estimated_weeks_of_catalogue_cover_at_21_per_week": 2.4,
   "catalogue_exhaustion_warning": null,
   "added": [
     {
-      "id": "TFC-C993AB86AC",
-      "title": "Money shame makes it harder to make a fresh start",
-      "category": "Financial Psychology",
+      "id": "TFC-141CCA80D2",
+      "title": "An emergency fund is not pessimism; it is preparation",
+      "category": "Saving and Emergency Funds",
+      "target_audience": [
+        "global adults",
+        "young adults",
+        "households",
+        "entrepreneurs"
+      ],
+      "geographic_relevance": [
+        "global",
+        "Uganda",
+        "East Africa"
+      ],
+      "related_concepts": [
+        "emergency",
+        "saving"
+      ],
+      "research_sources": [
+        {
+          "url": "https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/",
+          "final_url": "https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/",
+          "matched_keywords": [
+            "emergency",
+            "saving"
+          ],
+          "keyword_match_threshold": 2,
+          "publisher": "Consumer Financial Protection Bureau",
+          "domain": "consumerfinance.gov",
+          "http_status": 200,
+          "checked_at": "2026-11-27T15:26:46.964817+00:00",
+          "page_title": "",
+          "verification": "reachable_and_keyword_checked",
+          "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
+        }
+      ],
+      "sources": [
+        "https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/"
+      ],
+      "research_status": "source_checked_needs_claim_review",
+      "research_checked_at": "2026-11-27T15:26:46.964817+00:00",
+      "production_status": "not_started",
+      "publication_status": "not_published",
+      "editorial_brief": {
+        "problem": "Preparing for setbacks can feel unnecessary when everything is currently going well.",
+        "stakes": "Without a buffer, an ordinary disruption can force difficult trade-offs or borrowing at the worst moment.",
+        "explanation": "Emergency savings are a practical form of self-protection, not a prediction that something bad will happen.",
+        "action": "Name one realistic disruption that could affect your household and decide what first small preparation is possible."
+      },
+      "topic_slug": "emergency-is-not-unlucky",
+      "content_focus": "money_mindset_and_behaviour",
+      "research_role": "verify_educational_principles_not_report_financial_news",
+      "discovery_metadata": {
+        "method": "evergreen_money_mindset_blueprint",
+        "candidate_only": true
+      }
+    },
+    {
+      "id": "TFC-6C6D0495BF",
+      "title": "Become the person who follows through on money goals",
+      "category": "Wealth Creation",
+      "target_audience": [
+        "global adults",
+        "young adults",
+        "households",
+        "entrepreneurs"
+      ],
+      "geographic_relevance": [
+        "global",
+        "Uganda",
+        "East Africa"
+      ],
+      "related_concepts": [
+        "goals",
+        "saving"
+      ],
+      "research_sources": [
+        {
+          "url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+          "final_url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+          "matched_keywords": [
+            "goals",
+            "saving"
+          ],
+          "keyword_match_threshold": 2,
+          "publisher": "Consumer Financial Protection Bureau",
+          "domain": "consumerfinance.gov",
+          "http_status": 200,
+          "checked_at": "2026-11-27T15:26:46.964817+00:00",
+          "page_title": "",
+          "verification": "reachable_and_keyword_checked",
+          "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
+        }
+      ],
+      "sources": [
+        "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/"
+      ],
+      "research_status": "source_checked_needs_claim_review",
+      "research_checked_at": "2026-11-27T15:26:46.964817+00:00",
+      "production_status": "not_started",
+      "publication_status": "not_published",
+      "editorial_brief": {
+        "problem": "People often set ambitious financial goals but rely only on motivation to keep going.",
+        "stakes": "When motivation fades, the goal can disappear from everyday decisions.",
+        "explanation": "A repeatable routine, clear reminder and manageable action can make a goal easier to maintain than relying on willpower alone.",
+        "action": "Attach one small money action to an existing weekly routine and review it at the same time each week."
+      },
+      "topic_slug": "money-goals-need-identity",
+      "content_focus": "money_mindset_and_behaviour",
+      "research_role": "verify_educational_principles_not_report_financial_news",
+      "discovery_metadata": {
+        "method": "evergreen_money_mindset_blueprint",
+        "candidate_only": true
+      }
+    },
+    {
+      "id": "TFC-CBA6DB9679",
+      "title": "Financial independence starts before you become wealthy",
+      "category": "Wealth Creation",
       "target_audience": [
         "global adults",
         "young adults",
@@ -40,7 +156,7 @@
           "publisher": "Consumer Financial Protection Bureau",
           "domain": "consumerfinance.gov",
           "http_status": 200,
-          "checked_at": "2026-11-26T15:35:43.232868+00:00",
+          "checked_at": "2026-11-27T15:26:46.964817+00:00",
           "page_title": "",
           "verification": "reachable_and_keyword_checked",
           "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
@@ -50,132 +166,16 @@
         "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/"
       ],
       "research_status": "source_checked_needs_claim_review",
-      "research_checked_at": "2026-11-26T15:35:43.232868+00:00",
+      "research_checked_at": "2026-11-27T15:26:46.964817+00:00",
       "production_status": "not_started",
       "publication_status": "not_published",
       "editorial_brief": {
-        "problem": "People may hide money mistakes because they fear judgement from family, friends or themselves.",
-        "stakes": "Shame can delay asking questions, seeking support or taking the first practical step toward change.",
-        "explanation": "A financial mistake is information about a decision or circumstance, not a permanent identity. Honest review is more useful than self-punishment.",
-        "action": "Write down one money lesson from the past without insulting yourself, then choose one different action for next time."
+        "problem": "Financial independence can seem like a distant destination reserved for people with high incomes.",
+        "stakes": "If it feels unreachable, people may ignore the smaller choices that can improve their current level of control.",
+        "explanation": "Greater financial independence begins with understanding obligations, making deliberate choices and gradually building options; the path differs by circumstance.",
+        "action": "Identify one recurring expense, obligation or habit you can understand better this week and decide whether it still serves your priorities."
       },
-      "topic_slug": "shame-keeps-you-stuck",
-      "content_focus": "money_mindset_and_behaviour",
-      "research_role": "verify_educational_principles_not_report_financial_news",
-      "discovery_metadata": {
-        "method": "evergreen_money_mindset_blueprint",
-        "candidate_only": true
-      }
-    },
-    {
-      "id": "TFC-8CF071325F",
-      "title": "Why financial pressure can make tomorrow harder to think about",
-      "category": "Financial Psychology",
-      "target_audience": [
-        "global adults",
-        "young adults",
-        "households",
-        "entrepreneurs"
-      ],
-      "geographic_relevance": [
-        "global",
-        "Uganda",
-        "East Africa"
-      ],
-      "related_concepts": [
-        "financial",
-        "decisions"
-      ],
-      "research_sources": [
-        {
-          "url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
-          "final_url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
-          "matched_keywords": [
-            "financial",
-            "decisions"
-          ],
-          "keyword_match_threshold": 2,
-          "publisher": "Consumer Financial Protection Bureau",
-          "domain": "consumerfinance.gov",
-          "http_status": 200,
-          "checked_at": "2026-11-26T15:35:43.232868+00:00",
-          "page_title": "",
-          "verification": "reachable_and_keyword_checked",
-          "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
-        }
-      ],
-      "sources": [
-        "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/"
-      ],
-      "research_status": "source_checked_needs_claim_review",
-      "research_checked_at": "2026-11-26T15:35:43.232868+00:00",
-      "production_status": "not_started",
-      "publication_status": "not_published",
-      "editorial_brief": {
-        "problem": "When money is constantly tight, immediate needs can consume nearly all attention.",
-        "stakes": "Long-term planning may feel impossible, even when small protective steps could reduce future pressure.",
-        "explanation": "Scarcity and uncertainty can narrow the choices people feel able to consider. Advice must respect real constraints rather than blame people for them.",
-        "action": "Focus on one manageable decision within your control this week; do not measure yourself against someone with different resources."
-      },
-      "topic_slug": "scarcity-and-short-term-thinking",
-      "content_focus": "money_mindset_and_behaviour",
-      "research_role": "verify_educational_principles_not_report_financial_news",
-      "discovery_metadata": {
-        "method": "evergreen_money_mindset_blueprint",
-        "candidate_only": true
-      }
-    },
-    {
-      "id": "TFC-E2720060E3",
-      "title": "How to manage money when payday is never predictable",
-      "category": "Budgeting and Money Management",
-      "target_audience": [
-        "global adults",
-        "young adults",
-        "households",
-        "entrepreneurs"
-      ],
-      "geographic_relevance": [
-        "global",
-        "Uganda",
-        "East Africa"
-      ],
-      "related_concepts": [
-        "income",
-        "cash"
-      ],
-      "research_sources": [
-        {
-          "url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
-          "final_url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
-          "matched_keywords": [
-            "income",
-            "cash"
-          ],
-          "keyword_match_threshold": 2,
-          "publisher": "Consumer Financial Protection Bureau",
-          "domain": "consumerfinance.gov",
-          "http_status": 200,
-          "checked_at": "2026-11-26T15:35:43.232868+00:00",
-          "page_title": "",
-          "verification": "reachable_and_keyword_checked",
-          "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
-        }
-      ],
-      "sources": [
-        "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/"
-      ],
-      "research_status": "source_checked_needs_claim_review",
-      "research_checked_at": "2026-11-26T15:35:43.232868+00:00",
-      "production_status": "not_started",
-      "publication_status": "not_published",
-      "editorial_brief": {
-        "problem": "Freelancers, traders and casual workers may not know exactly when or how much money will arrive.",
-        "stakes": "A fixed monthly routine may fail when income changes, leading to avoidable shortages or rushed decisions.",
-        "explanation": "A flexible system can prioritise essentials, track upcoming obligations and make saving responsive to actual cash flow.",
-        "action": "Write down essential costs and due dates, then decide how each incoming payment will be divided before optional spending."
-      },
-      "topic_slug": "irregular-income-no-routine",
+      "topic_slug": "financial-independence-starts-with-awareness",
       "content_focus": "money_mindset_and_behaviour",
       "research_role": "verify_educational_principles_not_report_financial_news",
       "discovery_metadata": {
@@ -196,6 +196,10 @@
     {
       "title": "The dangerous cycle of borrowing to feel financially okay",
       "reason": "Source page returned too little readable text: https://bou.or.ug/financial_literacy"
+    },
+    {
+      "title": "You do not need to get rich quickly to make financial progress",
+      "reason": "HTTP Error 403: Forbidden"
     }
   ],
   "discovery_method": "evergreen_money_mindset_blueprints",

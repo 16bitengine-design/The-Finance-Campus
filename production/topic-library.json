@@ -694,5 +694,179 @@
       "method": "evergreen_money_mindset_blueprint",
       "candidate_only": true
     }
+  },
+  {
+    "id": "TFC-141CCA80D2",
+    "title": "An emergency fund is not pessimism; it is preparation",
+    "category": "Saving and Emergency Funds",
+    "target_audience": [
+      "global adults",
+      "young adults",
+      "households",
+      "entrepreneurs"
+    ],
+    "geographic_relevance": [
+      "global",
+      "Uganda",
+      "East Africa"
+    ],
+    "related_concepts": [
+      "emergency",
+      "saving"
+    ],
+    "research_sources": [
+      {
+        "url": "https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/",
+        "final_url": "https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/",
+        "matched_keywords": [
+          "emergency",
+          "saving"
+        ],
+        "keyword_match_threshold": 2,
+        "publisher": "Consumer Financial Protection Bureau",
+        "domain": "consumerfinance.gov",
+        "http_status": 200,
+        "checked_at": "2026-11-27T15:26:46.964817+00:00",
+        "page_title": "",
+        "verification": "reachable_and_keyword_checked",
+        "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
+      }
+    ],
+    "sources": [
+      "https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/"
+    ],
+    "research_status": "source_checked_needs_claim_review",
+    "research_checked_at": "2026-11-27T15:26:46.964817+00:00",
+    "production_status": "not_started",
+    "publication_status": "not_published",
+    "editorial_brief": {
+      "problem": "Preparing for setbacks can feel unnecessary when everything is currently going well.",
+      "stakes": "Without a buffer, an ordinary disruption can force difficult trade-offs or borrowing at the worst moment.",
+      "explanation": "Emergency savings are a practical form of self-protection, not a prediction that something bad will happen.",
+      "action": "Name one realistic disruption that could affect your household and decide what first small preparation is possible."
+    },
+    "topic_slug": "emergency-is-not-unlucky",
+    "content_focus": "money_mindset_and_behaviour",
+    "research_role": "verify_educational_principles_not_report_financial_news",
+    "discovery_metadata": {
+      "method": "evergreen_money_mindset_blueprint",
+      "candidate_only": true
+    }
+  },
+  {
+    "id": "TFC-6C6D0495BF",
+    "title": "Become the person who follows through on money goals",
+    "category": "Wealth Creation",
+    "target_audience": [
+      "global adults",
+      "young adults",
+      "households",
+      "entrepreneurs"
+    ],
+    "geographic_relevance": [
+      "global",
+      "Uganda",
+      "East Africa"
+    ],
+    "related_concepts": [
+      "goals",
+      "saving"
+    ],
+    "research_sources": [
+      {
+        "url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+        "final_url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+        "matched_keywords": [
+          "goals",
+          "saving"
+        ],
+        "keyword_match_threshold": 2,
+        "publisher": "Consumer Financial Protection Bureau",
+        "domain": "consumerfinance.gov",
+        "http_status": 200,
+        "checked_at": "2026-11-27T15:26:46.964817+00:00",
+        "page_title": "",
+        "verification": "reachable_and_keyword_checked",
+        "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
+      }
+    ],
+    "sources": [
+      "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/"
+    ],
+    "research_status": "source_checked_needs_claim_review",
+    "research_checked_at": "2026-11-27T15:26:46.964817+00:00",
+    "production_status": "not_started",
+    "publication_status": "not_published",
+    "editorial_brief": {
+      "problem": "People often set ambitious financial goals but rely only on motivation to keep going.",
+      "stakes": "When motivation fades, the goal can disappear from everyday decisions.",
+      "explanation": "A repeatable routine, clear reminder and manageable action can make a goal easier to maintain than relying on willpower alone.",
+      "action": "Attach one small money action to an existing weekly routine and review it at the same time each week."
+    },
+    "topic_slug": "money-goals-need-identity",
+    "content_focus": "money_mindset_and_behaviour",
+    "research_role": "verify_educational_principles_not_report_financial_news",
+    "discovery_metadata": {
+      "method": "evergreen_money_mindset_blueprint",
+      "candidate_only": true
+    }
+  },
+  {
+    "id": "TFC-CBA6DB9679",
+    "title": "Financial independence starts before you become wealthy",
+    "category": "Wealth Creation",
+    "target_audience": [
+      "global adults",
+      "young adults",
+      "households",
+      "entrepreneurs"
+    ],
+    "geographic_relevance": [
+      "global",
+      "Uganda",
+      "East Africa"
+    ],
+    "related_concepts": [
+      "financial",
+      "goals"
+    ],
+    "research_sources": [
+      {
+        "url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+        "final_url": "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+        "matched_keywords": [
+          "financial",
+          "goals"
+        ],
+        "keyword_match_threshold": 2,
+        "publisher": "Consumer Financial Protection Bureau",
+        "domain": "consumerfinance.gov",
+        "http_status": 200,
+        "checked_at": "2026-11-27T15:26:46.964817+00:00",
+        "page_title": "",
+        "verification": "reachable_and_keyword_checked",
+        "evidence_note": "Official source page was reachable and matched the required mapped topic keywords; this is a relevance check, not proof of claim-level support."
+      }
+    ],
+    "sources": [
+      "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/"
+    ],
+    "research_status": "source_checked_needs_claim_review",
+    "research_checked_at": "2026-11-27T15:26:46.964817+00:00",
+    "production_status": "not_started",
+    "publication_status": "not_published",
+    "editorial_brief": {
+      "problem": "Financial independence can seem like a distant destination reserved for people with high incomes.",
+      "stakes": "If it feels unreachable, people may ignore the smaller choices that can improve their current level of control.",
+      "explanation": "Greater financial independence begins with understanding obligations, making deliberate choices and gradually building options; the path differs by circumstance.",
+      "action": "Identify one recurring expense, obligation or habit you can understand better this week and decide whether it still serves your priorities."
+    },
+    "topic_slug": "financial-independence-starts-with-awareness",
+    "content_focus": "money_mindset_and_behaviour",
+    "research_role": "verify_educational_principles_not_report_financial_news",
+    "discovery_metadata": {
+      "method": "evergreen_money_mindset_blueprint",
+      "candidate_only": true
+    }
   }
 ]
